@@ -1,0 +1,193 @@
+/*  defauls.h: default values of configuration options and constants.
+    Copyright (C) 2006, 2007, 2008, 2009 Werner Baumann
+
+    This file is part of davfs2.
+
+    davfs2 is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    davfs2 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with davfs2; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+
+#ifndef DAV_DEFAULTS_H
+#define DAV_DEFAULTS_H
+
+
+/* Misc. */
+/*=======*/
+
+#define DAV_HOME "http://dav.sourceforge.net"
+
+/* File system type to be used with 'mount -t' and fstab. */
+#define DAV_FS_TYPE "davfs"
+
+/* Mount options set by mount program in case of mounting by an
+   ordinary user. */
+#define DAV_USER_MOPTS (MS_MGC_VAL | MS_NOSUID | MS_NOEXEC | MS_NODEV)
+
+/* This mount options will allways be set by davfs2. Different values from
+   command line and even fstab will be silently ignored. */
+#define DAV_MOPTS (MS_MGC_VAL | MS_NOSUID | MS_NODEV)
+
+/* XML namespace for the cache index file. */
+#define DAV_XML_NS "http://dav.sf.net/"
+
+
+/* Directories and Files */
+/*=======================*/
+
+/* The device directory. */
+#define DAV_DEV_DIR "/dev"
+
+/* The file davfs reads mtab entries from. If not available it will
+   use _PATH_MOUNTED. */
+#define DAV_MOUNTS "/proc/mounts"
+
+/* The directory where the cache files will be stored, when mounted by
+   a non root users; relative to DAV_USER_DIR.
+   May be overridden by user config file. */
+#define DAV_CACHE "cache"
+
+/* The name of index files. */
+#define DAV_INDEX "index"
+
+/* Name of the directory within the davfs2 filesystem that holds local
+   backup files.
+   May be overridden by system config file and user config file. */
+#define DAV_BACKUP_DIR "lost+found"
+
+/* Buffer size for reading the XML index files of persistent cache. */
+#define DAV_XML_BUF_SIZE 16 * 1024
+
+
+/* Cache Optimization */
+/*====================*/
+
+/* Cache size in MiByte.
+   May be overridden by system config file and user config file.
+   (1 MiByte = 1,048,576 Byte; Mi = Mebi = Mega Binary according to IEC) */
+#define DAV_CACHE_SIZE 50
+
+/* Size of the hash table to store nodes. Should be a power of 2.
+   May be overridden by system config file and user config file. */
+#define DAV_TABLE_SIZE 1024
+
+/* How long in seconds a cached directory is valid. After this time
+   a new PROPFIND request for this directory must be performed.
+   May be overridden by system config file and user config file. */
+#define DAV_DIR_REFRESH 60
+
+/* Wait at least that many seconds from last file access until a new
+   GET If-Modified request is send to the server. If set to 0 a request
+   will be send every time the file is opened. But some applications do
+   open and close calls in short sequence that cause - mostly - unnecessary
+   traffic.
+   May be overridden by system config file and user config file. */
+#define DAV_FILE_REFRESH 1
+
+/* How long to delay uploading of locally changed files after closing. 
+   May be overridden by system config file and user config file. */
+#define DAV_DELAY_UPLOAD 10
+
+/* Use PROPFIND to get the Last-Modified time of all files in a directory
+   instead of GET If-Modified_Since for single files.
+   May be overridden by system config file and user config file. */
+#define DAV_GUI_OPTIMIZE 0
+
+
+/* HTTP */
+/*======*/
+
+/* The default proxy port.
+   May be overridden by system config file, user config file or environment
+   variable. */
+#define DAV_DEFAULT_PROXY_PORT 8080
+
+/* Whether to use a proxy if one is specified.
+   May be overridden by command line or fstab. */
+#define DAV_USE_PROXY 1
+
+/* Whether to ask user for credentials if not given.
+   May be overridden by command line, fstab or system config file. */
+#define DAV_ASKAUTH 1
+
+/* Whether to use locks.
+   May be overridden by command line or fstab. */
+#define DAV_LOCKS 1
+
+/* Send expect 100-continue header in PUT requests.
+   May be overridden by system config file and user config file. */
+#define DAV_EXPECT100 0
+
+/* If If-Match and If-None-Match does not work on the server, set to 1.
+   Default is 1, as Apache has this bug.
+   May be overridden by system config file and user config file. */
+#define DAV_IF_MATCH_BUG 0
+
+/* Some servers sends a weak invalid etag that turns into a valid strong etag
+   after one second. With this flag set, the etag will not be used,
+   otherwise the weakness indicator will be removed and the etag be trated
+   as if it was strong.
+   May be overridden by system config file and user config file. */
+#define DAV_DROP_WEAK_ETAGS 0
+
+/* Wether to allow a cookie to be set and included in requests.
+   May be overridden by system config file and user config file. */
+#define DAV_ALLOW_COOKIE 0
+
+/* Check on server whether a file exists or has been modified before
+   locking a new file or changing an existant one.
+   May be overridden by system config file and user config file. */
+#define DAV_PRECHECK 1
+
+/* Ignore the information in the DAV-header, if any, because it
+   may be a lie.
+   May be overridden by system config file and user config file. */
+#define DAV_IGNORE_DAV_HEADER 0
+
+/* Timeout in seconds used when libneon supports non blocking io
+   A value of zero means use the TCP default
+   May be overriden by system config file and user config file. */
+#define DAV_CONNECT_TIMEOUT 10
+
+/* Timeout in seconds used when reading from a socket.
+   May be overridden by system config file and user config file. */
+#define DAV_READ_TIMEOUT 30
+
+/* Default retry time after a PROPFIND request failed. When the request fails
+   again, the retry time will subsequently be increased up to DAV_MAX_RETRY.
+   May be overridden by system config file and user config file. */
+#define DAV_RETRY 30
+
+/* Maximum retry time after a PROPFIND request failed.
+   May be overridden by system config file and user config file. */
+#define DAV_MAX_RETRY 300
+
+/* Preferred live time of locks in seconds, before they have to be refreshed.
+   May be overridden by system config file and user config file. */
+#define DAV_LOCK_TIMEOUT 1800
+
+/* How many seconds before a lock expires it should be refreshed.
+   May be overridden by system config file and user config file. */
+#define DAV_LOCK_REFRESH 60
+
+
+/* Debug Constants */
+/*=================*/
+
+#define DAV_DBG_CONFIG 0x1
+#define DAV_DBG_KERNEL 0x2
+#define DAV_DBG_CACHE 0x4
+#define DAV_DBG_SECRETS 0x8
+
+
+#endif /* DAV_DEFAULTS_H */

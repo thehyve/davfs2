@@ -1,0 +1,6 @@
+davfs2 TODO 2009-03-29
+----------------------
+
+- object oriented redisign of cache
+
+- multithreading for HTTP-requests and cache maintainance

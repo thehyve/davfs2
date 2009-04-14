@@ -1,0 +1,13 @@
+davfs2 known bugs 2008-07-13
+----------------------------
+
+If a filename contains a "/"-character, it will be displayed, but it
+cannot be accessed.
+
+Report Bugs
+-----------
+
+Please report bugs at
+http://savannah.nongnu.org/support/?func=additem&group=davfs2 or
+http://savannah.nongnu.org/support/?func=additem&group=davfs2
+
