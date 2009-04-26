@@ -192,6 +192,9 @@ static dav_args *
 new_args(void);
 
 static void
+log_dbg_cmdline(char *argv[]);
+
+static void
 log_dbg_config(char *argv[], dav_args *args);
 
 static int
@@ -209,8 +212,8 @@ read_no_proxy_list(dav_args *args);
 static void
 read_secrets(dav_args *args, const char *filename);
 
-static void
-split_proxy(char **host, int *port, const char *arg);
+static int
+split_uri(char **scheme, char **host, int *port,char **path, const char *uri);
 
 static void
 usage(void);
@@ -910,6 +913,7 @@ is_mounted(void)
 static dav_args *
 parse_commandline(int argc, char *argv[])
 {
+    log_dbg_cmdline(argv);
     dav_args *args = new_args();
 
     char *short_options = "vwVho:";
@@ -976,35 +980,11 @@ parse_commandline(int argc, char *argv[])
 
     if (!url)
         error(EXIT_FAILURE, 0, _("no WebDAV-server specified"));
-    ne_uri *uri = (ne_uri *) ne_malloc(sizeof(ne_uri));
-    if (ne_uri_parse(url, uri) != 0 || !uri->host || !uri->path)
+    if (split_uri(&args->scheme, &args->host, &args->port, &args->path,
+                  url) != 0)
         error(EXIT_FAILURE, 0, _("invalid URL"));
-
-    if (uri->scheme) {
-        args->scheme = uri->scheme;
-        uri->scheme = NULL;
-    } else {
-        args->scheme = ne_strdup("http");
-    }
-
-    args->host = uri->host;
-    uri->host = NULL;
-    if (uri->port) {
-        args->port = uri->port;
-    } else {
+    if (!args->port)
         args->port = ne_uri_defaultport(args->scheme);
-    }
-
-    if (strlen(uri->path) < 1
-            || *(uri->path + strlen(uri->path) -1) != '/') {
-        args->path = ne_concat(uri->path, "/", NULL);
-    } else {
-        args->path = uri->path;
-        uri->path = NULL;
-    }
-
-    ne_uri_free(uri);
-    free(uri);
 
     return args;       
 }
@@ -1786,7 +1766,7 @@ new_args(void)
 
 
 static void
-log_dbg_config(char *argv[], dav_args *args)
+log_dbg_cmdline(char *argv[])
 {
     size_t len;
     char *cmdline;
@@ -1795,7 +1775,12 @@ log_dbg_config(char *argv[], dav_args *args)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), cmdline);
         free(cmdline);
     }
-    
+}
+
+
+static void
+log_dbg_config(char *argv[], dav_args *args)
+{
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "Configuration:");
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2070,27 +2055,21 @@ proxy_from_env(dav_args *args)
     if (!env)
         return;
 
-    char *proxy;
-    if (strstr(env, "://") == NULL) {
-        proxy = ne_concat("http://", env, NULL);
-    } else {
-        proxy = ne_strdup(env);
+    char *scheme = NULL;
+    char *host = NULL;
+    int port = 0;
+    split_uri(&scheme, &host, &port, NULL, env);
+
+    if (scheme && strcmp(scheme, "http") == 0 && host) {
+        if (args->p_host) free(args->p_host);
+        args->p_host = host;
+        host = NULL;
+        if (port)
+            args->p_port = port;
     }
 
-    ne_uri *uri = (ne_uri *) ne_malloc(sizeof(ne_uri));
-    if (ne_uri_parse(proxy, uri) == 0 && uri->host
-            && (!uri->scheme || strcmp(uri->scheme, "http") == 0)) {
-        if (args->p_host)
-            free(args->p_host);
-        args->p_host = uri->host;
-        uri->host = NULL;
-        if (uri->port)
-            args->p_port = uri->port;
-    }
-
-    ne_uri_free(uri);
-    free(uri);
-    free(proxy);
+    if (scheme) free(scheme);
+    if (host) free(host);
 }
 
 
@@ -2163,9 +2142,10 @@ read_config(dav_args *args, const char * filename, int system)
                     free(args->clicert);
                 args->clicert = ne_strdup(parmv[1]);
             } else if (system && strcmp(parmv[0], "proxy") == 0) {
-                if (args->p_host)
-                    free(args->p_host);
-                split_proxy(&args->p_host, &args->p_port, parmv[1]); 
+                if (split_uri(NULL, &args->p_host, &args->p_port, NULL,
+                              parmv[1]) != 0)
+                    error_at_line(EXIT_FAILURE, 0, filename, lineno,
+                                  _("malformed line"));
             } else if (system && strcmp(parmv[0], "use_proxy") == 0) {
                 args->useproxy = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "ask_auth") == 0) {
@@ -2357,26 +2337,11 @@ read_secrets(dav_args *args, const char *filename)
 
         if (count == 2 || count == 3) {
 
-            char *phost = NULL;
-            int pport = 0;
-            split_proxy(&phost, &pport, parmv[0]);
-
-            ne_uri *uri = (ne_uri *) ne_malloc(sizeof(ne_uri));
-            if (!uri) abort();
-            if (ne_uri_parse(parmv[0], uri) == 0 && uri->host && uri->path) {
-                if (!uri->port)
-                    uri->port = ne_uri_defaultport(args->scheme);
-                if (strlen(uri->path) < 1
-                        || *(uri->path + strlen(uri->path) -1) != '/') {
-                    char *tmp = ne_concat(uri->path, "/", NULL);
-                    free(uri->path);
-                    uri->path = tmp;
-                }
-            } else {
-                ne_uri_free(uri);
-                free(uri);
-                uri = NULL;
-            }
+            char *scheme = NULL;
+            char *host = NULL;
+            int port = 0;
+            char *path = 0;
+            split_uri(&scheme, &host, &port, &path, parmv[0]);
 
             char *ccert = NULL;
             if (args->clicert) {
@@ -2391,11 +2356,12 @@ read_secrets(dav_args *args, const char *filename)
                     || (mpoint && strstr(parmv[0], mpoint) == parmv[0]
                         && *(parmv[0] + strlen(mpoint)) == '/'
                         && *(parmv[0] + strlen(mpoint) + 1) == '\0')
-                    || (uri && args->scheme && args->host && args->path
-                        && strcmp(uri->scheme, args->scheme) == 0
-                        && strcmp(uri->host, args->host) == 0
-                        && uri->port == args->port
-                        && strcmp(uri->path, args->path) == 0)) {
+                    || (scheme && args->scheme
+                        && strcmp(scheme, args->scheme) == 0
+                        && host && args->host && strcmp(host, args->host) == 0
+                        && port == args->port
+                        && path && args->path
+                        && strcmp(path, args->path) == 0)) {
 
                 if (args->username) {
                     memset(args->username, '\0', strlen(args->username));
@@ -2410,9 +2376,9 @@ read_secrets(dav_args *args, const char *filename)
                     args->password = ne_strdup(parmv[2]);
 
             } else if (strcmp(parmv[0], "proxy") == 0
-                       || (args->p_host && phost
-                           && strcmp(phost, args->p_host) == 0
-                           && (!pport || pport == args->p_port))) {
+                       || (host && args->p_host
+                           && strcmp(host, args->p_host) == 0
+                           && (!port || port == args->p_port))) {
 
                 if (args->p_user) {
                     memset(args->p_user, '\0', strlen(args->p_user));
@@ -2440,12 +2406,9 @@ read_secrets(dav_args *args, const char *filename)
                 args->clicert_pw = ne_strdup(parmv[1]);
             }
 
-            if (uri) {
-                ne_uri_free(uri);
-                free(uri);
-            }
-            if (phost)
-                free(phost);
+            if (scheme) free(scheme);
+            if (host) free(host);
+            if (path) free(path);
         }
 
         for (parmc = 0; parmc < count; parmc++) {
@@ -2465,24 +2428,107 @@ read_secrets(dav_args *args, const char *filename)
 }
 
 
-/* Splits arg into hostname and port if there is a colon in arg. If there is no
-   colon, arg is taken als hostname, and port is set to DAV_DEFAULT_PROXY_PORT.
-   The string host will be newly allacoated. The calling function is
-   responsible to free it.
-   host  : A pointer to a string to return the hostname.
-   port  : A pointer to an integer to return the port number.
-   arg   : the string to be split. */
-static void
-split_proxy(char **host, int *port, const char *arg)
+/* Splits an uri and returns the components.
+   The uri must contain a host, the other components are optional. It must
+   not contain userinfo. It shall not contain a query or fragment component;
+   they would be treated as part of path.
+   The path component must *not* be %-encoded. scheme, if present in uri,
+   must be either http or https. If host is a IPv6 address, it must be enclosed
+   in square brackets.
+   The pointers to the components may be NULL. If they point to a non-NULL
+   string, it is freed and then replaced by a newly allocated string.
+   If no scheme is foud the default sheme "http" is returned.
+   If no path is foud "/" is returned as path. path will always end with "/".
+   There is *no* default value returned for port.
+   return value : 0 on success, -1 otherwise. */
+static int
+split_uri(char **scheme, char **host, int *port,char **path, const char *uri)
 {
-    char *ps = strchr(arg, ':');
-    if (!ps) {
-        *host = ne_strdup(arg);
+    if (!uri || !*uri) return -1;
+
+    const char *sch = NULL;
+    int po = 0;
+    const char *ho = strstr(uri, "://");
+    if (ho) {
+        if ((ho - uri) == 4 && strcasestr(uri, "http") == uri) {
+            sch = "http";
+        } else if ((ho - uri) == 5 && strcasestr(uri, "https") == uri) {
+            sch = "https";
+        } else {
+            return -1;
+        }
+        ho += 3;
     } else {
-        *host = ne_strndup(arg, strlen(arg) - strlen(ps));
-        ps++;
-        *port = arg_to_int(ps, 10, "proxy:port");
+        ho = uri;
     }
+    if (!*ho) return -1;
+
+    const char *pa = strchrnul(ho, '/');
+    if (pa == ho) return -1;
+
+    const char *end = strchr(ho, '@');
+    if (end && end < pa) return -1;
+
+    if (*ho == '[') {
+        end = strchr(ho, ']');
+        if (!end || end >= pa) return -1;
+        end++;
+    } else {
+        end = strchr(ho, ':');
+        if (!end)
+            end = pa;
+    }
+
+    if (end < pa) {
+        if (end == ho || end == (pa - 1) || *end != ':') return -1;
+        char *tail = NULL;
+        po = strtol(end + 1, &tail, 10);
+        if (po <= 0 || tail != pa) return -1;
+    }
+
+    if (scheme) {
+        if (*scheme) free(*scheme);
+        if (sch) {
+            *scheme = strdup(sch);
+        } else {
+            *scheme = strdup("http");
+        }
+        if (!*scheme) abort();
+    }
+
+    if (port && po)
+        *port = po;
+
+    if (host) {
+        if (*host) free(*host);
+        *host = malloc(end - ho + 1);
+        if (!*host) abort();
+        int i;
+        for (i = 0; i < (end - ho); i++) {
+            if (*ho == '[') {
+                *(*host + i) = islower(*(ho + i))
+                               ? toupper(*(ho + i)) : *(ho + i);
+            } else {
+                *(*host + i) = isupper(*(ho + i))
+                               ? tolower(*(ho + i)) : *(ho + i);
+            }
+        }
+        *(*host + i) = '\0';
+    }
+
+    if (path) {
+        if (*path) free(*path);
+        if (!*pa) {
+            *path = strdup("/");
+        } else if (*(pa + strlen(pa) - 1) == '/') {
+            *path = strdup(pa);
+        } else {
+            if (asprintf(path, "%s/", pa) < 1) abort();
+        }
+        if (!*path) abort();
+    }
+
+    return 0;
 }
 
 

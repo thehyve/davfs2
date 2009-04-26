@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2009-04-26 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c:
+      New function split_uri; allow arbitrary characters
+      in path component, including spaces.
+
 2009-04-14 Werner Baumann (werner.baumann@onlinehome.de)
     * Reverted to fuse_kernel.h from 2.5.3 because of
       different length of struct fuse_attr.
