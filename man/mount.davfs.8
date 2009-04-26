@@ -48,12 +48,11 @@ using the \fI\-t davfs\fP option. After mounting it runs as a daemon. To unmount
 the \fBumount\fR(8) command is used.
 
 .PP
-\fIwebdavserver\fP must be a complete url, including scheme, fully qualified
-domain name and path. Scheme may be \fBhttp\fR or \fBhttps\fR. If the path
-contains spaces or other characters, that might be interpreted by the shell,
-the url must be enclosed in double quotes
-(e.g. \fI"http://foo.bar/name with spaces"\fP). See \fBURLS AND MOUNT POINTS
-WITH SPACES\fR.
+\fIwebdavserver\fP is the URI of the server. It must at least contain the
+host name. It may additionally contain the scheme, the port and the path.
+Missing components are set to sensible default values. The path component must
+\fBnot\fR be %-encoded, but when entering the URI at the command line or in
+/etc/fstab the escaping rules of the shell or fstab must be obeyed.
 
 .PP
 \fIdir\fP is the mountpoint where the WebDAV resource is mounted on.
