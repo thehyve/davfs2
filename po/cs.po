@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-04-13 21:33+0200\n"
+"POT-Creation-Date: 2009-04-27 20:29+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -71,10 +71,10 @@ msgstr "nemohu vytvořit soubor vyrovnávací paměti %s"
 msgid "error writing directory %s"
 msgstr "chyba při zápisu adresáře %s"
 
-#: src/cache.c:2688 src/mount_davfs.c:588 src/mount_davfs.c:590
-#: src/mount_davfs.c:762 src/mount_davfs.c:764 src/mount_davfs.c:770
-#: src/mount_davfs.c:810 src/mount_davfs.c:812 src/mount_davfs.c:829
-#: src/mount_davfs.c:831 src/mount_davfs.c:1692 src/mount_davfs.c:1694
+#: src/cache.c:2688 src/mount_davfs.c:591 src/mount_davfs.c:593
+#: src/mount_davfs.c:765 src/mount_davfs.c:767 src/mount_davfs.c:773
+#: src/mount_davfs.c:813 src/mount_davfs.c:815 src/mount_davfs.c:832
+#: src/mount_davfs.c:834 src/mount_davfs.c:1672 src/mount_davfs.c:1674
 msgid "can't read user data base"
 msgstr "nemohu přečíst údaje o uživatelích"
 
@@ -127,129 +127,129 @@ msgstr ""
 msgid "can't allocate message buffer"
 msgstr "nemohu alokovat buffer pro zprávu"
 
-#: src/kernel_interface.c:106
+#: src/kernel_interface.c:108
 msgid "trying fuse kernel file system"
 msgstr "zkouším jaderný souborový systém fuse"
 
-#: src/kernel_interface.c:114
+#: src/kernel_interface.c:116
 msgid "fuse device opened successfully"
 msgstr "zařízení fuse otevřeno úspěšně"
 
-#: src/kernel_interface.c:126
+#: src/kernel_interface.c:128
 msgid "trying coda kernel file system"
 msgstr "zkouším jaderný souborový systém coda"
 
-#: src/kernel_interface.c:132
+#: src/kernel_interface.c:134
 msgid "coda device opened successfully"
 msgstr "zařízení coda otevřeno úspěšně"
 
-#: src/kernel_interface.c:140
+#: src/kernel_interface.c:142
 #, c-format
 msgid "unknown kernel file system %s"
 msgstr "neznámý jaderný souborový systém %s"
 
-#: src/kernel_interface.c:187
+#: src/kernel_interface.c:189
 msgid "no free coda device to mount"
 msgstr "pro připojení není volné žádné coda zařízení"
 
-#: src/kernel_interface.c:196
+#: src/kernel_interface.c:198
 #, c-format
 msgid "CODA_KERNEL_VERSION %u not supported"
 msgstr "CODA_KERNEL_VERSION %u není podporováno"
 
-#: src/kernel_interface.c:235
+#: src/kernel_interface.c:237
 msgid "can't open fuse device"
 msgstr "nemohu otevřít fuse zařízení"
 
-#: src/kernel_interface.c:261
+#: src/kernel_interface.c:263
 msgid "can't mount using fuse kernel file system"
 msgstr "nemohu připojit jaderný souborový systém fuse"
 
-#: src/mount_davfs.c:237
+#: src/mount_davfs.c:240
 msgid "program is not setuid root"
 msgstr "program není spuštěn jako setuid root"
 
-#: src/mount_davfs.c:239 src/mount_davfs.c:440 src/mount_davfs.c:444
+#: src/mount_davfs.c:242 src/mount_davfs.c:443 src/mount_davfs.c:447
 msgid "can't change effective user id"
 msgstr "nemohu změnit identifikátor efektivního uživatele"
 
-#: src/mount_davfs.c:305
+#: src/mount_davfs.c:308
 msgid "can't start daemon process"
 msgstr "nemohu spustit proces na pozadí"
 
-#: src/mount_davfs.c:328
+#: src/mount_davfs.c:331
 msgid "can't release root privileges"
 msgstr "nemohu uvolnit oprávnění uživatele root"
 
-#: src/mount_davfs.c:348
+#: src/mount_davfs.c:351
 msgid "failed to release tty properly"
 msgstr ""
 
-#: src/mount_davfs.c:359
+#: src/mount_davfs.c:362
 #, c-format
 msgid "can't write pid file %s"
 msgstr "nemohu zapsat pid souboru %s"
 
-#: src/mount_davfs.c:377
+#: src/mount_davfs.c:380
 #, c-format
 msgid "unmounting %s"
 msgstr "odpojuji %s"
 
-#: src/mount_davfs.c:379
+#: src/mount_davfs.c:382
 msgid "unmounting failed"
 msgstr "odpojení selhalo"
 
-#: src/mount_davfs.c:428 src/mount_davfs.c:491 src/mount_davfs.c:574
-#: src/mount_davfs.c:834
+#: src/mount_davfs.c:431 src/mount_davfs.c:494 src/mount_davfs.c:577
+#: src/mount_davfs.c:837
 #, c-format
 msgid "group %s does not exist"
 msgstr "skupina %s neexistuje"
 
-#: src/mount_davfs.c:432
+#: src/mount_davfs.c:435
 msgid "can't change group id"
 msgstr "nemohu změnit id skupiny"
 
-#: src/mount_davfs.c:437
+#: src/mount_davfs.c:440
 #, c-format
 msgid "user %s does not exist"
 msgstr "uživatel %s neexistuje"
 
-#: src/mount_davfs.c:477 src/mount_davfs.c:559 src/mount_davfs.c:594
+#: src/mount_davfs.c:480 src/mount_davfs.c:562 src/mount_davfs.c:597
 #, c-format
 msgid "can't create directory %s"
 msgstr "nemohu vytvořit adresář %s"
 
-#: src/mount_davfs.c:481 src/mount_davfs.c:563 src/mount_davfs.c:598
-#: src/mount_davfs.c:603 src/mount_davfs.c:612
+#: src/mount_davfs.c:484 src/mount_davfs.c:566 src/mount_davfs.c:601
+#: src/mount_davfs.c:606 src/mount_davfs.c:615
 #, c-format
 msgid "can't access directory %s"
 msgstr "nemohu přistupovat k adresáři %s"
 
-#: src/mount_davfs.c:487 src/mount_davfs.c:569
+#: src/mount_davfs.c:490 src/mount_davfs.c:572
 #, c-format
 msgid "can't change mode of directory %s"
 msgstr "nemohu změnit oprávnění (mode) adresáře %s"
 
-#: src/mount_davfs.c:496 src/mount_davfs.c:579
+#: src/mount_davfs.c:499 src/mount_davfs.c:582
 #, c-format
 msgid "can't change group of directory %s"
 msgstr "nemohu změnit skupinu adresáře %s"
 
-#: src/mount_davfs.c:607 src/mount_davfs.c:815
+#: src/mount_davfs.c:610 src/mount_davfs.c:818
 msgid "can't read group data base"
 msgstr "nemohu přečíst údaje o skupinách"
 
-#: src/mount_davfs.c:630
+#: src/mount_davfs.c:633
 #, c-format
 msgid "can't open file %s"
 msgstr "nemohu otevřít soubor %s"
 
-#: src/mount_davfs.c:635
+#: src/mount_davfs.c:638
 #, c-format
 msgid "%s is already mounted on %s"
 msgstr "%s už je připojeno jako %s"
 
-#: src/mount_davfs.c:658
+#: src/mount_davfs.c:661
 #, c-format
 msgid ""
 "found PID file %s.\n"
@@ -260,81 +260,81 @@ msgstr ""
 "Buď %s používá jiný proces, nebo\n"
 "jiné připojení skončilo neobvykle"
 
-#: src/mount_davfs.c:681
+#: src/mount_davfs.c:684
 #, c-format
 msgid "no entry for %s found in %s"
 msgstr "pro %s nebyla v %s nalezena žádná položka"
 
-#: src/mount_davfs.c:687
+#: src/mount_davfs.c:690
 #, c-format
 msgid "different URL in %s"
 msgstr "v %s je jiné URL"
 
-#: src/mount_davfs.c:695
+#: src/mount_davfs.c:698
 #, c-format
 msgid "different file system type in %s"
 msgstr "v %s je jiný souborový systém"
 
-#: src/mount_davfs.c:698
+#: src/mount_davfs.c:701
 #, c-format
 msgid "different config file in %s"
 msgstr "v %s je jiný konfigurační soubor"
 
-#: src/mount_davfs.c:700
+#: src/mount_davfs.c:703
 #, c-format
 msgid "option `user' not set in %s"
 msgstr "volba 'user' není v %s nastavena"
 
-#: src/mount_davfs.c:702
+#: src/mount_davfs.c:705
 #, c-format
 msgid "different mount options in %s"
 msgstr "v %s jsou jiné parametry připojení"
 
-#: src/mount_davfs.c:705
+#: src/mount_davfs.c:708
 #, c-format
 msgid "different uid in %s"
 msgstr "v %s je odlišné uid"
 
-#: src/mount_davfs.c:707
+#: src/mount_davfs.c:710
 #, c-format
 msgid "different gid in %s"
 msgstr "v %s je odlišné gid"
 
-#: src/mount_davfs.c:709
+#: src/mount_davfs.c:712
 #, c-format
 msgid "different dir_mode in %s"
 msgstr "v %s je odlišný dir_mode"
 
-#: src/mount_davfs.c:711
+#: src/mount_davfs.c:714
 #, c-format
 msgid "different file_mode in %s"
 msgstr "v %s je odlišný file_mode"
 
-#: src/mount_davfs.c:739
+#: src/mount_davfs.c:742
 #, c-format
 msgid "can't evaluate path of mount point %s"
 msgstr "nemohu vyhodnotit cestu k přípojnému bodu %s"
 
-#: src/mount_davfs.c:744
+#: src/mount_davfs.c:747
 #, c-format
 msgid "can't get home directory for uid %i"
 msgstr "nemohu zjistit domovský adresář pro uid %i"
 
-#: src/mount_davfs.c:746
+#: src/mount_davfs.c:749
 msgid "A relative mount point must lie within your home directory"
 msgstr "Relativní přípojný bod musí ležet ve vašem domovském adresáři"
 
-#: src/mount_davfs.c:754
+#: src/mount_davfs.c:757
 #, c-format
 msgid "invalid mount point %s"
 msgstr "neplatný přípojný bod %s"
 
-#: src/mount_davfs.c:757
+#: src/mount_davfs.c:760
 #, c-format
 msgid "mount point %s does not exist"
 msgstr "přípojný bod %s neexistuje"
 
-#: src/mount_davfs.c:775
+#: src/mount_davfs.c:778
 #, c-format
 msgid ""
 "%s is the home directory of user %s.\n"
@@ -343,34 +343,34 @@ msgstr ""
 "%s je domovský adresář uživatele %s.\n"
 "Do domovského adresáře jiného uživatele nemůžete nic připojovat"
 
-#: src/mount_davfs.c:803
+#: src/mount_davfs.c:806
 msgid "you can't set file owner different from your uid"
 msgstr "nemůžete nastavit jiného vlastníka souboru než je vaše uid"
 
-#: src/mount_davfs.c:821
+#: src/mount_davfs.c:824
 msgid "you must be member of the group of the file system"
 msgstr "musíte být členem skupiny souborového systému"
 
-#: src/mount_davfs.c:841
+#: src/mount_davfs.c:844
 #, c-format
 msgid "user %s must be member of group %s"
 msgstr "uživatel %s musí být členem skupiny %s"
 
-#: src/mount_davfs.c:864
+#: src/mount_davfs.c:867
 #, c-format
 msgid "can't mount %s on %s"
 msgstr "není možno připojit %s do %s"
 
-#: src/mount_davfs.c:866
+#: src/mount_davfs.c:869
 #, c-format
 msgid "kernel does not know file system %s"
 msgstr "kernel nezná souborový systém %s"
 
-#: src/mount_davfs.c:868
+#: src/mount_davfs.c:871
 msgid "mount point is busy"
 msgstr "přípojný bod je zaneprázdněn"
 
-#: src/mount_davfs.c:929 src/umount_davfs.c:88
+#: src/mount_davfs.c:933 src/umount_davfs.c:88
 #, c-format
 msgid ""
 "This is free software; see the source for copying conditions.  There is NO\n"
@@ -381,50 +381,50 @@ msgstr ""
 "Program je poskytován BEZ JAKÉKOLIV záruky, včetně záruky PRODEJNOSTI či "
 "VHODNOSTI K URČITÉMU ÚČELU.\n"
 
-#: src/mount_davfs.c:945 src/umount_davfs.c:113
+#: src/mount_davfs.c:949 src/umount_davfs.c:113
 msgid "unknown error parsing arguments"
 msgstr "neznámá chyba při zpracování argumentů"
 
-#: src/mount_davfs.c:954 src/umount_davfs.c:119
+#: src/mount_davfs.c:958 src/umount_davfs.c:119
 msgid "missing argument"
 msgstr "chybějící argument"
 
-#: src/mount_davfs.c:967 src/umount_davfs.c:121
+#: src/mount_davfs.c:971 src/umount_davfs.c:121
 msgid "too many arguments"
 msgstr "příliš mnoho argumentů"
 
-#: src/mount_davfs.c:973
+#: src/mount_davfs.c:977
 msgid "no mountpoint specified"
 msgstr "nebyl zadán žádný přípojný bod"
 
-#: src/mount_davfs.c:978
+#: src/mount_davfs.c:982
 msgid "no WebDAV-server specified"
 msgstr "nebyl zadán žádný WebDAV server"
 
-#: src/mount_davfs.c:981
+#: src/mount_davfs.c:985
 msgid "invalid URL"
 msgstr "neplatné URL"
 
-#: src/mount_davfs.c:1024
+#: src/mount_davfs.c:1004
 msgid "can't determine home directory"
 msgstr "nelze určit domovský adresář"
 
-#: src/mount_davfs.c:1102 src/webdav.c:387
+#: src/mount_davfs.c:1082 src/webdav.c:387
 #, c-format
 msgid "can't read client certificate %s"
 msgstr "nelze přečíst klientský certifikát %s"
 
-#: src/mount_davfs.c:1107
+#: src/mount_davfs.c:1087
 #, c-format
 msgid "client certificate file %s has wrong owner"
 msgstr "klientský certifikát %s má chybného vlastníka"
 
-#: src/mount_davfs.c:1113
+#: src/mount_davfs.c:1093
 #, c-format
 msgid "client certificate file %s has wrong permissions"
 msgstr "soubor s klientským certifikátem %s má chybná oprávnění"
 
-#: src/mount_davfs.c:1156
+#: src/mount_davfs.c:1136
 #, fuzzy, c-format
 msgid ""
 "Please enter the username to authenticate with proxy\n"
@@ -434,11 +434,11 @@ msgstr ""
 "%s (pokud žádné zadat nechcete, pouze stiskněte enter).\n"
 "Uživatelské jméno: "
 
-#: src/mount_davfs.c:1158 src/mount_davfs.c:1174
+#: src/mount_davfs.c:1138 src/mount_davfs.c:1154
 msgid "Username:"
 msgstr ""
 
-#: src/mount_davfs.c:1162
+#: src/mount_davfs.c:1142
 #, c-format
 msgid ""
 "Please enter the password to authenticate user %s with proxy\n"
@@ -447,11 +447,11 @@ msgstr ""
 "Zadejte prosím heslo pro autentizaci uživatele %s na proxy\n"
 "%s (pokud žádné zadat nechcete, pouze stiskněte enter).\n"
 
-#: src/mount_davfs.c:1164 src/mount_davfs.c:1180 src/webdav.c:394
+#: src/mount_davfs.c:1144 src/mount_davfs.c:1160 src/webdav.c:394
 msgid "Password: "
 msgstr "Heslo: "
 
-#: src/mount_davfs.c:1172
+#: src/mount_davfs.c:1152
 #, fuzzy, c-format
 msgid ""
 "Please enter the username to authenticate with server\n"
@@ -461,7 +461,7 @@ msgstr ""
 "%s (nebo pouze stiskně enter, pokud nic zadat nechcete).\n"
 "Uživatelské jméno: "
 
-#: src/mount_davfs.c:1178
+#: src/mount_davfs.c:1158
 #, c-format
 msgid ""
 "Please enter the password to authenticate user %s with server\n"
@@ -470,12 +470,12 @@ msgstr ""
 "Zadejte prosím heslo uživatele %s pro autentizaci na serveru\n"
 "%s (nebo pouze stiskně enter, pokud nic zadat nechcete).\n"
 
-#: src/mount_davfs.c:1227
+#: src/mount_davfs.c:1207
 #, c-format
 msgid "pid %i, got signal %i"
 msgstr "pid %i dostal signál %i"
 
-#: src/mount_davfs.c:1259
+#: src/mount_davfs.c:1239
 msgid ""
 "Warning: can't read user data base. Mounting anyway, but there is no entry "
 "in mtab."
@@ -483,62 +483,62 @@ msgstr ""
 "Varování: nelze přečíst údaje o uživatelích. Přesto připojuji, v mtab ale "
 "nebude žádný záznam."
 
-#: src/mount_davfs.c:1276
+#: src/mount_davfs.c:1256
 msgid ""
 "Warning: can't write entry into mtab, but will mount the file system anyway"
 msgstr ""
 "Varování: nelze zapsat položku do mtab, přesto souborový systém připojím"
 
-#: src/mount_davfs.c:1302
+#: src/mount_davfs.c:1282
 #, c-format
 msgid "option %s has invalid argument;it must be a decimal number"
 msgstr "volba %s má neplatný argument; musí to být číslo v desítkové soustavě"
 
-#: src/mount_davfs.c:1305
+#: src/mount_davfs.c:1285
 #, c-format
 msgid "option %s has invalid argument;it must be an octal number"
 msgstr "volba %s má neplatný argument; musí to být číslo v osmičkové soustavě"
 
-#: src/mount_davfs.c:1308
+#: src/mount_davfs.c:1288
 #, c-format
 msgid "option %s has invalid argument;it must be a number"
 msgstr "volba %s má neplatný argument; musí to být číslo"
 
-#: src/mount_davfs.c:1566
+#: src/mount_davfs.c:1546
 #, c-format
 msgid "option %s requires argument"
 msgstr "volba %s vyžaduje argument"
 
-#: src/mount_davfs.c:1654
+#: src/mount_davfs.c:1634
 #, c-format
 msgid "Unknown option %s.\n"
 msgstr "Neznámá volba %s.\n"
 
-#: src/mount_davfs.c:2108 src/mount_davfs.c:2328 src/mount_davfs.c:2340
+#: src/mount_davfs.c:2087 src/mount_davfs.c:2308 src/mount_davfs.c:2320
 #, fuzzy, c-format
 msgid "opening %s failed"
 msgstr "odpojení selhalo"
 
-#: src/mount_davfs.c:2129 src/mount_davfs.c:2255 src/mount_davfs.c:2356
-#: src/mount_davfs.c:2435
+#: src/mount_davfs.c:2108 src/mount_davfs.c:2148 src/mount_davfs.c:2235
+#: src/mount_davfs.c:2336 src/mount_davfs.c:2401
 msgid "malformed line"
 msgstr "špatně zapsaný řádek"
 
-#: src/mount_davfs.c:2236 src/mount_davfs.c:2249
+#: src/mount_davfs.c:2216 src/mount_davfs.c:2229
 msgid "unknown option"
 msgstr "neznámá volba"
 
-#: src/mount_davfs.c:2332
+#: src/mount_davfs.c:2312
 #, c-format
 msgid "file %s has wrong owner"
 msgstr "soubor %s má chybného vlastníka"
 
-#: src/mount_davfs.c:2335
+#: src/mount_davfs.c:2315
 #, c-format
 msgid "file %s has wrong permissions"
 msgstr "soubor %s má chybná oprávnění"
 
-#: src/mount_davfs.c:2493
+#: src/mount_davfs.c:2539
 #, c-format
 msgid ""
 "Usage:\n"
@@ -551,7 +551,7 @@ msgstr ""
 "    %s -h,--help      : vytiskne tuto zprávu\n"
 "\n"
 
-#: src/mount_davfs.c:2497
+#: src/mount_davfs.c:2543
 #, c-format
 msgid ""
 "To mount a WebDAV-resource don't call %s directly, but use\n"
@@ -560,7 +560,7 @@ msgstr ""
 "Pro připojení zdroje WebDAV nevolejte přímo %s, ale\n"
 "použijte místo toho `mount'.\n"
 
-#: src/mount_davfs.c:2499
+#: src/mount_davfs.c:2545
 #, c-format
 msgid ""
 "    mount <mountpoint>  : or\n"
@@ -571,7 +571,7 @@ msgstr ""
 "    mount <url_serveru> : připojí zdroj WebDAV tak, jak je zadáno\n"
 "                          v /etc/fstab.\n"
 
-#: src/mount_davfs.c:2502
+#: src/mount_davfs.c:2548
 #, c-format
 msgid ""
 "    mount -t davfs <server-url> <mountpoint> [-o options]\n"
@@ -588,7 +588,7 @@ msgstr ""
 "                          označuje seznam voleb oddělených čárkou.\n"
 "\n"
 
-#: src/mount_davfs.c:2507
+#: src/mount_davfs.c:2553
 #, c-format
 msgid ""
 "Recognised options:\n"
@@ -607,7 +607,7 @@ msgstr ""
 "    file_mode=   : výchozí mode souboru (v osmičkové soustavě)\n"
 "    dir_mode=    : výchozí mode adresáře (v osmičkové soustavě)\n"
 
-#: src/mount_davfs.c:2513
+#: src/mount_davfs.c:2559
 #, c-format
 msgid ""
 "    ro           : mount read-only\n"

@@ -1,4 +1,4 @@
-# #-#-#-#-#  umount.davfs.8.po (davfs2 1.4.0)  #-#-#-#-#
+# #-#-#-#-#  umount.davfs.8.po (davfs2)  #-#-#-#-#
 # German translation of umount.davfs(8) man page.
 # Copyright (C) 2007 Werner Baumann
 # Werner Baumann <werner.baumann@onlinehome.de>, 2007.
@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2009-04-13 21:30+0300\n"
-"PO-Revision-Date: 2009-04-13 21:49+0200\n"
+"POT-Creation-Date: 2009-04-27 18:47+0300\n"
+"PO-Revision-Date: 2009-04-27 18:49+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -39,24 +39,24 @@ msgid "DESCRIPTION"
 msgstr "BESCHREIBUNG"
 
 # type: SH
-#: davfs2.conf.5:501 mount.davfs.8:514 umount.davfs.8:79
+#: davfs2.conf.5:501 mount.davfs.8:513 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
 # type: SH
-#: davfs2.conf.5:507 mount.davfs.8:531 umount.davfs.8:84
+#: davfs2.conf.5:507 mount.davfs.8:530 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
-# type: Plain text
-#: davfs2.conf.5:510 mount.davfs.8:534 umount.davfs.8:87
-msgid "http://savannah.nongnu.org/projects/davfs2"
-msgstr "http://savannah.nongnu.org/projects/davfs2"
+# type: TH
+#: davfs2.conf.5:510 mount.davfs.8:533 umount.davfs.8:87
+msgid "@PACKAGE_BUGREPORT@"
+msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
-#: davfs2.conf.5:512 mount.davfs.8:536 umount.davfs.8:89
+#: davfs2.conf.5:512 mount.davfs.8:535 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
@@ -74,7 +74,7 @@ msgid "SYNOPSIS (root only)"
 msgstr "ÜBERSICHT (nur für root)"
 
 # type: Plain text
-#: mount.davfs.8:61 umount.davfs.8:30
+#: mount.davfs.8:60 umount.davfs.8:30
 msgid ""
 "I<dir> is the mountpoint where the WebDAV resource is mounted on.  It may be "
 "an absolute or relative path."
@@ -83,47 +83,47 @@ msgstr ""
 "sein."
 
 # type: SH
-#: mount.davfs.8:68 umount.davfs.8:51
+#: mount.davfs.8:67 umount.davfs.8:51
 #, no-wrap
 msgid "OPTIONS"
 msgstr "OPTIONEN"
 
 # type: TP
-#: mount.davfs.8:70 umount.davfs.8:53
+#: mount.davfs.8:69 umount.davfs.8:53
 #, no-wrap
 msgid "B<-V --version>"
 msgstr "B<-V --version>"
 
 # type: Plain text
-#: mount.davfs.8:73 umount.davfs.8:56
+#: mount.davfs.8:72 umount.davfs.8:56
 msgid "Output version."
 msgstr "Zeige die Version an."
 
 # type: TP
-#: mount.davfs.8:74 umount.davfs.8:57
+#: mount.davfs.8:73 umount.davfs.8:57
 #, no-wrap
 msgid "B<-h --help>"
 msgstr "B<-h --help>"
 
 # type: Plain text
-#: mount.davfs.8:77 umount.davfs.8:60
+#: mount.davfs.8:76 umount.davfs.8:60
 msgid "Print a help message."
 msgstr "Zeige einen Hilfe-Text an."
 
 # type: SH
-#: mount.davfs.8:345 umount.davfs.8:67
+#: mount.davfs.8:344 umount.davfs.8:67
 #, no-wrap
 msgid "FILES"
 msgstr "DATEIEN"
 
 # type: TP
-#: mount.davfs.8:406 umount.davfs.8:69
+#: mount.davfs.8:405 umount.davfs.8:69
 #, no-wrap
 msgid "I<@SYS_RUN@>"
 msgstr "I<@SYS_RUN@>"
 
 # type: SH
-#: mount.davfs.8:509 umount.davfs.8:74
+#: mount.davfs.8:508 umount.davfs.8:74
 #, no-wrap
 msgid "BUGS"
 msgstr "FEHLER"

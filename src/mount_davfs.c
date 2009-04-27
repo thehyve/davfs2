@@ -929,7 +929,7 @@ parse_commandline(int argc, char *argv[])
     while (o != -1) {
         switch (o) {
         case 'V':
-            printf("%s  <%s>\n\n", PACKAGE_STRING, DAV_HOME);
+            printf("%s  <%s>\n\n", PACKAGE_STRING, PACKAGE_BUGREPORT);
             printf(_("This is free software; see the source for copying "
                      "conditions.  There is NO\n"
                      "warranty; not even for MERCHANTABILITY or FITNESS "

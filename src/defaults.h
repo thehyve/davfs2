@@ -25,8 +25,6 @@
 /* Misc. */
 /*=======*/
 
-#define DAV_HOME "http://dav.sourceforge.net"
-
 /* File system type to be used with 'mount -t' and fstab. */
 #define DAV_FS_TYPE "davfs"
 

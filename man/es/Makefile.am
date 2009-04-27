@@ -29,6 +29,7 @@ manual5dir = $(mandir)/es/man5
 edit = sed \
        -e 's|@PACKAGE[@]|$(PACKAGE)|g' \
        -e 's|@PACKAGE_STRING[@]|$(PACKAGE_STRING)|g' \
+       -e 's|@PACKAGE_BUGREPORT[@]|$(PACKAGE_BUGREPORT)|g' \
        -e 's|@PROGRAM_NAME[@]|mount.davfs|g' \
        -e 's|@SYS_CONF_DIR[@]|$(pkgsysconfdir)|g' \
        -e 's|@SYS_RUN[@]|$(pkglocalstatedir)|g' \
