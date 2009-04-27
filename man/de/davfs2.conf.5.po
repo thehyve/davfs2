@@ -1,4 +1,4 @@
-# #-#-#-#-#  davfs2.conf.5.po (davfs2 1.4.0)  #-#-#-#-#
+# #-#-#-#-#  davfs2.conf.5.po (davfs2)  #-#-#-#-#
 # German translation of davfs2.conf(5) man page.
 # Copyright (C) 2007, 2008 Werner Baumann
 # Werner Baumann <werner.baumann@onlinehome.de>, 2007.
@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2009-04-13 21:30+0300\n"
-"PO-Revision-Date: 2009-04-13 10:38+0200\n"
+"POT-Creation-Date: 2009-04-27 18:47+0300\n"
+"PO-Revision-Date: 2009-04-27 18:49+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1285,7 +1285,7 @@ msgid "Includes config, kernel, cache and http."
 msgstr "Beinhaltet config, kernel, cache und http."
 
 # type: SH
-#: davfs2.conf.5:501 mount.davfs.8:514 umount.davfs.8:79
+#: davfs2.conf.5:501 mount.davfs.8:513 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
@@ -1300,18 +1300,18 @@ msgstr ""
 "geschrieben."
 
 # type: SH
-#: davfs2.conf.5:507 mount.davfs.8:531 umount.davfs.8:84
+#: davfs2.conf.5:507 mount.davfs.8:530 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
-# type: Plain text
-#: davfs2.conf.5:510 mount.davfs.8:534 umount.davfs.8:87
-msgid "http://savannah.nongnu.org/projects/davfs2"
-msgstr "http://savannah.nongnu.org/projects/davfs2"
+# type: TH
+#: davfs2.conf.5:510 mount.davfs.8:533 umount.davfs.8:87
+msgid "@PACKAGE_BUGREPORT@"
+msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
-#: davfs2.conf.5:512 mount.davfs.8:536 umount.davfs.8:89
+#: davfs2.conf.5:512 mount.davfs.8:535 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"

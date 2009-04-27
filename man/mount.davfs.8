@@ -48,10 +48,10 @@ using the \fI\-t davfs\fP option. After mounting it runs as a daemon. To unmount
 the \fBumount\fR(8) command is used.
 
 .PP
-\fIwebdavserver\fP is the URI of the server. It must at least contain the
+\fIwebdavserver\fP is the URL of the server. It must at least contain the
 host name. It may additionally contain the scheme, the port and the path.
 Missing components are set to sensible default values. The path component must
-\fBnot\fR be %-encoded, but when entering the URI at the command line or in
+\fBnot\fR be %-encoded, but when entering the URL at the command line or in
 /etc/fstab the escaping rules of the shell or fstab must be obeyed.
 
 .PP
@@ -241,12 +241,6 @@ the escape and quotation rules described in the \fB@CONFIGFILE@\fR(5) man page.
 .PP
 On \fIcommand line\fP you must obey the escaping rules of the shell.
 
-.PP
-After escaping and quotation have been removed by the respective program,
-the url and mount point must resolve to exactly the same string, whether they
-are taken from \fIfstab\fP, \fI@CONFIGFILE@\fP, \fI@SECRETSFILE@\fP or
-the command line.
-
 
 .SH CACHING
 
@@ -293,9 +287,8 @@ even happen without intention).
 .RE
 
 .PP
-\fB@PROGRAM_NAME@\fR will therefore allways check if the file has been changed on the
-the server before it uploads a new version. Unfortunately it has to do this in
-two separate HTTP requests, as not all servers support conditional PUT. If it
+\fB@PROGRAM_NAME@\fR will therefore check if the file has been changed on the
+the server before it uploads a new version. If it
 finds it impossible to upload the locally changed file, it will store it in
 the local backup direcotry \fIlost+found\fP. You should check this directory from
 time to time and decide what to do with this files.
@@ -507,7 +500,9 @@ Mounts the resource \fIhttp://linux.org.ar/repos\fP at \fI/dav\fP.
 
 .SH BUGS
 
-\fB@PACKAGE@\fR does not support links (neither hard nor soft ones).
+\fB@PACKAGE@\fR does not support links.
+.PP
+A \fB@PACKAGE@\fR file system cannot be moved with \fImount --move\fR.
 
 
 .SH AUTHORS
@@ -529,7 +524,7 @@ by Werner Baumann.
 
 .SH DAVFS2 HOME
 
-http://savannah.nongnu.org/projects/davfs2
+@PACKAGE_BUGREPORT@
 
 
 .SH SEE ALSO
