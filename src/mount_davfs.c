@@ -669,9 +669,7 @@ check_double_mounts(dav_args *args)
 /* Checks fstab whether there is an entry for the mountpoint specified in args
    and compares the values in args with the values in fstab.
    If there is no such entry, or this entry does not allow user-mount, or the
-   values differ, an error message is printed and the program terminates.
-   Option useproxy, askauth and locks are not checked. The mounting user is
-   free to choose them. They should be configured in davfs2.conf anyway. */
+   values differ, an error message is printed and the program terminates. */
 static void
 check_fstab(const dav_args *args)
 {
@@ -699,8 +697,15 @@ check_fstab(const dav_args *args)
               _PATH_FSTAB);
     if (strcmp(args->conf, n_args->conf) != 0)
         error(EXIT_FAILURE, 0, _("different config file in %s"), _PATH_FSTAB);
-    if (n_args->user != 1)
-        error(EXIT_FAILURE, 0, _("option `user' not set in %s"), _PATH_FSTAB);
+    if (!n_args->user && !n_args->users)
+        error(EXIT_FAILURE, 0,
+              _("neither option `user' nor option `users' set in %s"),
+              _PATH_FSTAB);
+    if (args->user != n_args->user)
+        error(EXIT_FAILURE, 0, _("different option `user' in %s"), _PATH_FSTAB);
+    if (args->users != n_args->users)
+        error(EXIT_FAILURE, 0, _("different option `users' in %s"),
+              _PATH_FSTAB);
     if (args->mopts != n_args->mopts)
         error(EXIT_FAILURE, 0, _("different mount options in %s"),
               _PATH_FSTAB);
@@ -1492,6 +1497,7 @@ get_options(dav_args *args, char *option)
         DIR_MODE,
         USER,
         NOUSER,
+        USERS,
         NETDEV,
         NONETDEV,
         RW,
@@ -1516,6 +1522,7 @@ get_options(dav_args *args, char *option)
         [DIR_MODE] = "dir_mode",
         [USER] = "user",
         [NOUSER] = "nouser",
+        [USERS] = "users",
         [NETDEV] = "_netdev",
         [NONETDEV] = "no_netdev",
         [RW] = "rw",
@@ -1593,6 +1600,9 @@ get_options(dav_args *args, char *option)
             break;
         case NOUSER:
             args->user = 0;
+            break;
+        case USERS:
+            args->users = 1;
             break;
         case NETDEV:
             args->netdev = 1;
@@ -1688,6 +1698,7 @@ new_args(void)
     }
 
     args->user = 0;
+    args->users = 0;
     args->netdev = 1;
     args->mopts = DAV_MOPTS;
     args->add_mopts = NULL;
