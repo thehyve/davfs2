@@ -37,6 +37,7 @@ typedef struct {
     char *conf;               /* Command line */
     /* Mount options */
     int user;                 /* Command line */
+    int users;                 /* Command line */
     int netdev;               /* Command line */
     unsigned long int mopts;  /* Command line */
     char *add_mopts;
