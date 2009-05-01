@@ -479,7 +479,7 @@ fuse_create(void)
 
     int fd = 0;
     oh->error = dav_open(&fd, node, in->flags & ~(O_EXCL | O_CREAT), ih->pid,
-                         0, ih->uid);
+                         0, ih->uid, 1);
 
     if (oh->error || !fd) {
         if (created)
@@ -806,7 +806,7 @@ fuse_open(void)
 
     int fd = 0;
     oh->error = dav_open(&fd, (dav_node *) ((size_t) ih->nodeid), in->flags,
-                         ih->pid, 0, ih->uid);
+                         ih->pid, 0, ih->uid, 0);
 
     if (oh->error || !fd) {
         if (!oh->error)

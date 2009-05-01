@@ -1062,7 +1062,8 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
 
 
 int
-dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid)
+dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
+         int open_create)
 {
     if (!is_valid(node))
         return ENOENT;
@@ -1079,7 +1080,7 @@ dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid)
     } else {
         how = R_OK | W_OK;
     }
-    if (!has_permission(node, uid, how))
+    if (!open_create && !has_permission(node, uid, how))
         return EACCES;
 
     if (is_dir(node)) {

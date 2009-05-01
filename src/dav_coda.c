@@ -603,7 +603,7 @@ coda_open_by_fd(void)
     }
     flags |= (in->flags & C_O_TRUNC) ? O_TRUNC : 0;
 
-    oh->result = dav_open(&out->fd, node, flags, ih->pid, ih->pgid, ih->uid);
+    oh->result = dav_open(&out->fd, node, flags, ih->pid, ih->pgid, ih->uid, 0);
 
     if (oh->result || !out->fd) {
         if (!oh->result)
