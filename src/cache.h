@@ -335,9 +335,14 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
    Permissions:
    uid must have execute permission for parent and all of its ancestors, as
    as well as read and/or write permission for node, according to the
-   accessmode. */
+   accessmode.
+   If open_create is set to 1, permissions will not be checked. This flag must
+   only be set when the call to dav_open is part of an open-call with flag
+   O_CREATE. It allows dav_open to succeed if when the file mode would not
+   allow this.  */
 int
-dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid);
+dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
+         int open_create);
 
 /* Reads size bytes from file descriptor fd, starting at position offset
    and copies them into buf.

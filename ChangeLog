@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2009-05-01 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.h, dav_open:
+      Add parameter open_create to allow
+      for open(..., O_CREATE, 444).
+
 2009-04-30 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_close:
       if delay_upload == 0 save to server immediately.
