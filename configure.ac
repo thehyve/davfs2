@@ -77,7 +77,7 @@ AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STRFTIME
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
-AC_CHECK_FUNCS([endpwent getmntent memset mkdir nl_langinfo rpmatch select setlocale strcasecmp strchr strdup strerror strpbrk strrchr strstr strtol utime])
+AC_CHECK_FUNCS([endpwent ftruncate getmntent memset mkdir nl_langinfo rpmatch select setlocale strcasecmp strchr strdup strerror strpbrk strrchr strstr strtol utime])
 
 # Misc.
 DAV_DEFAULTS
