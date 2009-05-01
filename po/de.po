@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.3.3\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-04-30 21:12+0200\n"
+"POT-Creation-Date: 2009-05-01 20:32+0200\n"
 "PO-Revision-Date: 2009-01-02 12:26+0100\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
@@ -61,63 +61,63 @@ msgstr "Fehler beim Schreiben der neuen Indexdatei %s"
 msgid "can't create new index file for %s"
 msgstr "kann keine neue Indexdatei für %s erzeugen"
 
-#: src/cache.c:2503 src/cache.c:2537
+#: src/cache.c:2504 src/cache.c:2538
 #, c-format
 msgid "can't create cache file %s"
 msgstr "kann die Cachedatei %s nicht erzeugen"
 
-#: src/cache.c:2552
+#: src/cache.c:2553
 #, c-format
 msgid "error writing directory %s"
 msgstr "Fehler beim Schreiben des Verzeichnisses %s"
 
-#: src/cache.c:2718 src/mount_davfs.c:591 src/mount_davfs.c:593
+#: src/cache.c:2719 src/mount_davfs.c:591 src/mount_davfs.c:593
 #: src/mount_davfs.c:770 src/mount_davfs.c:772 src/mount_davfs.c:778
 #: src/mount_davfs.c:818 src/mount_davfs.c:820 src/mount_davfs.c:837
 #: src/mount_davfs.c:839 src/mount_davfs.c:1682 src/mount_davfs.c:1684
 msgid "can't read user data base"
 msgstr "kann die Benutzerdatenbank nicht lesen"
 
-#: src/cache.c:2729
+#: src/cache.c:2730
 #, c-format
 msgid "can't open cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht öffnen"
 
-#: src/cache.c:2744
+#: src/cache.c:2745
 #, c-format
 msgid "can't create cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht erzeugen"
 
-#: src/cache.c:2751
+#: src/cache.c:2752
 #, c-format
 msgid "can't access cache directory %s"
 msgstr "Zugriff auf das Cachverzeichnis %s verweigert"
 
-#: src/cache.c:2754
+#: src/cache.c:2755
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr "das Cacheverzeichnis %s hat den falschen Besitzer"
 
-#: src/cache.c:2758
+#: src/cache.c:2759
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr "das Cachverzeichnis %s hat die falschen Dateirechte"
 
-#: src/cache.c:2788
+#: src/cache.c:2789
 msgid "found orphaned file in cache:"
 msgstr "fand verwaiste Datei im Cache:"
 
-#: src/cache.c:2859
+#: src/cache.c:2860
 #, c-format
 msgid "error parsing %s"
 msgstr "Syntaxfehler in %s"
 
-#: src/cache.c:2860
+#: src/cache.c:2861
 #, c-format
 msgid "  at line %i"
 msgstr "  in Zeile %i"
 
-#: src/cache.c:2905
+#: src/cache.c:2906
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
@@ -423,7 +423,7 @@ msgstr "die URL ist ungültig"
 msgid "can't determine home directory"
 msgstr "kann das Home-Verzeichnis nicht ermitteln"
 
-#: src/mount_davfs.c:1087 src/webdav.c:387
+#: src/mount_davfs.c:1087 src/webdav.c:390
 #, c-format
 msgid "can't read client certificate %s"
 msgstr "kann das Client-Zertifikat %s nicht lesen"
@@ -464,7 +464,7 @@ msgstr ""
 "Gib bitte das Passwort von %s für den Proxy %s\n"
 "an; wenn du keines angeben willst, drücke Return.\n"
 
-#: src/mount_davfs.c:1149 src/mount_davfs.c:1165 src/webdav.c:394
+#: src/mount_davfs.c:1149 src/mount_davfs.c:1165 src/webdav.c:397
 msgid "Password: "
 msgstr "Passwort:"
 
@@ -724,24 +724,24 @@ msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr ""
 "während des Wartens trat ein Fehler auf; bitte warte bis der %s-Prozess endet"
 
-#: src/webdav.c:320
+#: src/webdav.c:323
 msgid "socket library initialization failed"
 msgstr "die socket-Bibliothek konnte nicht initialisiert werden"
 
-#: src/webdav.c:333
+#: src/webdav.c:336
 msgid "can't open stream to log neon-messages"
 msgstr "kann die Ausgabe für neon-Log-Meldungen nicht öffnen"
 
-#: src/webdav.c:366
+#: src/webdav.c:369
 msgid "neon library does not support TLS/SSL"
 msgstr "die Neon-Bibliothek uterstützt TLS/SSL nicht"
 
-#: src/webdav.c:374
+#: src/webdav.c:377
 #, c-format
 msgid "can't read server certificate %s"
 msgstr "kann das Server-Zertifikat %s nicht lesen"
 
-#: src/webdav.c:392
+#: src/webdav.c:395
 #, c-format
 msgid ""
 "Please enter the password to decrypt client\n"
@@ -750,78 +750,78 @@ msgstr ""
 "Gib bitte das Passwort für die Entschlüsselung des\n"
 "Client-Zertifikats %s ein.\n"
 
-#: src/webdav.c:406
+#: src/webdav.c:409
 #, c-format
 msgid "can't decrypt client certificate %s"
 msgstr "kann das Zertifikat %s nicht entschlüsseln"
 
-#: src/webdav.c:458 src/webdav.c:461
+#: src/webdav.c:461 src/webdav.c:464
 msgid "mounting failed; the server does not support WebDAV"
 msgstr "das Einhängen schlug fehl; der Server unterstützt WebDAV nicht"
 
-#: src/webdav.c:469
+#: src/webdav.c:472
 msgid "warning: the server does not support locks"
 msgstr "Warnung: der Server kann Dateien nicht sperren"
 
-#: src/webdav.c:1502
+#: src/webdav.c:1501
 msgid "authentication failure:"
 msgstr "Authentifizierungsfehler"
 
-#: src/webdav.c:1540
+#: src/webdav.c:1539
 #, c-format
 msgid "%i can't open cache file"
 msgstr "%i kann die Cache-Datei nicht öffnen"
 
-#: src/webdav.c:1548
+#: src/webdav.c:1547
 #, c-format
 msgid "%i error writing to cache file"
 msgstr "%i Fehler beim Schreiben der Cache-Datei"
 
-#: src/webdav.c:1803 src/webdav.c:1806
+#: src/webdav.c:1789 src/webdav.c:1792
 msgid "error processing server certificate"
 msgstr "Fehler beim Analysieren des Server-Zertifikats"
 
-#: src/webdav.c:1813 src/webdav.c:1849
+#: src/webdav.c:1799 src/webdav.c:1835
 msgid "the server certificate is not yet valid"
 msgstr "das Server-Zertifikat ist noch nicht gültig"
 
-#: src/webdav.c:1815 src/webdav.c:1852
+#: src/webdav.c:1801 src/webdav.c:1838
 msgid "the server certificate has expired"
 msgstr "das Server-Zertifikat ist nicht mehr gültig"
 
-#: src/webdav.c:1817 src/webdav.c:1855
+#: src/webdav.c:1803 src/webdav.c:1841
 msgid "the server certificate does not match the server name"
 msgstr "das Server-Zertifikat passt nicht zum Namen des Servers"
 
-#: src/webdav.c:1819 src/webdav.c:1858
+#: src/webdav.c:1805 src/webdav.c:1844
 msgid "the server certificate is not trusted"
 msgstr "wir trauen dem Zertifikat nicht"
 
-#: src/webdav.c:1821 src/webdav.c:1861
+#: src/webdav.c:1807 src/webdav.c:1847
 msgid "unknown certificate error"
 msgstr "Fehler beim Analysieren des Server-Zertifikats"
 
-#: src/webdav.c:1822
+#: src/webdav.c:1808
 #, c-format
 msgid "  issuer:      %s"
 msgstr "  Aussteller:    %s"
 
-#: src/webdav.c:1824
+#: src/webdav.c:1810
 #, c-format
 msgid "  subject:     %s"
 msgstr "  Inhaber:       %s"
 
-#: src/webdav.c:1826
+#: src/webdav.c:1812
 #, c-format
 msgid "  identity:    %s"
 msgstr "  Name:          %s"
 
-#: src/webdav.c:1828
+#: src/webdav.c:1814
 #, c-format
 msgid "  fingerprint: %s"
 msgstr "  Fingerabdruck: %s"
 
-#: src/webdav.c:1831
+#: src/webdav.c:1817
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -832,26 +832,26 @@ msgstr ""
 "dass der Fingerabdruck stimmt. Der Server könnte gefälscht sein oder\n"
 "ein Angreifer könnte sich in die Verbindung zum Server eingeschaltet haben.\n"
 
-#: src/webdav.c:1834
+#: src/webdav.c:1820
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr "Ich akzeptiere das Zertifikat für diese Sitzung [j,N]: "
 
-#: src/webdav.c:1862
+#: src/webdav.c:1848
 #, c-format
 msgid "  issuer: %s"
 msgstr "  Aussteller des Zertifikats: %s"
 
-#: src/webdav.c:1863
+#: src/webdav.c:1849
 #, c-format
 msgid "  subject: %s"
 msgstr "  Inhaber des Zertifikats: %s"
 
-#: src/webdav.c:1864
+#: src/webdav.c:1850
 #, c-format
 msgid "  identity: %s"
 msgstr "  Name: %s"
 
-#: src/webdav.c:1867
+#: src/webdav.c:1853
 msgid "  accepted by user"
 msgstr "  durch den Benutzer akzeptiert"

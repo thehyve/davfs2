@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-04-30 21:12+0200\n"
+"POT-Creation-Date: 2009-05-01 20:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,63 +56,63 @@ msgstr ""
 msgid "can't create new index file for %s"
 msgstr ""
 
-#: src/cache.c:2503 src/cache.c:2537
+#: src/cache.c:2504 src/cache.c:2538
 #, c-format
 msgid "can't create cache file %s"
 msgstr ""
 
-#: src/cache.c:2552
+#: src/cache.c:2553
 #, c-format
 msgid "error writing directory %s"
 msgstr ""
 
-#: src/cache.c:2718 src/mount_davfs.c:591 src/mount_davfs.c:593
+#: src/cache.c:2719 src/mount_davfs.c:591 src/mount_davfs.c:593
 #: src/mount_davfs.c:770 src/mount_davfs.c:772 src/mount_davfs.c:778
 #: src/mount_davfs.c:818 src/mount_davfs.c:820 src/mount_davfs.c:837
 #: src/mount_davfs.c:839 src/mount_davfs.c:1682 src/mount_davfs.c:1684
 msgid "can't read user data base"
 msgstr ""
 
-#: src/cache.c:2729
+#: src/cache.c:2730
 #, c-format
 msgid "can't open cache directory %s"
 msgstr ""
 
-#: src/cache.c:2744
+#: src/cache.c:2745
 #, c-format
 msgid "can't create cache directory %s"
 msgstr ""
 
-#: src/cache.c:2751
+#: src/cache.c:2752
 #, c-format
 msgid "can't access cache directory %s"
 msgstr ""
 
-#: src/cache.c:2754
+#: src/cache.c:2755
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr ""
 
-#: src/cache.c:2758
+#: src/cache.c:2759
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr ""
 
-#: src/cache.c:2788
+#: src/cache.c:2789
 msgid "found orphaned file in cache:"
-msgstr ""
-
-#: src/cache.c:2859
-#, c-format
-msgid "error parsing %s"
 msgstr ""
 
 #: src/cache.c:2860
 #, c-format
+msgid "error parsing %s"
+msgstr ""
+
+#: src/cache.c:2861
+#, c-format
 msgid "  at line %i"
 msgstr ""
 
-#: src/cache.c:2905
+#: src/cache.c:2906
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
@@ -404,7 +404,7 @@ msgstr ""
 msgid "can't determine home directory"
 msgstr ""
 
-#: src/mount_davfs.c:1087 src/webdav.c:387
+#: src/mount_davfs.c:1087 src/webdav.c:390
 #, c-format
 msgid "can't read client certificate %s"
 msgstr ""
@@ -437,7 +437,7 @@ msgid ""
 "%s or hit enter for none.\n"
 msgstr ""
 
-#: src/mount_davfs.c:1149 src/mount_davfs.c:1165 src/webdav.c:394
+#: src/mount_davfs.c:1149 src/mount_davfs.c:1165 src/webdav.c:397
 msgid "Password: "
 msgstr ""
 
@@ -640,102 +640,102 @@ msgstr ""
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr ""
 
-#: src/webdav.c:320
+#: src/webdav.c:323
 msgid "socket library initialization failed"
 msgstr ""
 
-#: src/webdav.c:333
+#: src/webdav.c:336
 msgid "can't open stream to log neon-messages"
 msgstr ""
 
-#: src/webdav.c:366
+#: src/webdav.c:369
 msgid "neon library does not support TLS/SSL"
 msgstr ""
 
-#: src/webdav.c:374
+#: src/webdav.c:377
 #, c-format
 msgid "can't read server certificate %s"
 msgstr ""
 
-#: src/webdav.c:392
+#: src/webdav.c:395
 #, c-format
 msgid ""
 "Please enter the password to decrypt client\n"
 "certificate %s.\n"
 msgstr ""
 
-#: src/webdav.c:406
+#: src/webdav.c:409
 #, c-format
 msgid "can't decrypt client certificate %s"
 msgstr ""
 
-#: src/webdav.c:458 src/webdav.c:461
+#: src/webdav.c:461 src/webdav.c:464
 msgid "mounting failed; the server does not support WebDAV"
 msgstr ""
 
-#: src/webdav.c:469
+#: src/webdav.c:472
 msgid "warning: the server does not support locks"
 msgstr ""
 
-#: src/webdav.c:1502
+#: src/webdav.c:1501
 msgid "authentication failure:"
 msgstr ""
 
-#: src/webdav.c:1540
+#: src/webdav.c:1539
 #, c-format
 msgid "%i can't open cache file"
 msgstr ""
 
-#: src/webdav.c:1548
+#: src/webdav.c:1547
 #, c-format
 msgid "%i error writing to cache file"
 msgstr ""
 
-#: src/webdav.c:1803 src/webdav.c:1806
+#: src/webdav.c:1789 src/webdav.c:1792
 msgid "error processing server certificate"
 msgstr ""
 
-#: src/webdav.c:1813 src/webdav.c:1849
+#: src/webdav.c:1799 src/webdav.c:1835
 msgid "the server certificate is not yet valid"
 msgstr ""
 
-#: src/webdav.c:1815 src/webdav.c:1852
+#: src/webdav.c:1801 src/webdav.c:1838
 msgid "the server certificate has expired"
 msgstr ""
 
-#: src/webdav.c:1817 src/webdav.c:1855
+#: src/webdav.c:1803 src/webdav.c:1841
 msgid "the server certificate does not match the server name"
 msgstr ""
 
-#: src/webdav.c:1819 src/webdav.c:1858
+#: src/webdav.c:1805 src/webdav.c:1844
 msgid "the server certificate is not trusted"
 msgstr ""
 
-#: src/webdav.c:1821 src/webdav.c:1861
+#: src/webdav.c:1807 src/webdav.c:1847
 msgid "unknown certificate error"
 msgstr ""
 
-#: src/webdav.c:1822
+#: src/webdav.c:1808
 #, c-format
 msgid "  issuer:      %s"
 msgstr ""
 
-#: src/webdav.c:1824
+#: src/webdav.c:1810
 #, c-format
 msgid "  subject:     %s"
 msgstr ""
 
-#: src/webdav.c:1826
+#: src/webdav.c:1812
 #, c-format
 msgid "  identity:    %s"
 msgstr ""
 
-#: src/webdav.c:1828
+#: src/webdav.c:1814
 #, c-format
 msgid "  fingerprint: %s"
 msgstr ""
 
-#: src/webdav.c:1831
+#: src/webdav.c:1817
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -743,26 +743,26 @@ msgid ""
 "or there might be a man-in-the-middle-attack.\n"
 msgstr ""
 
-#: src/webdav.c:1834
+#: src/webdav.c:1820
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr ""
 
-#: src/webdav.c:1862
+#: src/webdav.c:1848
 #, c-format
 msgid "  issuer: %s"
 msgstr ""
 
-#: src/webdav.c:1863
+#: src/webdav.c:1849
 #, c-format
 msgid "  subject: %s"
 msgstr ""
 
-#: src/webdav.c:1864
+#: src/webdav.c:1850
 #, c-format
 msgid "  identity: %s"
 msgstr ""
 
-#: src/webdav.c:1867
+#: src/webdav.c:1853
 msgid "  accepted by user"
 msgstr ""

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-04-30 21:12+0200\n"
+"POT-Creation-Date: 2009-05-01 20:32+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -61,63 +61,63 @@ msgstr "chyba při zápisu nového indexového souboru %s"
 msgid "can't create new index file for %s"
 msgstr "nemohu vytvořit nový indexový soubor pro %s"
 
-#: src/cache.c:2503 src/cache.c:2537
+#: src/cache.c:2504 src/cache.c:2538
 #, c-format
 msgid "can't create cache file %s"
 msgstr "nemohu vytvořit soubor vyrovnávací paměti %s"
 
-#: src/cache.c:2552
+#: src/cache.c:2553
 #, c-format
 msgid "error writing directory %s"
 msgstr "chyba při zápisu adresáře %s"
 
-#: src/cache.c:2718 src/mount_davfs.c:591 src/mount_davfs.c:593
+#: src/cache.c:2719 src/mount_davfs.c:591 src/mount_davfs.c:593
 #: src/mount_davfs.c:770 src/mount_davfs.c:772 src/mount_davfs.c:778
 #: src/mount_davfs.c:818 src/mount_davfs.c:820 src/mount_davfs.c:837
 #: src/mount_davfs.c:839 src/mount_davfs.c:1682 src/mount_davfs.c:1684
 msgid "can't read user data base"
 msgstr "nemohu přečíst údaje o uživatelích"
 
-#: src/cache.c:2729
+#: src/cache.c:2730
 #, c-format
 msgid "can't open cache directory %s"
 msgstr "nemohu otevřít kešovací adresář %s"
 
-#: src/cache.c:2744
+#: src/cache.c:2745
 #, c-format
 msgid "can't create cache directory %s"
 msgstr "nemohu vytvořit kešovací adresář %s"
 
-#: src/cache.c:2751
+#: src/cache.c:2752
 #, c-format
 msgid "can't access cache directory %s"
 msgstr "nemohu přistoupit ke kešovacímu adresáři %s"
 
-#: src/cache.c:2754
+#: src/cache.c:2755
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr "chybný vlastník kešovacího adresáře %s"
 
-#: src/cache.c:2758
+#: src/cache.c:2759
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr "pro kešovací adresář %s nastaveno chybné oprávnění"
 
-#: src/cache.c:2788
+#: src/cache.c:2789
 msgid "found orphaned file in cache:"
 msgstr ""
 
-#: src/cache.c:2859
+#: src/cache.c:2860
 #, c-format
 msgid "error parsing %s"
 msgstr "chyba při zpracování %s"
 
-#: src/cache.c:2860
+#: src/cache.c:2861
 #, c-format
 msgid "  at line %i"
 msgstr ""
 
-#: src/cache.c:2905
+#: src/cache.c:2906
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
@@ -419,7 +419,7 @@ msgstr "neplatné URL"
 msgid "can't determine home directory"
 msgstr "nelze určit domovský adresář"
 
-#: src/mount_davfs.c:1087 src/webdav.c:387
+#: src/mount_davfs.c:1087 src/webdav.c:390
 #, c-format
 msgid "can't read client certificate %s"
 msgstr "nelze přečíst klientský certifikát %s"
@@ -457,7 +457,7 @@ msgstr ""
 "Zadejte prosím heslo pro autentizaci uživatele %s na proxy\n"
 "%s (pokud žádné zadat nechcete, pouze stiskněte enter).\n"
 
-#: src/mount_davfs.c:1149 src/mount_davfs.c:1165 src/webdav.c:394
+#: src/mount_davfs.c:1149 src/mount_davfs.c:1165 src/webdav.c:397
 msgid "Password: "
 msgstr "Heslo: "
 
@@ -716,25 +716,25 @@ msgstr "%s: čekám, než si  %s (pid %s) sesynchronizuje vyrovnávací paměť.
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr "při čekání došlo k chybě; čekejte prosím až %s skončí"
 
-#: src/webdav.c:320
+#: src/webdav.c:323
 #, fuzzy
 msgid "socket library initialization failed"
 msgstr "selhala inicializace knihovny socketů"
 
-#: src/webdav.c:333
+#: src/webdav.c:336
 msgid "can't open stream to log neon-messages"
 msgstr ""
 
-#: src/webdav.c:366
+#: src/webdav.c:369
 msgid "neon library does not support TLS/SSL"
 msgstr "knihovna neon nepodporuje TLS/SSL"
 
-#: src/webdav.c:374
+#: src/webdav.c:377
 #, c-format
 msgid "can't read server certificate %s"
 msgstr "nemohu přečíst serverový cerifikát %s"
 
-#: src/webdav.c:392
+#: src/webdav.c:395
 #, c-format
 msgid ""
 "Please enter the password to decrypt client\n"
@@ -743,78 +743,78 @@ msgstr ""
 "Zadejte prosím heslo pro dešifrování klientského\n"
 "certifikátu %s.\n"
 
-#: src/webdav.c:406
+#: src/webdav.c:409
 #, c-format
 msgid "can't decrypt client certificate %s"
 msgstr "nemohu dešifrovat klientský certifikát %s"
 
-#: src/webdav.c:458 src/webdav.c:461
+#: src/webdav.c:461 src/webdav.c:464
 msgid "mounting failed; the server does not support WebDAV"
 msgstr "připojení selhalo; server nepodporuje WebDAV"
 
-#: src/webdav.c:469
+#: src/webdav.c:472
 msgid "warning: the server does not support locks"
 msgstr "varování: server nepodporuje zámky"
 
-#: src/webdav.c:1502
+#: src/webdav.c:1501
 msgid "authentication failure:"
 msgstr "selhání autentizace:"
 
-#: src/webdav.c:1540
+#: src/webdav.c:1539
 #, c-format
 msgid "%i can't open cache file"
 msgstr "%i nemůže otevřít soubor vyrovnávací paměti"
 
-#: src/webdav.c:1548
+#: src/webdav.c:1547
 #, c-format
 msgid "%i error writing to cache file"
 msgstr "%i chyba při zápisu do souboru vyrovnávací paměti"
 
-#: src/webdav.c:1803 src/webdav.c:1806
+#: src/webdav.c:1789 src/webdav.c:1792
 msgid "error processing server certificate"
 msgstr "chyba při zpracování certifikátu serveru"
 
-#: src/webdav.c:1813 src/webdav.c:1849
+#: src/webdav.c:1799 src/webdav.c:1835
 msgid "the server certificate is not yet valid"
 msgstr "certifikát serveru zatím není platný"
 
-#: src/webdav.c:1815 src/webdav.c:1852
+#: src/webdav.c:1801 src/webdav.c:1838
 msgid "the server certificate has expired"
 msgstr "platnost certifikátu serveru vypršela"
 
-#: src/webdav.c:1817 src/webdav.c:1855
+#: src/webdav.c:1803 src/webdav.c:1841
 msgid "the server certificate does not match the server name"
 msgstr "certifikát serveru nedopovídá jménu serveru"
 
-#: src/webdav.c:1819 src/webdav.c:1858
+#: src/webdav.c:1805 src/webdav.c:1844
 msgid "the server certificate is not trusted"
 msgstr "certifikát serveru je nedůvěryhodný"
 
-#: src/webdav.c:1821 src/webdav.c:1861
+#: src/webdav.c:1807 src/webdav.c:1847
 msgid "unknown certificate error"
 msgstr "neznámá chyba certifikátu"
 
-#: src/webdav.c:1822
+#: src/webdav.c:1808
 #, c-format
 msgid "  issuer:      %s"
 msgstr "  vydavatel:      %s"
 
-#: src/webdav.c:1824
+#: src/webdav.c:1810
 #, c-format
 msgid "  subject:     %s"
 msgstr "  subjekt:     %s"
 
-#: src/webdav.c:1826
+#: src/webdav.c:1812
 #, c-format
 msgid "  identity:    %s"
 msgstr "  identita:    %s"
 
-#: src/webdav.c:1828
+#: src/webdav.c:1814
 #, c-format
 msgid "  fingerprint: %s"
 msgstr "  otisk: %s"
 
-#: src/webdav.c:1831
+#: src/webdav.c:1817
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -825,27 +825,27 @@ msgstr ""
 "ověřit jeho otisk! Server může být podvržen nebo může\n"
 "dojít k útoku s prostředníkem (man-in-the-middle attack).\n"
 
-#: src/webdav.c:1834
+#: src/webdav.c:1820
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr "Přijmout certifikát pro toto sezení? [y,N] "
 
-#: src/webdav.c:1862
+#: src/webdav.c:1848
 #, c-format
 msgid "  issuer: %s"
 msgstr "  vydavatel: %s"
 
-#: src/webdav.c:1863
+#: src/webdav.c:1849
 #, c-format
 msgid "  subject: %s"
 msgstr "  subjekt: %s"
 
-#: src/webdav.c:1864
+#: src/webdav.c:1850
 #, c-format
 msgid "  identity: %s"
 msgstr "  identita: %s"
 
-#: src/webdav.c:1867
+#: src/webdav.c:1853
 msgid "  accepted by user"
 msgstr "  přijat uživatelem"
 

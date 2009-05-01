@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2009-05-01 Werner Baumann (werner.baumann@onlinehome.de)
+    * bootstrap:
+      Use --copy option with automake, remove rm commands.
+
+2009-05-01 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c:
       Fix Etag normalization.
 
