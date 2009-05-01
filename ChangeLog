@@ -4,7 +4,6 @@ ChangeLog for davfs2
 2009-04-30 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_close:
       if delay_upload == 0 save to server immediately.
-   FIXME: manpage
 
 2009-04-29 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h:
