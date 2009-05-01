@@ -810,6 +810,36 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
         set_upload_time(node);
     }
 
+    if (delay_upload == 0 && (is_dirty(node) || is_created(node))
+            && !is_open_write(node) && !is_backup(node)) {
+        int set_execute = -1;
+        if (is_created(node) && node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+            set_execute = 1;
+        int ret = dav_put(node->path, node->cache_path, &node->remote_exists,
+                          &node->lock_expire, &node->etag, &node->smtime,
+                          &node->mime_type, set_execute);
+        if (!ret) {
+            node->utime = time(NULL);
+            node->dirty = 0;
+            if (dav_unlock(node->path, &node->lock_expire) == 0)
+                remove_from_changed(node);
+        } else {
+            if (debug) {
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "close: neon error");
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "      %s",
+                       dav_get_webdav_error());
+            }
+            if (ret == EACCES || ret == EINVAL || ret == ENOENT
+                    || ret == EPERM || ret == ENOSPC || ret == EEXIST) {
+                dav_unlock(node->path, &node->lock_expire);
+                delete_cache_file(node->parent);
+                node->parent->utime = 0;
+                remove_node(node);
+                *flush = 1;
+            }
+        }
+    }
+
     return 0;
 }
 
