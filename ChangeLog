@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2009-05-01 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c:
+      Fix Etag normalization.
+
+2009-05-01 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.h, dav_open:
       Add parameter open_create to allow
       for open(..., O_CREATE, 444).

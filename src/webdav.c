@@ -165,8 +165,8 @@ static int use_expect100;
 static int has_if_match_bug;
 
 /* Some servers sends a weak invalid etag that turns into a valid strong etag
-   after one second. With this flag set, the weakness indicator is removed,
-   otherwise the etag is not used at all. */
+   after one second. With this flag set weak etags are not used at all,
+   otherwise the weakness indicator is removed. */
 static int drop_weak_etags;
 
 /* Check with HEAD for existence or modification of a file, before locking or
@@ -232,6 +232,9 @@ lock_refresh(struct ne_lock *lock, time_t *expire);
 
 static ssize_t
 log_writer(void *cookie, const char *buffer, size_t size);
+
+static char *
+normalize_etag(const char *etag);
 
 static void
 replace_slashes(char **name);
@@ -697,21 +700,8 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
             *mtime = ne_httpdate_parse(value);
 
         if (etag) {
-            if (*etag)
-                free(*etag);
-            value = ne_get_response_header(req, "ETag");
-            if (value && *value == 'W') {
-                if (drop_weak_etags) {
-                    value = strchr(value, '\"');
-                } else {
-                    value = NULL;
-                }
-            }
-            if (value) {
-                *etag = ne_strdup(value);
-            } else {
-                *etag = NULL;
-            }
+            if (*etag) free(*etag);
+            *etag = normalize_etag(ne_get_response_header(req, "ETag"));
         }
 
         value = ne_get_response_header(req, "Content-Type");
@@ -749,20 +739,8 @@ dav_head(const char *path, char **etag, time_t *mtime, off_t *length,
 
     const char *value = ne_get_response_header(req, "ETag");
     if (!ret && etag && value) {
-        if (*etag)
-            free(*etag);
-        if (*value == 'W') {
-            if (drop_weak_etags) {
-                value = NULL;
-            } else {
-                value = strchr(value, '\"');
-            }
-        }
-        if (value) {
-            *etag = ne_strdup(value);
-        } else {
-            *etag = NULL;
-        }
+        if (*etag) free(*etag);
+        *etag = normalize_etag(value);
     }
 
     value = ne_get_response_header(req, "Last-Modified");
@@ -1044,23 +1022,8 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
         const char *value;
 
         if (etag) {
-            if (*etag) {
-                free(*etag);
-                *etag = NULL;
-            }
-            value = ne_get_response_header(req, "ETag");
-            if (value && *value == 'W') {
-                if (drop_weak_etags) {
-                    value = strchr(value, '\"');
-                } else {
-                    value = NULL;
-                }
-            }
-            if (value) {
-                *etag = ne_strdup(value);
-            } else {
-                need_head = 1;
-            }
+            if (*etag) free(*etag);
+            *etag = normalize_etag(ne_get_response_header(req, "ETag"));
         }
 
         if (mtime) {
@@ -1448,6 +1411,42 @@ log_writer(void *cookie, const char *buffer, size_t size)
 }
 
 
+/* Checks etag for weakness indicator and quotation marks.
+   The reurn value is either a strong etag with quotation marks or NULL.
+   Depending on global variable drop_weak_etags weak etags are either
+   dropped or convertet into strong ones. */
+static char *
+normalize_etag(const char *etag)
+{
+    if (!etag) return NULL;
+
+    const char * e = etag;
+    if (*e == 'W') {
+        if (drop_weak_etags) {
+            return NULL;
+        } else {
+            e++;
+            if (*e == '/') {
+                e++;
+            } else {
+                return NULL;
+            }
+        }
+    }
+    if (!*e) return NULL;
+
+    char *ne = NULL;
+    if (*e == '\"') {
+        ne = strdup(e);
+    } else {
+        if (asprintf(&ne, "\"%s\"", e) < 0)
+            ne = NULL;;
+    }
+
+    return ne;
+}
+
+
 /* Replaces slashes in name by "slash-", "-slash-" or "-slash", depending
    on the position of the slash within name. */
 static void
@@ -1694,20 +1693,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     }
 
     data = ne_propset_value(set, &prop_names[ETAG]);
-    if (data && *data == 'W') {
-        if (drop_weak_etags) {
-            data = NULL;
-        } else {
-            data += 2;
-        }
-    }
-    if (data) {
-        if (*data == '\"') {
-            result->etag = ne_strdup(data);
-         } else {
-            result->etag = ne_concat("\"", data, "\"", NULL);
-        }
-    }
+    result->etag = normalize_etag(data);
 
     data = ne_propset_value(set, &prop_names[LENGTH]);
     if (data)
