@@ -11,10 +11,8 @@ autopoint --force
 cd man; po4a po4a.conf; cd ..
 aclocal -I config
 autoheader
-automake --add-missing --force-missing
+automake --add-missing --force-missing --copy
 autoconf
-rm COPYING
-rm INSTALL
 cp -p config/COPYING.davfs2 COPYING
 cp -p config/INSTALL.davfs2 INSTALL
 
