@@ -258,7 +258,7 @@ Default: 0
 Popular servers send a weak etag whenever they are not able to calculate
 a strong one. This weak etag will never be valid, but after one second it
 is silently turned into a strong, valid etag. With this flag set to 1,
-\fB@PROGRAM_NAME@\fR will never use this weak etags. If the flas is 0,
+\fB@PROGRAM_NAME@\fR will never use this weak etags. If the flag is 0,
 the weakness indicator will be removed and the etag is assumed to be
 strong. There is some danger of the Lost-Update-Problem with
 this. But it is minimized when using locks.

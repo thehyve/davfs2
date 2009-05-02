@@ -7,7 +7,61 @@
 What is new in davfs2 1.4.0
 ===========================
 
-FIXME
+With this release of davfs2 the default configuration has changed
+significantly to better match user experience and the behaviour of
+current WebDAV servers. This might cause your current configuration
+to no longer work with your server. Please carefully check for
+changes that might affect your davfs2 configuration.
+
+if_match_bug
+------------
+The default is now 0 (was 1) assuming your server does not have this
+bug. To the best of my knowledge this bug was only found in
+Apache with mod_dav and was fixed with release 2.2.8. But there are
+many older versions of Apache/mod_dav out there and you might have
+to manually insert this option in your davfs2.conf.
+
+use_expect100
+-------------
+The default is now 0 (was 1). This option rarely is of any use but
+frequently causes trouble with servers that don't support it (it is
+an optional protocol element). You only should set this option if
+you really need it and know it is working with your server.
+
+use_displayname
+---------------
+This option has been removed. davfs2 no longer supports "displayname".
+This WebDAV property has been undefined nonsense from the beginning
+and the update of the WebDAV protocol only made it worse. The protocol
+explicitly states that this "name"(?) needs *not* to be unique. It is
+therefore impossible to use it as a file name in davfs2. 
+
+delay_upload
+------------
+When this option is set to 0 seconds on closing a changed file it will be
+*synchronously* saved to the server and the upcall from the kernel will
+block until the upload is finished. But in case the upload fails temporarily
+the upcall from the kernel will return and davfs2 will try uploading later.
+This may make davfs2 very slow due too many unsuccessful attempts to upload.
+Only use "delay_upload 0" when your really need it and you have a reliable
+connection to the server.
+
+Command line (and fstab) options askauth, locks and useproxy
+------------------------------------------------------------
+These have been deprecated for many years and now have been removed. There
+are corresponding options in davfs2.conf.
+
+Command line (and fstab) option users
+-------------------------------------
+davfs2 now supports the option users which allows any user to unmount a
+davfs2 file system. This is intended as a work around for systems without
+the mtab file.
+
+Known bugs (except those listed in BUGS) have been fixed.
+
+Last but not least the davfs2 project moved to Savannah:
+http://savannah.nongnu.org/projects/davfs2
+
 
 
 What is new in davfs2 1.3.X
