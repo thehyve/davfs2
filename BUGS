@@ -1,4 +1,4 @@
-davfs2 known bugs 2009-04-27
+davfs2 known bugs 2009-05-02
 ----------------------------
 
 davfs2 does not support links.
@@ -7,6 +7,8 @@ A davfs2 file system cannot be moved with 'mount --move'.
 
 If a filename contains a "/"-character, it will be displayed, but it
 cannot be accessed.
+
+A proper GNU-style manual is still missing.
 
 
 Report Bugs

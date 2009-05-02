@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2009-04-27 18:47+0300\n"
+"POT-Creation-Date: 2009-05-02 16:52+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -546,7 +546,7 @@ msgid ""
 "Popular servers send a weak etag whenever they are not able to calculate a "
 "strong one. This weak etag will never be valid, but after one second it is "
 "silently turned into a strong, valid etag. With this flag set to 1, "
-"B<@PROGRAM_NAME@> will never use this weak etags. If the flas is 0, the "
+"B<@PROGRAM_NAME@> will never use this weak etags. If the flag is 0, the "
 "weakness indicator will be removed and the etag is assumed to be strong. "
 "There is some danger of the Lost-Update-Problem with this. But it is "
 "minimized when using locks."
@@ -1066,7 +1066,7 @@ msgid "Includes config, kernel, cache and http."
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:501 mount.davfs.8:513 umount.davfs.8:79
+#: davfs2.conf.5:501 mount.davfs.8:518 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr ""
@@ -1079,18 +1079,18 @@ msgid ""
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:507 mount.davfs.8:530 umount.davfs.8:84
+#: davfs2.conf.5:507 mount.davfs.8:535 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:510 mount.davfs.8:533 umount.davfs.8:87
+#: davfs2.conf.5:510 mount.davfs.8:538 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:512 mount.davfs.8:535 umount.davfs.8:89
+#: davfs2.conf.5:512 mount.davfs.8:540 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr ""

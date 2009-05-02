@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2009-05-02 Werner Baumann (werner.baumann@onlinehome.de)
+    * Released version 1.4.0.
+
 2009-05-01 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac;
       Add AC_CHECK_FUNCS([ftruncate]).
