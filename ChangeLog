@@ -1,6 +1,12 @@
 ChangeLog for davfs2
 --------------------
 
+2009-05-15 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_open:
+      Open dirs with O_RDONLY.
+    * dav_coda.c, dav_fuse.c:
+      Replace ENOTSUP by ENOSYS for unsupported upcalls.
+
 2009-05-02 Werner Baumann (werner.baumann@onlinehome.de)
     * Released version 1.4.0.
 
