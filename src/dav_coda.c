@@ -219,7 +219,7 @@ dav_coda_loop(int device, size_t bufsize, time_t idle_time,
         case CODA_OPEN:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "CODA_OPEN:");
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         case CODA_CLOSE:
@@ -229,7 +229,7 @@ dav_coda_loop(int device, size_t bufsize, time_t idle_time,
         case CODA_IOCTL:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "CODA_IOCTL:");
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         case CODA_GETATTR:
@@ -261,7 +261,7 @@ dav_coda_loop(int device, size_t bufsize, time_t idle_time,
         case CODA_LINK:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "CODA_LINK:");
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         case CODA_RENAME: {
@@ -296,13 +296,13 @@ dav_coda_loop(int device, size_t bufsize, time_t idle_time,
         case CODA_SYMLINK:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "CODA_SYMLINK:");
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         case CODA_READLINK:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "CODA_READLINK:");
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         case CODA_FSYNC: {
@@ -318,14 +318,14 @@ dav_coda_loop(int device, size_t bufsize, time_t idle_time,
         case CODA_VGET:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "CODA_VGET:");
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         case CODA_OPEN_BY_PATH:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                        "CODA_OPEN_BY_PATH:");
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         case CODA_STATFS:
@@ -350,7 +350,7 @@ dav_coda_loop(int device, size_t bufsize, time_t idle_time,
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                        "UNKNOWN CODA CALL %u", ih->opcode);
-            oh->result = ENOTSUP;
+            oh->result = ENOSYS;
             len = sizeof(struct coda_out_hdr);
             break;
         }
