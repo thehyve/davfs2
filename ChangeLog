@@ -2,6 +2,8 @@ ChangeLog for davfs2
 --------------------
 
 2009-05-15 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_close:
+      Always delete directory cache files on close.
     * cache.c, dav_open:
       Open dirs with O_RDONLY.
     * dav_coda.c, dav_fuse.c:
