@@ -1090,7 +1090,7 @@ dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
         if (create_dir_cache_file(node) != 0)
             return EIO;
         node->atime = time(NULL);
-        return open_file(fd, node, O_RDWR, pid, pgid, uid);
+        return open_file(fd, node, O_RDONLY, pid, pgid, uid);
     }
 
     int ret = 0;

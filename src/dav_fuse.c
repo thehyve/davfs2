@@ -235,13 +235,13 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
         case FUSE_READLINK:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_READLINK:");
-            oh->error = -ENOTSUP;
+            oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_SYMLINK:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_SYMLINK:");
-            oh->error = -ENOTSUP;
+            oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_MKNOD:
@@ -284,7 +284,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
         case FUSE_LINK:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LINK:");
-            oh->error = -ENOTSUP;
+            oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_OPEN:
@@ -317,7 +317,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
         case FUSE_SETXATTR:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETXATTR:");
-            oh->error = -ENOTSUP;
+            oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_GETXATTR:
@@ -329,7 +329,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
         case FUSE_REMOVEXATTR:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_REMOVEXATTR:");
-            oh->error = -ENOTSUP;
+            oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_FLUSH:
@@ -354,7 +354,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
         case FUSE_FSYNCDIR:
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_FSYNCDIR:");
-            oh->error = -ENOTSUP;
+            oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_ACCESS:
@@ -367,7 +367,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                        "UNKNOWN FUSE CALL %i", ih->opcode);
-            oh->error = -ENOTSUP;
+            oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         }
