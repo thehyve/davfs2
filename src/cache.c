@@ -805,10 +805,12 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
 
     if (is_dir(node)) {
         node->atime = time(NULL);
-    } else {
-        attr_from_cache_file(node);
-        set_upload_time(node);
+        delete_cache_file(node);
+        return 0;
     }
+
+    attr_from_cache_file(node);
+    set_upload_time(node);
 
     if (delay_upload == 0 && (is_dirty(node) || is_created(node))
             && !is_open_write(node) && !is_backup(node)) {
