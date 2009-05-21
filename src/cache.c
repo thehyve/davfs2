@@ -1840,7 +1840,7 @@ move_dirty(dav_node *src, dav_node *dst, dav_node *dst_parent,
     char *dst_path;
     if (!dst) {
         char *dst_conv = dav_conv_to_server_enc(dst_name);
-        dst_path = ne_concat(dst_parent->path, dst_name, NULL);
+        dst_path = ne_concat(dst_parent->path, dst_conv, NULL);
         free(dst_conv);
     } else {
         dst_path = ne_strdup(dst->path);
@@ -1910,7 +1910,7 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
     char *dst_path;
     if (!dst) {
         char *dst_conv = dav_conv_to_server_enc(dst_name);
-        dst_path = ne_concat(dst_parent->path, dst_name, NULL);
+        dst_path = ne_concat(dst_parent->path, dst_conv, NULL);
         free(dst_conv);
     } else {
         dst_path = ne_strdup(dst->path);

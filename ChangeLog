@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-05-21 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.ce, move_dirty, move_reg:
+      Use converted file name for dst_path.
+
 2009-05-15 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_close:
       Always delete directory cache files on close.
