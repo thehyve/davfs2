@@ -273,8 +273,8 @@ move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
          const char *dst_name);
 
 static int
-move_dirty(dav_node *src, dav_node *dst, dav_node *dst_parent,
-           const char *dst_name);
+move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
+               const char *dst_name);
 
 static int
 move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
@@ -1253,7 +1253,7 @@ dav_rename(dav_node *src_parent, const char *src_name, dav_node *dst_parent,
         ret = move_dir(src, dst, dst_parent, dst_name);
     } else {
         if (is_created(src) || is_backup(src)) {
-            ret = move_dirty(src, dst, dst_parent, dst_name);
+            ret = move_no_remote(src, dst, dst_parent, dst_name);
         } else {
             ret = move_reg(src, dst, dst_parent, dst_name);
         }
@@ -1827,12 +1827,15 @@ move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
 }
 
 
-/* As the most recent version of file src is local, it deletes src and dst
-   on the server and locks dst. 
-   CLEAN-UP-NEEDED: no longer used with dirty files. Remote must not exist. */
+/* src does not exist on the server, but there may be a locked null-resource.
+   - if dst exists it will be removed, local and remote
+   - if src is locked, it is unlocked
+   - the path of src is changed according dst_name
+   - dst is locked on the server
+   - src is moved to its new position in the tree. */
 static int
-move_dirty(dav_node *src, dav_node *dst, dav_node *dst_parent,
-           const char *dst_name)
+move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
+               const char *dst_name)
 {
     if (dst && is_dir(dst))
         return EISDIR;
