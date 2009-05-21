@@ -1949,7 +1949,7 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
     src->name = ne_strdup(dst_name);
     free(src->path);
     src->path = dst_path;
-    src->utime = 0;
+    src->utime = time(NULL);
 
     return 0;
 }

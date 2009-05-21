@@ -5,7 +5,9 @@ ChangeLog for davfs2
     * cache.c, move_dirty, move_reg:
       Use converted file name for dst_path.
     * cache.c:
-      Rename move_dirty to Move_no_remote.
+      Rename move_dirty to move_no_remote.
+    * cache.c, move_reg:
+      Set src->utime = time(NULL).
 
 2009-05-15 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_close:
