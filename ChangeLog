@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-05-25 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, mount_davfs.c:
+      Add missing includes.
+
 2009-05-21 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, move_dirty, move_reg:
       Use converted file name for dst_path.
