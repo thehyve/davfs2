@@ -1,6 +1,36 @@
 ChangeLog for davfs2
 --------------------
 
+2009-05-31 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, cache.h, dav_coda.c, dav_fuse.c:
+      Cache quota in global variable fs_stat.
+      Update with dir_refresh and when closing or
+      deleting files.
+      Function dav_stafs now returns a pointer.
+
+2009-05-30 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, webdav.h, dav_quota:
+      Return total webspace instead of available.
+      Rember support for quota in static flag use_rfc.
+      Add support for method USERINFO.
+    * webdav.c:
+      Rename block_writer into file_reader for consistency
+      with neon naming conventions.
+    * cache.c, dav_open, dav_write:
+      Open directories O_RDWR again, but prevent writing
+      by applications.
+
+2009-05-29 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, check_double_mounts:
+      Free temporary string mp.
+    * cache.c, parse_index:
+      Free index.
+    * webdav.c, dav_init_webdav:
+      Make custom_header a global variable to not disturb
+      code test tools.
+    * webdav.c, dav_quota:
+      Initialize ctx to 0; add ctx.error, use strtoull.
+
 2009-05-25 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, mount_davfs.c:
       Add missing includes.

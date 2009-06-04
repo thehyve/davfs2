@@ -684,13 +684,17 @@ coda_statfs(void)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "CODA_STATFS:");
 
-    dav_stat st = dav_statfs();
+    dav_stat *st = dav_statfs();
+    if (!st) {
+        oh->result = EIO;
+        return sizeof(struct coda_out_hdr);
+    }
 
-    out->stat.f_blocks = st.blocks;
-    out->stat.f_bfree = st.bfree;
-    out->stat.f_bavail = st.bavail;
-    out->stat.f_files = st.files;
-    out->stat.f_ffree = st.ffree;
+    out->stat.f_blocks = st->blocks;
+    out->stat.f_bfree = st->bfree;
+    out->stat.f_bavail = st->bavail;
+    out->stat.f_files = st->files;
+    out->stat.f_ffree = st->ffree;
 
     oh->result = 0;
     return sizeof(struct coda_statfs_out);

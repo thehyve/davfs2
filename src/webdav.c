@@ -90,8 +90,9 @@ typedef struct {
 } get_context;
 
 typedef struct {
-    off_t available;            /* Available bytes. */
-    off_t used;                 /* Used bytes. */
+    int error;
+    off64_t total;              /* Total amount of available bytes. */
+    off64_t used;               /* Used bytes. */
 } quota_context;
 
 
@@ -203,6 +204,9 @@ static iconv_t to_server_enc;
 /* A GNU custom stream, used to redirect neon debug messages to syslog. */
 static FILE *log_stream;
 
+/* A user defined header that is added to all requests. */
+char *custom_header;
+
 #if NE_VERSION_MINOR > 25
 /* Session cookie. */
 static char *cookie;
@@ -248,7 +252,7 @@ static int
 auth(void *userdata, const char *realm, int attempt, char *user, char *pwd);
 
 static int
-block_writer(void *userdata, const char *block, size_t length);
+file_reader(void *userdata, const char *block, size_t length);
 
 #if NE_VERSION_MINOR < 26
 
@@ -275,6 +279,9 @@ static void
 quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set);
 
 #endif /* NE_VERSION_MINOR >= 26 */
+
+static int
+quota_reader(void *userdata, const char *block, size_t length);
 
 static int
 ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert);
@@ -429,7 +436,7 @@ dav_init_webdav(const dav_args *args)
     }
 
     if (args->header) {
-        char *custom_header = ne_strdup(args->header);
+        custom_header = ne_strdup(args->header);
         ne_hook_pre_send(session, add_header, custom_header);
     }
 
@@ -674,7 +681,7 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
         ne_add_request_header(req, "If-Modified-Since", mod_time);
     }
 
-    ne_add_response_body_reader(req, ne_accept_2xx, block_writer, &ctx);
+    ne_add_response_body_reader(req, ne_accept_2xx, file_reader, &ctx);
 
     ret = ne_request_dispatch(req);
     ret = get_error(ret, "GET");
@@ -1063,7 +1070,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
 
 
 int
-dav_quota(const char *path, off_t *available, off_t *used)
+dav_quota(const char *path, off64_t *total, off64_t *used)
 {
     int ret;
     if (!initialized) {
@@ -1071,26 +1078,52 @@ dav_quota(const char *path, off_t *available, off_t *used)
         if (ret) return ret;
     }
 
+    static int use_rfc = 1;
+    static int use_userinfo = 1;
+
     quota_context ctx;
-    ctx.available = (off_t) -1;
-    ctx.used = (off_t) -1;
-
+    ctx.error = 0;
+    ctx.total = 0;
+    ctx.used = 0;
+    ret = EIO;
     char *spath = ne_path_escape(path);
-    ne_propfind_handler *ph = ne_propfind_create(session, spath, NE_DEPTH_ZERO);
-    ret = ne_propfind_named(ph, quota_names, quota_result, &ctx);
-    ret = get_error(ret, "PROPFIND");
-    ne_propfind_destroy(ph);
-    free(spath);
 
-    if (!ret) {
-        if (ctx.available == (off_t) -1 || ctx.used == (off_t) -1) {
+    if (use_rfc) {
+        ne_propfind_handler *ph = ne_propfind_create(session, spath,
+                                                     NE_DEPTH_ZERO);
+        ret = ne_propfind_named(ph, quota_names, quota_result, &ctx);
+        ret = get_error(ret, "PROPFIND");
+        ne_propfind_destroy(ph);
+
+        if (!ret && ctx.error) {
             ret = EIO;
-        } else {
-            *available = ctx.available;
-            *used = ctx.used;
+            if (ctx.error == 2)
+                use_rfc = 0;
         }
     }
 
+    if (ret && use_userinfo) {
+        ctx.error = 0;
+        ne_request *req = ne_request_create(session, "USERINFO", spath);
+        ne_add_response_body_reader(req, ne_accept_2xx, quota_reader, &ctx);
+        ret = ne_request_dispatch(req);
+        ret = get_error(ret, "USERINFO");
+        ne_request_destroy(req);
+
+        if (!ret) {
+            if (ctx.error)
+                ret = EIO;
+        } else if (ret == EINVAL) {
+            use_userinfo = 0;
+        }
+    }
+
+    if (!ret) {
+        *total = ctx.total;
+        *used = ctx.used;
+    }
+
+    free(spath);
     return ret;
 }
 
@@ -1519,7 +1552,7 @@ auth(void *userdata, const char *realm, int attempt, char *user, char *pwd)
 }
 
 
-/* Writes data from block to a local file.
+/* Reads HTTP-data from blockand writes them to a local file.
    userdata must be a get_context structure that holds at least the name of
    the local file. If it does not contain a file descriptor, the file is
    opened for writing and the file descriptor is stored in the get_context
@@ -1530,7 +1563,7 @@ auth(void *userdata, const char *realm, int attempt, char *user, char *pwd)
    length   : Number of bytes in the buffer.
    return value : 0 on success, EIO otherwise. */
 static int
-block_writer(void *userdata, const char *block, size_t length)
+file_reader(void *userdata, const char *block, size_t length)
 {
     get_context *ctx = (get_context *) userdata;
     if (!ctx->fd)
@@ -1733,6 +1766,36 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 }
 
 
+static int
+quota_reader(void *userdata, const char *block, size_t length)
+{
+    if (length < 1) return 0;
+    quota_context *ctx = (quota_context *) userdata;
+
+    char *quota = strndup(block, length);
+    if (!quota) {
+        ctx->error = 1;
+        return 0;
+    }
+
+    char *number = strtok(quota, ",");
+    if (number) {
+        ctx->total = strtoull(number, NULL, 10);
+    } else {
+        ctx->error = 1;
+        free(quota);
+        return 0;
+    }
+
+    number = strtok(NULL, ",");
+    if (number)
+        ctx->used = strtoull(number, NULL, 10);
+
+    free(quota);
+    return 0;
+}
+
+
 /* Reads available and used bytes from set and stores them in
    userdata. */
 #if NE_VERSION_MINOR < 26
@@ -1756,12 +1819,23 @@ quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 #endif /* NE_VERSION_MINOR >= 26 */
 
     const char *data = ne_propset_value(set, &quota_names[AVAILABLE]);
-    if (data)
-        ctx->available = strtol(data, NULL, 10);
+    if (data) {
+        ctx->total = strtoull(data, NULL, 10);
+    } else {
+        const ne_status *st = ne_propset_status(set, &quota_names[AVAILABLE]);
+        if (st && st->klass == 4) {
+            ctx->error = 2;
+        } else {
+            ctx->error = 1;
+        }
+        return;
+    }
 
     data = ne_propset_value(set, &quota_names[USED]);
     if (data)
-        ctx->used = strtol(data, NULL, 10);
+        ctx->used = strtoull(data, NULL, 10);
+
+    ctx->total += ctx->used;
 }
 
 

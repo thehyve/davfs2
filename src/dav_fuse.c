@@ -972,16 +972,20 @@ fuse_stat(void)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_STATFS:");
 
-    dav_stat st = dav_statfs();
+    dav_stat *st = dav_statfs();
+    if (!st) {
+        oh->error = -EIO;
+        return sizeof(struct fuse_out_header);
+    }
 
-    out->st.blocks = st.blocks;
-    out->st.bfree = st.bfree;
-    out->st.bavail = st.bavail;
-    out->st.files = st.files;
-    out->st.ffree = st.ffree;
+    out->st.blocks = st->blocks;
+    out->st.bfree = st->bfree;
+    out->st.bavail = st->bavail;
+    out->st.files = st->files;
+    out->st.ffree = st->ffree;
     out->st.bsize = (buf_size - sizeof(struct fuse_in_header)
                      - sizeof(struct fuse_write_in) - 4095) & ~4095;
-    out->st.namelen = st.namelen;
+    out->st.namelen = st->namelen;
     out->st.frsize = 0;
     out->st.padding = 0;
     int i;
