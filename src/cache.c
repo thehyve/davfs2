@@ -128,8 +128,8 @@ static const char* const type[] = {
 /* Private global variables */
 /*==========================*/
 
-/* Number of nodes. */
-static int nnodes;
+/* File system statistics. */
+static dav_stat *fs_stat;
 
 /* Root node of the directory cache. */
 static dav_node *root;
@@ -315,6 +315,15 @@ update_node(dav_node *node, dav_props *props);
 
 static void
 update_path(dav_node *node, const char *src_path, const char *dst_path);
+
+static inline void
+update_stat(off_t size, int sign)
+{
+    if (!fs_stat->utime) return;
+    fs_stat->bfree += sign * (size / fs_stat->bsize);
+    fs_stat->bavail = fs_stat->bfree;
+    fs_stat->ffree = fs_stat->bfree;
+}
 
 /* Get information about node. */
 
@@ -580,6 +589,9 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     max_retry = args->max_retry;
     lock_refresh = args->lock_refresh;
 
+    fs_stat = (dav_stat *) malloc(sizeof(dav_stat));
+    if (!fs_stat) abort();
+
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Checking cache directory");
     max_cache_size = args->cache_size * 0x100000;
@@ -602,6 +614,19 @@ dav_init_cache(const dav_args *args, const char *mpoint)
 
     clean_cache();
 
+    fs_stat->blocks = 0x65B9AA;
+    fs_stat->bfree = 0x32DCD5;
+    fs_stat->bavail = 0x32DCD5;
+    fs_stat->ffree = 666666;
+    struct stat cache_st;
+    if (stat(cache_dir, &cache_st) == 0) {
+        fs_stat->bsize = cache_st.st_blksize;
+    } else {
+        fs_stat->bsize = 4096;
+    }
+    fs_stat->namelen = 256;
+    fs_stat->utime = 0;
+
     int ret = update_directory(root, 0);
     if (ret == EAGAIN) {
         root->utime = 0;
@@ -621,6 +646,8 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     } else if (ret) {
         error(EXIT_FAILURE, 0, _("Mounting failed.\n%s"),
               dav_get_webdav_error());
+    } else {
+        dav_statfs();
     }
 }
 
@@ -681,14 +708,8 @@ dav_register_kernel_interface(dav_write_dir_entry_fn write_fn, int *flush_flag,
     if (flush_flag)
         flush = flush_flag;
 
-    if (blksize) {
-        struct stat st;
-        if (stat(cache_dir, &st) == 0) {
-            *blksize = st.st_blksize;
-        } else {
-            *blksize = 4096;
-        }
-    }
+    if (blksize)
+        *blksize = fs_stat->bsize;
 
     return alignment;
 }
@@ -699,7 +720,7 @@ dav_tidy_cache(void)
 {
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-               "tidy: %i of %i nodes changed", nchanged, nnodes);
+               "tidy: %i of %llu nodes changed", nchanged, fs_stat->files);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "cache-size: %llu MiBytes.",
                (cache_size + 0x80000) / 0x100000);
     }
@@ -812,8 +833,10 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
         return 0;
     }
 
+    update_stat(node->size, 1);
     attr_from_cache_file(node);
     set_upload_time(node);
+    update_stat(node->size, -1);
 
     if (delay_upload == 0 && (is_dirty(node) || is_created(node))
             && !is_open_write(node) && !is_backup(node)) {
@@ -1095,7 +1118,7 @@ dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
         if (create_dir_cache_file(node) != 0)
             return EIO;
         node->atime = time(NULL);
-        return open_file(fd, node, O_RDONLY, pid, pgid, uid);
+        return open_file(fd, node, O_RDWR, pid, pgid, uid);
     }
 
     int ret = 0;
@@ -1202,6 +1225,7 @@ dav_remove(dav_node *parent, const char *name, uid_t uid)
     if (ret)
         return ret;
 
+    update_stat(node->size, 1);
     remove_from_tree(node);
     remove_from_changed(node);
     if (is_open(node)) {
@@ -1486,32 +1510,22 @@ dav_setattr(dav_node *node, uid_t uid, int sm, mode_t mode, int so,
 }
 
 
-dav_stat
+dav_stat *
 dav_statfs(void)
 {
-    dav_stat st;
-    st.blocks = 0x65B9AA;
-    st.bfree = 0x32DCD5;
-    st.bavail = 0x32DCD5;
-    st.files = nnodes;
-    st.ffree = 666666;
-    struct stat cache_st;
-    if (stat(cache_dir, &cache_st) == 0) {
-        st.bsize = cache_st.st_blksize;
-    } else {
-        st.bsize = 4096;
-    }
-    st.namelen = 256;
-
-    off_t used = 0;
-    if (dav_quota(root->path, &st.blocks, &used) == 0) {
-        st.blocks /= st.bsize;
-        st.bfree = st.blocks - (used / st.bsize) - 1;
-        st.bavail = st.bfree;
-        st.ffree = st.bfree;
+    if (time(NULL) > (fs_stat->utime + dir_refresh)) {
+        off64_t total = 0;
+        off64_t used = 0;
+        if (dav_quota(root->path, &total, &used) == 0) {
+            fs_stat->blocks = total / fs_stat->bsize;
+            fs_stat->bfree = fs_stat->blocks - (used / fs_stat->bsize) - 1;
+            fs_stat->bavail = fs_stat->bfree;
+            fs_stat->ffree = fs_stat->bfree;
+            fs_stat->utime = time(NULL);
+        }
     }
 
-    return st;
+    return fs_stat;
 }
 
 
@@ -1538,6 +1552,8 @@ dav_write(size_t *written, dav_node * node, int fd, char *buf, size_t size,
 {
     if (!exists(node))
         return ENOENT;
+    if (is_dir(node))
+        return EBADF;
 
     dav_handle *fh = get_file_handle(node, fd, 0, 0, 0);
     if (!fh)
@@ -1770,7 +1786,7 @@ delete_node(dav_node *node)
         free(tofree);
     }
     free(node);
-    nnodes--;
+    fs_stat->files--;
 }
 
 
@@ -2016,7 +2032,7 @@ new_node(dav_node *parent, mode_t mode)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "new node: %p->%p",
                node->parent, node);
-    nnodes++;
+    fs_stat->files++;
     return node;
 }
 
@@ -2824,8 +2840,10 @@ parse_index(void)
 {
     char *index = ne_concat(cache_dir, "/", DAV_INDEX, NULL);
     FILE *idx = fopen(index, "r");
-    if (!idx)
+    if (!idx) {
+        free(index);
         return;
+    }
 
     char *buf = ne_malloc(DAV_XML_BUF_SIZE);
     size_t len = fread(buf, 1, DAV_XML_BUF_SIZE, idx);

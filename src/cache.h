@@ -147,13 +147,17 @@ struct dav_node_item {
 /* Returned by dav_statfs(). */
 typedef struct dav_stat dav_stat;
 struct dav_stat {
-    off_t blocks;
-    off_t bfree;
-    off_t bavail;
-    off_t files;
-    off_t ffree;
-    off_t bsize;
-    off_t namelen;
+    off64_t     blocks;
+    off64_t     bfree;
+    off64_t     bavail;
+    off64_t     files;
+    off64_t     ffree;
+    off_t       bsize;
+    off_t       namelen;
+    time_t      utime;      /* Time when last updated with data from the server.
+                               must When 0 this structure contains fake data,
+                               that not be changed when a file is changed or
+                               deleted. */
 };
 
 
@@ -409,9 +413,12 @@ dav_setattr(dav_node *node, uid_t uid, int sm, mode_t mode, int so,
             uid_t owner, int sg, gid_t gid, int sat, time_t atime, int smt,
             time_t mtime, int ssz, off_t size);
 
-/* Returns struct dav_stat which currently is mainly fake.
+
+/* Returns struct dav_stat. If the server does not provide theinformation
+   it will contain fake data.
    No permissions necessary. */
-dav_stat dav_statfs(void);
+dav_stat *
+dav_statfs(void);
 
 
 /* Calls fsync() for all filedescriptors of node, that are not read only.
@@ -424,7 +431,6 @@ dav_sync(dav_node *node);
    offset.
    The number of bytes written is returned in len.
    The file must be opened writeonly or readwrite. */
-/* TODO: Remove pid; check flags. */
 int
 dav_write(size_t *written, dav_node * node, int fd, char *buf, size_t size,
           off_t offset);

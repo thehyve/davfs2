@@ -654,8 +654,8 @@ check_double_mounts(dav_args *args)
         m = strchr(mp, '/');
     }
     char *pidf = NULL;
-    if (asprintf(&pidf, "%s/%s.pid", DAV_SYS_RUN, mp) < 0)
-        abort();
+    if (asprintf(&pidf, "%s/%s.pid", DAV_SYS_RUN, mp) < 0) abort();
+    free(mp);
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "PID file: %s", pidf);
 
