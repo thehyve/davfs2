@@ -2373,7 +2373,7 @@ read_secrets(dav_args *args, const char *filename)
                     || (scheme && args->scheme
                         && strcmp(scheme, args->scheme) == 0
                         && host && args->host && strcmp(host, args->host) == 0
-                        && port == args->port
+                        && (!port || port == args->port)
                         && path && args->path
                         && strcmp(path, args->path) == 0)) {
 
@@ -2452,7 +2452,7 @@ read_secrets(dav_args *args, const char *filename)
    The pointers to the components may be NULL. If they point to a non-NULL
    string, it is freed and then replaced by a newly allocated string.
    If no scheme is foud the default sheme "http" is returned.
-   If no path is foud "/" is returned as path. path will always end with "/".
+   If no path is found "/" is returned as path. path will always end with "/".
    There is *no* default value returned for port.
    return value : 0 on success, -1 otherwise. */
 static int
