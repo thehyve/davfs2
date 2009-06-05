@@ -2356,6 +2356,9 @@ read_secrets(dav_args *args, const char *filename)
             int port = 0;
             char *path = 0;
             split_uri(&scheme, &host, &port, &path, parmv[0]);
+            int p_port = port;
+            if (!port)
+                port = ne_uri_defaultport(scheme);
 
             char *ccert = NULL;
             if (args->clicert) {
@@ -2373,7 +2376,7 @@ read_secrets(dav_args *args, const char *filename)
                     || (scheme && args->scheme
                         && strcmp(scheme, args->scheme) == 0
                         && host && args->host && strcmp(host, args->host) == 0
-                        && (!port || port == args->port)
+                        && port == args->port
                         && path && args->path
                         && strcmp(path, args->path) == 0)) {
 
@@ -2392,7 +2395,7 @@ read_secrets(dav_args *args, const char *filename)
             } else if (strcmp(parmv[0], "proxy") == 0
                        || (host && args->p_host
                            && strcmp(host, args->p_host) == 0
-                           && (!port || port == args->p_port))) {
+                           && (!p_port || p_port == args->p_port))) {
 
                 if (args->p_user) {
                     memset(args->p_user, '\0', strlen(args->p_user));
