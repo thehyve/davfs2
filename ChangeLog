@@ -6,6 +6,8 @@ ChangeLog for davfs2
       Do HEAD if no etag returned (regression in 1.4.0).
     * mount_davfs.c, read_secrets:
       For URLs only check port if present.
+    * redo the above: set port to default if not present
+      and check.
 
 2009-05-31 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, cache.h, dav_coda.c, dav_fuse.c:
