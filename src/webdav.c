@@ -1031,6 +1031,8 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
         if (etag) {
             if (*etag) free(*etag);
             *etag = normalize_etag(ne_get_response_header(req, "ETag"));
+            if (!*etag)
+                need_head = 1;
         }
 
         if (mtime) {
