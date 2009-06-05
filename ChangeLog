@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-06-05 Werner Baumann (werner.baumann@onlinehome.de)
+    * wedav.c, dav_put:
+      Do HEAD if no etag returned (regression in 1.4.0).
+
 2009-05-31 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, cache.h, dav_coda.c, dav_fuse.c:
       Cache quota in global variable fs_stat.
