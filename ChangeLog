@@ -1,6 +1,12 @@
 ChangeLog for davfs2
 --------------------
 
+2009-06-06 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_statfs:
+      Use retry time instead of dir_refresh.
+    * mount_davfs, read_secrets:
+      Only call ne_uri_defaultport if scheme != NULL.
+
 2009-06-05 Werner Baumann (werner.baumann@onlinehome.de)
     * wedav.c, dav_put:
       Do HEAD if no etag returned (regression in 1.4.0).
