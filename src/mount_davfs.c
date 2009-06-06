@@ -2357,7 +2357,7 @@ read_secrets(dav_args *args, const char *filename)
             char *path = 0;
             split_uri(&scheme, &host, &port, &path, parmv[0]);
             int p_port = port;
-            if (!port)
+            if (scheme && !port)
                 port = ne_uri_defaultport(scheme);
 
             char *ccert = NULL;

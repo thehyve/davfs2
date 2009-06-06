@@ -1513,7 +1513,7 @@ dav_setattr(dav_node *node, uid_t uid, int sm, mode_t mode, int so,
 dav_stat *
 dav_statfs(void)
 {
-    if (time(NULL) > (fs_stat->utime + dir_refresh)) {
+    if (time(NULL) > (fs_stat->utime + retry)) {
         off64_t total = 0;
         off64_t used = 0;
         if (dav_quota(root->path, &total, &used) == 0) {
