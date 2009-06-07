@@ -140,6 +140,7 @@ typedef struct dav_node_item dav_node_list_item;
 struct dav_node_item {
     dav_node_list_item *next;
     dav_node *node;
+    int attempts;
     time_t save_at;
 };
 

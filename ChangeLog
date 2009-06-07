@@ -5,6 +5,11 @@ ChangeLog for davfs2
     * webdav.c, prop_result:
       If property not found try property without namespace.
       (idea by Dirk Arend <d.arend@avm.de>)
+    * cache.c, add_to_changed:
+      Fixed: wrong size in malloc.
+    * cache.c:
+      When upload fails temporarily: retry with
+      increasing delays.
 
 2009-06-06 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_statfs:

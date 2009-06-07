@@ -124,6 +124,8 @@ static const char* const type[] = {
     [END] = NULL
 };
 
+#define MAX_UPLOAD_ATTEMPTS 20
+
 
 /* Private global variables */
 /*==========================*/
@@ -296,6 +298,20 @@ static void
 remove_from_tree(dav_node *node);
 
 static void remove_node(dav_node *node);
+
+static inline int
+set_next_upload_attempt(dav_node *node)
+{
+    dav_node_list_item *item = changed;
+    while (item && item->node != node)
+        item = item->next;
+    if (!item) return 0;
+    item->attempts++;
+    if (item->attempts > MAX_UPLOAD_ATTEMPTS)
+        return -1;
+    item->save_at += item->attempts * min_retry;
+    return 0;
+}
 
 static inline void
 set_upload_time(dav_node *node)
@@ -764,7 +780,8 @@ dav_tidy_cache(void)
                        dav_get_webdav_error());
             }
             if (ret == EACCES || ret == EINVAL || ret == ENOENT
-                      || ret == EPERM || ret == ENOSPC || ret == EEXIST) {
+                      || ret == EPERM || ret == ENOSPC || ret == EEXIST
+                      || set_next_upload_attempt(node) < 0) {
                 dav_unlock(node->path, &node->lock_expire);
                 delete_cache_file(node->parent);
                 node->parent->utime = 0;
@@ -858,7 +875,8 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
                        dav_get_webdav_error());
             }
             if (ret == EACCES || ret == EINVAL || ret == ENOENT
-                    || ret == EPERM || ret == ENOSPC || ret == EEXIST) {
+                    || ret == EPERM || ret == ENOSPC || ret == EEXIST
+                    || set_next_upload_attempt(node) < 0) {
                 dav_unlock(node->path, &node->lock_expire);
                 delete_cache_file(node->parent);
                 node->parent->utime = 0;
@@ -1644,11 +1662,12 @@ add_to_changed(dav_node *node)
             return;
         chp = &(*chp)->next;
     }
-    *chp = (dav_node_list_item *) malloc(sizeof(*chp));
+    *chp = (dav_node_list_item *) malloc(sizeof(dav_node_list_item));
     if (!*chp)
         abort();
     (*chp)->node = node;
     (*chp)->next = NULL;
+    (*chp)->attempts = 0;
     (*chp)->save_at = 0;
     nchanged++;
 }
