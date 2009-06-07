@@ -121,6 +121,16 @@ static const ne_propname prop_names[] = {
     [END] = {NULL, NULL}
 };
 
+static const ne_propname anonymous_prop_names[] = {
+    [ETAG] = {NULL, "getetag"},
+    [LENGTH] = {NULL, "getcontentlength"},
+    [CREATION] ={NULL, "creationdate"},
+    [MODIFIED] = {NULL, "getlastmodified"},
+    [TYPE] = {NULL, "resourcetype"},
+    [EXECUTE] = {NULL, "executable"},
+    [END] = {NULL, NULL}
+};
+
 /* Properties to be retrieved from the server. This constants
    are used by dav_quota(). */
 enum {
@@ -1693,6 +1703,8 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     const char *data;
 
     data = ne_propset_value(set, &prop_names[TYPE]);
+    if (!data)
+        data = ne_propset_value(set, &anonymous_prop_names[TYPE]);
     if (data && strstr(data, "collection"))
             result->is_dir = 1;
 
@@ -1728,9 +1740,13 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     }
 
     data = ne_propset_value(set, &prop_names[ETAG]);
+    if (!data)
+        data = ne_propset_value(set, &anonymous_prop_names[ETAG]);
     result->etag = normalize_etag(data);
 
     data = ne_propset_value(set, &prop_names[LENGTH]);
+    if (!data)
+        data = ne_propset_value(set, &anonymous_prop_names[LENGTH]);
     if (data)
 #if _FILE_OFFSET_BITS == 64
          result->size = strtoll(data, NULL, 10);
@@ -1739,6 +1755,8 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 #endif /* _FILE_OFFSET_BITS != 64 */
 
     data = ne_propset_value(set, &prop_names[CREATION]);
+    if (!data)
+        data = ne_propset_value(set, &anonymous_prop_names[CREATION]);
     if (data) {
         result->ctime = ne_iso8601_parse(data);
         if (result->ctime == (time_t) -1)
@@ -1748,6 +1766,8 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     }
 
     data = ne_propset_value(set, &prop_names[MODIFIED]);
+    if (!data)
+        data = ne_propset_value(set, &anonymous_prop_names[MODIFIED]);
     if (data) {
         result->mtime = ne_httpdate_parse(data);
         if (result->mtime == (time_t) -1)
@@ -1757,6 +1777,8 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     }
 
     data = ne_propset_value(set, &prop_names[EXECUTE]);
+    if (!data)
+        data = ne_propset_value(set, &anonymous_prop_names[EXECUTE]);
     if (!data) {
         result->is_exec = -1;
     } else if (*data == 'T') {
