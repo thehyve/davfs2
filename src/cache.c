@@ -781,7 +781,7 @@ dav_tidy_cache(void)
             }
             if (ret == EACCES || ret == EINVAL || ret == ENOENT
                       || ret == EPERM || ret == ENOSPC || ret == EEXIST
-                      /*|| set_next_upload_attempt(node) < 0*/) {
+                      || set_next_upload_attempt(node) < 0) {
                 dav_unlock(node->path, &node->lock_expire);
                 delete_cache_file(node->parent);
                 node->parent->utime = 0;
