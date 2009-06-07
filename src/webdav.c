@@ -572,17 +572,25 @@ dav_delete(const char *path, time_t *expire)
         if (ret) return ret;
     }
 
+    struct ne_lock *lock = NULL;
     char *spath = ne_path_escape(path);
     ret = ne_delete(session, spath);
     ret = get_error(ret, "DELETE");
 
-    if (ret == EACCES && lock_discover(spath, expire) == 0) {
-        ret = ne_delete(session, spath);
-        ret = get_error(ret, "DELETE");
+    if ((ret == EACCES || ret == ENOENT) && locks) {
+        lock_discover(spath, expire);
+        lock = lock_by_path(spath);
+        if (lock && ret == EACCES) {
+            ret = ne_delete(session, spath);
+            ret = get_error(ret, "DELETE");
+        } else if (lock) {
+            ne_unlock(session, lock);
+            ret = 0;
+        }
     }
 
-    if (!ret && locks && *expire) {
-        struct ne_lock *lock = lock_by_path(spath);
+    if (!ret && locks) {
+        lock = lock_by_path(spath);
         if (lock) {
             ne_lockstore_remove(locks, lock);
             ne_lock_destroy(lock);
