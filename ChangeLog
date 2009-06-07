@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2009-06-07 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, prop_result:
+      If property not found try property without namespace.
+      (idea by Dirk Arend <d.arend@avm.de>)
+
 2009-06-06 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_statfs:
       Use retry time instead of dir_refresh.
