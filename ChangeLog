@@ -10,6 +10,8 @@ ChangeLog for davfs2
     * cache.c:
       When upload fails temporarily: retry with
       increasing delays.
+    * webdav.c, dav_delete:
+      If file is not found, try to unlock.
 
 2009-06-06 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_statfs:
