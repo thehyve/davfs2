@@ -781,7 +781,7 @@ dav_tidy_cache(void)
             }
             if (ret == EACCES || ret == EINVAL || ret == ENOENT
                       || ret == EPERM || ret == ENOSPC || ret == EEXIST
-                      || set_next_upload_attempt(node) < 0) {
+                      /*|| set_next_upload_attempt(node) < 0*/) {
                 dav_unlock(node->path, &node->lock_expire);
                 delete_cache_file(node->parent);
                 node->parent->utime = 0;
@@ -2285,7 +2285,7 @@ update_node(dav_node *node, dav_props *props)
     }
 
     if (is_created(node)) {
-        if (!is_open(node) && (!is_locked(node) || props->size > 0)) {
+        if (!is_open(node) && (props->size > 0)) {
             add_node(node->parent, props);
             remove_node(node);
             *flush = 1;

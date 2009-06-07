@@ -12,6 +12,10 @@ ChangeLog for davfs2
       increasing delays.
     * webdav.c, dav_delete:
       If file is not found, try to unlock.
+    * cache.c, update_node:
+      Only remove created nodes when remote size > 0.
+    * webdav.c, dav_put:
+      Fix double free after second PUT attempt.
 
 2009-06-06 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_statfs:

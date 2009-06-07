@@ -1011,7 +1011,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
     if (ret == EACCES && lock_discover(spath, expire) == 0) {
 
         ne_request_destroy(req);
-        ne_request *req = ne_request_create(session, "PUT", spath);
+        req = ne_request_create(session, "PUT", spath);
 
         if (!has_if_match_bug) {
             if (!*exists) {
