@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-06-08 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, write_node et al:
+      Save member lock_expire to index file.
+
 2009-06-07 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, prop_result:
       If property not found try property without namespace.

@@ -96,6 +96,7 @@ enum {
     SMTIME,
     ETAG,
     MIME,
+    LOCK_EXPIRE,
     DIRTY,
     REMOTE_EXISTS,
     END
@@ -119,6 +120,7 @@ static const char* const type[] = {
     [SMTIME] = "smtime",
     [ETAG] = "etag",
     [MIME] = "mime",
+    [LOCK_EXPIRE] = "lock_expire",
     [DIRTY] = "dirty",
     [REMOTE_EXISTS] = "remote_exists",
     [END] = NULL
@@ -3078,6 +3080,11 @@ write_node(dav_node *node, FILE *file, const char *indent)
 
     if (is_reg(node) && !is_backup(node)
             && (is_dirty(node) || is_created(node))) {
+        lt = localtime(&node->lock_expire);
+        strftime(t, 64, "(%FT%T%z)", lt);
+        if (fprintf(file, "%s<d:%s>%li%s</d:%s>\n", ind, type[LOCK_EXPIRE],
+                    node->lock_expire, t, type[LOCK_EXPIRE]) < 0)
+            return -1;
         if (fprintf(file, "%s<d:%s>%i</d:%s>\n", ind, type[REMOTE_EXISTS],
                     node->remote_exists, type[REMOTE_EXISTS]) < 0)
             return -1;
@@ -3205,6 +3212,9 @@ xml_end_date(void *userdata, int state, const char *nspace, const char *name)
         break;
     case SMTIME:
         (*((dav_node **) userdata))->smtime = t;
+        break;
+    case LOCK_EXPIRE:
+        (*((dav_node **) userdata))->lock_expire = t;
         break;
     default:
         return -1;
@@ -3537,6 +3547,8 @@ xml_start_date(void *userdata, int parent, const char *nspace,
         ret = CTIME;
     } else if (strcmp(name, type[SMTIME]) == 0) {
         ret = SMTIME;
+    } else if (strcmp(name, type[LOCK_EXPIRE]) == 0) {
+        ret = LOCK_EXPIRE;
     } else {
         return 0;
     }
