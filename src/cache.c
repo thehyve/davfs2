@@ -311,7 +311,8 @@ set_next_upload_attempt(dav_node *node)
     item->attempts++;
     if (item->attempts > MAX_UPLOAD_ATTEMPTS)
         return -1;
-    item->save_at += item->attempts * min_retry;
+    time_t delay = item->attempts * min_retry;
+    item->save_at += (delay > max_retry) ? max_retry : delay;
     return 0;
 }
 

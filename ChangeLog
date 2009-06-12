@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-06-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, set_next_upload_attempt:
+      Max. retry intervall for files must not exceed max_retry.
+
 2009-06-08 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, write_node et al:
       Save member lock_expire to index file.
