@@ -4,6 +4,27 @@
 # permitted in any medium without royalty.
 
 
+What is new in davfs2 1.4.1
+===========================
+
+For this version I got many bug fixes, informations and
+suggestions for improvement from Dirk Arend of the German
+company AVM. Thanks a lot.
+
+davfs2 experimentally uses the non-standard method USERINFO
+to get information about available and used web space from the
+server. Some of the big German providers use it. davfs2 will
+now recognize when the server does not provide this information
+and avoid useless further attempts.
+
+When attempts to upload changed files fail because of problems
+with the network connection, new upload attempts will be done with
+increasing time intervals to not waist bandwith with to many
+useless attempts. When the davfs2 file system is unmounted while
+the connection is down changed files will stay in the cache and
+will be uploaded when the file system is mounted the next time.
+
+
 What is new in davfs2 1.4.0
 ===========================
 

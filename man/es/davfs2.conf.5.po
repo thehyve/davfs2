@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2.conf.5\n"
-"POT-Creation-Date: 2009-05-02 16:52+0300\n"
+"POT-Creation-Date: 2009-06-12 12:25+0300\n"
 "PO-Revision-Date: 2007-04-26 01:24-0300\n"
 "Last-Translator: Luciano Bello <luciano@linux.org.ar>\n"
 "Language-Team: Español <es@li.org>\n"
@@ -366,7 +366,7 @@ msgstr ""
 
 # type: Plain text
 #: davfs2.conf.5:143 davfs2.conf.5:208 davfs2.conf.5:215 davfs2.conf.5:293
-#: davfs2.conf.5:421
+#: davfs2.conf.5:433
 msgid "Default: 1"
 msgstr "Predeterminado: 1"
 
@@ -463,7 +463,7 @@ msgstr ""
 "I<@SYS_CONF_DIR@/@CERTS_DIR@/@CLICERTS_DIR@> serán buscados."
 
 # type: TP
-#: davfs2.conf.5:191 davfs2.conf.5:492
+#: davfs2.conf.5:191 davfs2.conf.5:504
 #, no-wrap
 msgid "B<secrets>"
 msgstr "B<secrets>"
@@ -586,7 +586,7 @@ msgstr ""
 "grande que B<delay_upload>."
 
 # type: Plain text
-#: davfs2.conf.5:238 davfs2.conf.5:411
+#: davfs2.conf.5:238 davfs2.conf.5:423
 msgid "Default: 60"
 msgstr "Predeterminado: 60"
 
@@ -611,7 +611,7 @@ msgstr ""
 
 # type: Plain text
 #: davfs2.conf.5:247 davfs2.conf.5:255 davfs2.conf.5:273 davfs2.conf.5:283
-#: davfs2.conf.5:300 davfs2.conf.5:441
+#: davfs2.conf.5:300 davfs2.conf.5:453
 msgid "Default: 0"
 msgstr "Predeterminado: 0"
 
@@ -771,7 +771,7 @@ msgid ""
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:329 davfs2.conf.5:431
+#: davfs2.conf.5:329 davfs2.conf.5:443
 msgid "Default: 10"
 msgstr "Predeterminado: 10"
 
@@ -831,11 +831,38 @@ msgstr "Predeterminado: 300"
 # type: TP
 #: davfs2.conf.5:351
 #, no-wrap
+msgid "B<max_upload_attempts>"
+msgstr ""
+
+# type: Plain text
+#: davfs2.conf.5:355
+msgid ""
+"When uploading a changed file fails temporarily B<@PROGRAM_NAME@> will retry "
+"with increasing intervals, but not more often than this."
+msgstr ""
+
+# type: Plain text
+#: davfs2.conf.5:360
+msgid ""
+"With a bad connection this will cause additional traffic. To reduce traffic "
+"caused by unsuccessful attempts option B<use_expect100> can be set. But "
+"please test it. Most proxies and some servers don't support this header."
+msgstr ""
+
+# type: Plain text
+#: davfs2.conf.5:362
+#, fuzzy
+msgid "Default: 15"
+msgstr "Predeterminado: 1"
+
+# type: TP
+#: davfs2.conf.5:363
+#, no-wrap
 msgid "B<add_header>"
 msgstr "B<add_header>"
 
 # type: Plain text
-#: davfs2.conf.5:356
+#: davfs2.conf.5:368
 msgid ""
 "Your server might expect special headers to do what you want. Different from "
 "other options, this one takes two values: the name of the header and its "
@@ -843,17 +870,17 @@ msgid ""
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:358
+#: davfs2.conf.5:370
 msgid "add_header Translate F"
 msgstr "add_header Translate F"
 
 # type: Plain text
-#: davfs2.conf.5:360
+#: davfs2.conf.5:372
 msgid "B<@PROGRAM_NAME@> will add header \"Translate: F\" on all requests."
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:364
+#: davfs2.conf.5:376
 msgid ""
 "This option is cumulative. You can enter more than one add_header option and "
 "all of them will be added. Also add_header options from @SYS_CONF_DIR@/"
@@ -861,19 +888,19 @@ msgid ""
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:366
+#: davfs2.conf.5:378
 #, no-wrap
 msgid "Cache Related Options"
 msgstr "Opciones Relacionadas al Caché "
 
 # type: TP
-#: davfs2.conf.5:368
+#: davfs2.conf.5:380
 #, no-wrap
 msgid "B<backup_dir>"
 msgstr "B<backup_dir>"
 
 # type: Plain text
-#: davfs2.conf.5:373
+#: davfs2.conf.5:385
 msgid ""
 "Each mounted @PACKAGE@ file system has a directory to store backups of files "
 "that could not be stored back to the server. This sets the name of this "
@@ -885,18 +912,18 @@ msgstr ""
 "debe ser examinado periodicamente."
 
 # type: Plain text
-#: davfs2.conf.5:375
+#: davfs2.conf.5:387
 msgid "Default: lost+found"
 msgstr "Predeterminado: lost+found"
 
 # type: TP
-#: davfs2.conf.5:376
+#: davfs2.conf.5:388
 #, no-wrap
 msgid "B<cache_dir>"
 msgstr "B<cache_dir>"
 
 # type: Plain text
-#: davfs2.conf.5:380
+#: davfs2.conf.5:392
 msgid ""
 "The directory where B<@PROGRAM_NAME@> will store cached files. For every "
 "mount point a subdirectory will be created."
@@ -905,7 +932,7 @@ msgstr ""
 "cadapunto de montaje un subdirectorio será creado."
 
 # type: Plain text
-#: davfs2.conf.5:384
+#: davfs2.conf.5:396
 msgid ""
 "In the systemwide configuration file this will set the system wide cache, "
 "used by root. In a users configuration file it will set the cache used by "
@@ -916,18 +943,18 @@ msgstr ""
 "por ese usuario."
 
 # type: Plain text
-#: davfs2.conf.5:386
+#: davfs2.conf.5:398
 msgid "Defaults: @SYS_CACHE_DIR@ and ~/.@PACKAGE@/cache"
 msgstr "Predeterminado: @SYS_CACHE_DIR@ y ~/.@PACKAGE@/cache"
 
 # type: TP
-#: davfs2.conf.5:387
+#: davfs2.conf.5:399
 #, no-wrap
 msgid "B<cache_size>"
 msgstr "B<cache_size>"
 
 # type: Plain text
-#: davfs2.conf.5:392
+#: davfs2.conf.5:404
 msgid ""
 "The amount of disk space in MiByte that may be used. B<@PROGRAM_NAME@> will "
 "always take enough space to cache open files, ignoring this value if "
@@ -938,18 +965,18 @@ msgstr ""
 "archivos, ignorando este valor si es necesario."
 
 # type: Plain text
-#: davfs2.conf.5:394
+#: davfs2.conf.5:406
 msgid "Default: 50"
 msgstr "Predeterminado: 50"
 
 # type: TP
-#: davfs2.conf.5:395
+#: davfs2.conf.5:407
 #, no-wrap
 msgid "B<table_size>"
 msgstr "B<table_size>"
 
 # type: Plain text
-#: davfs2.conf.5:401
+#: davfs2.conf.5:413
 msgid ""
 "B<@PROGRAM_NAME@> maintains a hash table with an entry for each known file "
 "or directory. This gives the number of entries in this table. For large file "
@@ -963,18 +990,18 @@ msgstr ""
 "archivos. El parámetro debe ser potencia de 2."
 
 # type: Plain text
-#: davfs2.conf.5:403
+#: davfs2.conf.5:415
 msgid "Default: 1024"
 msgstr "Predeterminado: 1024"
 
 # type: TP
-#: davfs2.conf.5:404
+#: davfs2.conf.5:416
 #, no-wrap
 msgid "B<dir_refresh>"
 msgstr "B<dir_refresh>"
 
 # type: Plain text
-#: davfs2.conf.5:409
+#: davfs2.conf.5:421
 #, fuzzy
 msgid ""
 "After B<@PROGRAM_NAME@> has got information about files in a directory it "
@@ -987,13 +1014,13 @@ msgstr ""
 "aplicación esté leyendo."
 
 # type: TP
-#: davfs2.conf.5:412
+#: davfs2.conf.5:424
 #, no-wrap
 msgid "B<file_refresh>"
 msgstr "B<file_refresh>"
 
 # type: Plain text
-#: davfs2.conf.5:419
+#: davfs2.conf.5:431
 msgid ""
 "When a file or directory is opened by an application, B<@PROGRAM_NAME@> will "
 "first check the server for a newer version. But some applications do open "
@@ -1009,13 +1036,13 @@ msgstr ""
 "información."
 
 # type: TP
-#: davfs2.conf.5:422
+#: davfs2.conf.5:434
 #, no-wrap
 msgid "B<delay_upload>"
 msgstr "B<delay_upload>"
 
 # type: Plain text
-#: davfs2.conf.5:429
+#: davfs2.conf.5:441
 msgid ""
 "When a file that has been changed is closed, B<@PROGRAM_NAME@> will wait "
 "that many seconds before it will upload it to the server. This will avoid "
@@ -1025,13 +1052,13 @@ msgid ""
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:432
+#: davfs2.conf.5:444
 #, no-wrap
 msgid "B<gui_optimize>"
 msgstr "B<gui_optimize>"
 
 # type: Plain text
-#: davfs2.conf.5:439
+#: davfs2.conf.5:451
 msgid ""
 "When a file is opened, B<@PROGRAM_NAME@> will have to check the server "
 "whether there is a newer version. Graphical User Interfaces tend to open "
@@ -1047,19 +1074,19 @@ msgstr ""
 "con un único pedido PROPFIND. 0 = no, 1 = sí."
 
 # type: SH
-#: davfs2.conf.5:443
+#: davfs2.conf.5:455
 #, fuzzy, no-wrap
 msgid "Debugging Options"
 msgstr "Opciones Generales"
 
 # type: TP
-#: davfs2.conf.5:445
+#: davfs2.conf.5:457
 #, no-wrap
 msgid "B<debug>"
 msgstr "B<debug>"
 
 # type: Plain text
-#: davfs2.conf.5:453
+#: davfs2.conf.5:465
 msgid ""
 "Send debug messages to the syslog daemon. The value tells what kind of "
 "information shall be logged. The messages are send with facility LOG_DAEMON "
@@ -1070,7 +1097,7 @@ msgid ""
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:457
+#: davfs2.conf.5:469
 msgid ""
 "Unlike other options, this option is cumulative. If there are several debug "
 "entries with different values, all of them will be applied. Also debug "
@@ -1079,148 +1106,148 @@ msgid ""
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:460
+#: davfs2.conf.5:472
 msgid ""
 "B<Note:> Debug messages let the log-files grow quickly. Never use this "
 "option in normal operation of mount.davfs."
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:462
+#: davfs2.conf.5:474
 msgid "Default: no debugging messages"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:463
+#: davfs2.conf.5:475
 #, no-wrap
 msgid "B<Recognized values:>"
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:465
+#: davfs2.conf.5:477
 #, no-wrap
 msgid "B<config>"
 msgstr "B<config>"
 
 # type: Plain text
-#: davfs2.conf.5:468
+#: davfs2.conf.5:480
 #, fuzzy
 msgid "Command line and configuration options."
 msgstr "B<Sólo permitido en el archivo general de configuración del sistema.>"
 
 # type: TP
-#: davfs2.conf.5:468
+#: davfs2.conf.5:480
 #, no-wrap
 msgid "B<kernel>"
 msgstr "B<kernel>"
 
 # type: Plain text
-#: davfs2.conf.5:471
+#: davfs2.conf.5:483
 msgid "Upcalls from the kernel file system."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:471
+#: davfs2.conf.5:483
 #, no-wrap
 msgid "B<cache>"
 msgstr "B<cache>"
 
 # type: Plain text
-#: davfs2.conf.5:474
+#: davfs2.conf.5:486
 msgid "Cache operations like adding and removing nodes."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:474
+#: davfs2.conf.5:486
 #, no-wrap
 msgid "B<http>"
 msgstr "B<http>"
 
 # type: Plain text
-#: davfs2.conf.5:477
+#: davfs2.conf.5:489
 msgid "HTTP headers."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:477
+#: davfs2.conf.5:489
 #, no-wrap
 msgid "B<xml>"
 msgstr "B<xml>"
 
 # type: Plain text
-#: davfs2.conf.5:480
+#: davfs2.conf.5:492
 msgid "Parsing of the XML-body of WebDAV-requests."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:480
+#: davfs2.conf.5:492
 #, no-wrap
 msgid "B<httpauth>"
 msgstr "B<httpauth>"
 
 # type: Plain text
-#: davfs2.conf.5:483
+#: davfs2.conf.5:495
 msgid "Negotiation of authentication."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:483
+#: davfs2.conf.5:495
 #, no-wrap
 msgid "B<locks>"
 msgstr "B<locks>"
 
 # type: Plain text
-#: davfs2.conf.5:486
+#: davfs2.conf.5:498
 msgid "Information about locks."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:486
+#: davfs2.conf.5:498
 #, no-wrap
 msgid "B<ssl>"
 msgstr "B<ssl>"
 
 # type: Plain text
-#: davfs2.conf.5:489
+#: davfs2.conf.5:501
 msgid "TLS/SSL related stuff like certificates."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:489
+#: davfs2.conf.5:501
 #, no-wrap
 msgid "B<httpbody>"
 msgstr "B<httpbody>"
 
 # type: Plain text
-#: davfs2.conf.5:492
+#: davfs2.conf.5:504
 msgid "Complete body of HTTP-responses."
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:495
+#: davfs2.conf.5:507
 msgid ""
 "Also print confidential information, which is usually omitted or obscured."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:495
+#: davfs2.conf.5:507
 #, no-wrap
 msgid "B<most>"
 msgstr "B<most>"
 
 # type: Plain text
-#: davfs2.conf.5:498
+#: davfs2.conf.5:510
 msgid "Includes config, kernel, cache and http."
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:501 mount.davfs.8:518 umount.davfs.8:79
+#: davfs2.conf.5:513 mount.davfs.8:518 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTORES"
 
 # type: Plain text
-#: davfs2.conf.5:505
+#: davfs2.conf.5:517
 msgid ""
 "This man page was written by by Werner Baumann E<lt>werner."
 "baumann@onlinehome.deE<gt>."
@@ -1229,24 +1256,24 @@ msgstr ""
 "baumann@onlinehome.deE<gt>."
 
 # type: SH
-#: davfs2.conf.5:507 mount.davfs.8:535 umount.davfs.8:84
+#: davfs2.conf.5:519 mount.davfs.8:535 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
-#: davfs2.conf.5:510 mount.davfs.8:538 umount.davfs.8:87
+#: davfs2.conf.5:522 mount.davfs.8:538 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
-#: davfs2.conf.5:512 mount.davfs.8:540 umount.davfs.8:89
+#: davfs2.conf.5:524 mount.davfs.8:540 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "VER TAMBIÉN"
 
 # type: Plain text
-#: davfs2.conf.5:518
+#: davfs2.conf.5:530
 msgid ""
 "B<@PROGRAM_NAME@>(8), B<u@PROGRAM_NAME@>(8), B<mount>(8), B<umount>(8), "
 "B<fstab>(5)"

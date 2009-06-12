@@ -161,14 +161,19 @@
    May be overridden by system config file and user config file. */
 #define DAV_READ_TIMEOUT 30
 
-/* Default retry time after a PROPFIND request failed. When the request fails
+/* Default retry time after a HTTP request failed. When the request fails
    again, the retry time will subsequently be increased up to DAV_MAX_RETRY.
    May be overridden by system config file and user config file. */
 #define DAV_RETRY 30
 
-/* Maximum retry time after a PROPFIND request failed.
+/* Maximum retry time after a HTTP request failed.
    May be overridden by system config file and user config file. */
 #define DAV_MAX_RETRY 300
+
+/* Maximum Number of attempts made to upoad a changed file before it is
+   moved into the lost+found directory.
+   May be overridden by system config file and user config file. */
+#define DAV_MAX_UPLOAD_ATTEMPTS 15
 
 /* Preferred live time of locks in seconds, before they have to be refreshed.
    May be overridden by system config file and user config file. */
