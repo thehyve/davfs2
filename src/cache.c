@@ -126,8 +126,6 @@ static const char* const type[] = {
     [END] = NULL
 };
 
-#define MAX_UPLOAD_ATTEMPTS 20
-
 
 /* Private global variables */
 /*==========================*/
@@ -179,6 +177,9 @@ static time_t min_retry;
 
 /* Maximum retry time. */
 static time_t max_retry;
+
+/* Maximum number of upload attempts. */
+static int max_upload_attempts;
 
 /* Refresh locks this much seconds before they time out. */
 static time_t lock_refresh;
@@ -309,7 +310,7 @@ set_next_upload_attempt(dav_node *node)
         item = item->next;
     if (!item) return 0;
     item->attempts++;
-    if (item->attempts > MAX_UPLOAD_ATTEMPTS)
+    if (item->attempts > max_upload_attempts)
         return -1;
     time_t delay = item->attempts * min_retry;
     item->save_at += (delay > max_retry) ? max_retry : delay;
@@ -606,6 +607,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     retry = dir_refresh;
     min_retry = args->retry;
     max_retry = args->max_retry;
+    max_upload_attempts = args->max_upload_attempts;
     lock_refresh = args->lock_refresh;
 
     fs_stat = (dav_stat *) malloc(sizeof(dav_stat));

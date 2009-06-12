@@ -81,6 +81,7 @@ typedef struct {
     time_t read_timeout;      /* User config file, system config file */
     time_t retry;             /* User config file, system config file */
     time_t max_retry;         /* User config file, system config file */
+    int max_upload_attempts;  /* User config file, system config file */
     char * s_charset;         /* User config file, system config file */
     char * header;            /* User config file, system config file */
     /* Cache */

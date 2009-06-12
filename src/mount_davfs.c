@@ -1753,6 +1753,7 @@ new_args(void)
     args->read_timeout = DAV_READ_TIMEOUT;
     args->retry = DAV_RETRY;
     args->max_retry = DAV_MAX_RETRY;
+    args->max_upload_attempts = DAV_MAX_UPLOAD_ATTEMPTS;
     args->s_charset = NULL;
     args->header = NULL;
 
@@ -2194,6 +2195,8 @@ read_config(dav_args *args, const char * filename, int system)
                 args->retry = arg_to_int(parmv[1], 10, parmv[0]); 
             } else if (strcmp(parmv[0], "max_retry") == 0) {
                 args->max_retry = arg_to_int(parmv[1], 10, parmv[0]);
+            } else if (strcmp(parmv[0], "max_upload_attempts") == 0) {
+                args->max_upload_attempts = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "server_charset") == 0) {
                 if (args->s_charset)
                     free(args->s_charset);

@@ -4,6 +4,7 @@ ChangeLog for davfs2
 2009-06-12 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, set_next_upload_attempt:
       Max. retry intervall for files must not exceed max_retry.
+    * Add configuration option max_upload_attempts.
 
 2009-06-08 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, write_node et al:

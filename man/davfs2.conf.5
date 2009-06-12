@@ -349,6 +349,18 @@ Maximum value of the retry interval.
 Default: 300
 
 .TP
+.B max_upload_attempts
+When uploading a changed file fails temporarily \fB@PROGRAM_NAME@\fR will
+retry with increasing intervals, but not more often than this.
+.br
+With a bad connection this will cause additional traffic. To reduce
+traffic caused by unsuccessful attempts option \fBuse_expect100\fR can be
+set. But please test it. Most proxies and some servers don't support this
+header.
+.br
+Default: 15
+
+.TP
 .B add_header
 Your server might expect special headers to do what you want. Different from
 other options, this one takes two values: the name of the header and its value.
