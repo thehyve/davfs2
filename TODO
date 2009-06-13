@@ -1,5 +1,20 @@
-davfs2 TODO 2009-03-29
+davfs2 TODO 2009-06-13
 ----------------------
+
+- write a GNU-style manual
+
+- remove unecessary calls to delete_cache_file(dir) in cache.c
+
+- calculate size of directories from number of files (not from
+  the size of the dir-cache-file
+
+- revisit setting and updating of file times
+
+- add code to tidy_cache to remove nodes from node-cache that
+  have not been used for a long time
+
+- do not use Last-Modified-Time for cache validation if an
+  Etag is available
 
 - object oriented redisign of cache
 

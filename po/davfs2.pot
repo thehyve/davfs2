@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-06-11 21:32+0200\n"
+"POT-Creation-Date: 2009-06-12 21:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,102 +17,102 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/cache.c:654
+#: src/cache.c:657
 msgid ""
 "connection timed out two times;\n"
 "trying one last time"
 msgstr ""
 
-#: src/cache.c:659
+#: src/cache.c:662
 #, c-format
 msgid "Last try succeeded.\n"
 msgstr ""
 
-#: src/cache.c:662
+#: src/cache.c:665
 msgid ""
 "server temporarily unreachable;\n"
 "mounting anyway"
 msgstr ""
 
-#: src/cache.c:665
+#: src/cache.c:668
 #, c-format
 msgid ""
 "Mounting failed.\n"
 "%s"
 msgstr ""
 
-#: src/cache.c:705
+#: src/cache.c:708
 #, c-format
 msgid "can't replace %s with %s"
 msgstr ""
 
-#: src/cache.c:709
+#: src/cache.c:712
 #, c-format
 msgid "error writing new index file %s"
 msgstr ""
 
-#: src/cache.c:713
+#: src/cache.c:716
 #, c-format
 msgid "can't create new index file for %s"
 msgstr ""
 
-#: src/cache.c:2549 src/cache.c:2583
+#: src/cache.c:2552 src/cache.c:2586
 #, c-format
 msgid "can't create cache file %s"
 msgstr ""
 
-#: src/cache.c:2598
+#: src/cache.c:2601
 #, c-format
 msgid "error writing directory %s"
 msgstr ""
 
-#: src/cache.c:2764 src/mount_davfs.c:594 src/mount_davfs.c:596
+#: src/cache.c:2767 src/mount_davfs.c:594 src/mount_davfs.c:596
 #: src/mount_davfs.c:773 src/mount_davfs.c:775 src/mount_davfs.c:781
 #: src/mount_davfs.c:821 src/mount_davfs.c:823 src/mount_davfs.c:840
 #: src/mount_davfs.c:842 src/mount_davfs.c:1685 src/mount_davfs.c:1687
 msgid "can't read user data base"
 msgstr ""
 
-#: src/cache.c:2775
+#: src/cache.c:2778
 #, c-format
 msgid "can't open cache directory %s"
 msgstr ""
 
-#: src/cache.c:2790
+#: src/cache.c:2793
 #, c-format
 msgid "can't create cache directory %s"
 msgstr ""
 
-#: src/cache.c:2797
+#: src/cache.c:2800
 #, c-format
 msgid "can't access cache directory %s"
 msgstr ""
 
-#: src/cache.c:2800
+#: src/cache.c:2803
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr ""
 
-#: src/cache.c:2804
+#: src/cache.c:2807
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr ""
 
-#: src/cache.c:2834
+#: src/cache.c:2837
 msgid "found orphaned file in cache:"
 msgstr ""
 
-#: src/cache.c:2907
+#: src/cache.c:2910
 #, c-format
 msgid "error parsing %s"
 msgstr ""
 
-#: src/cache.c:2908
+#: src/cache.c:2911
 #, c-format
 msgid "  at line %i"
 msgstr ""
 
-#: src/cache.c:2953
+#: src/cache.c:2956
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
@@ -496,31 +496,31 @@ msgstr ""
 msgid "Unknown option %s.\n"
 msgstr ""
 
-#: src/mount_davfs.c:2101 src/mount_davfs.c:2322 src/mount_davfs.c:2334
+#: src/mount_davfs.c:2102 src/mount_davfs.c:2325 src/mount_davfs.c:2337
 #, c-format
 msgid "opening %s failed"
 msgstr ""
 
-#: src/mount_davfs.c:2122 src/mount_davfs.c:2162 src/mount_davfs.c:2249
-#: src/mount_davfs.c:2350 src/mount_davfs.c:2418
+#: src/mount_davfs.c:2123 src/mount_davfs.c:2163 src/mount_davfs.c:2252
+#: src/mount_davfs.c:2353 src/mount_davfs.c:2421
 msgid "malformed line"
 msgstr ""
 
-#: src/mount_davfs.c:2230 src/mount_davfs.c:2243
+#: src/mount_davfs.c:2233 src/mount_davfs.c:2246
 msgid "unknown option"
-msgstr ""
-
-#: src/mount_davfs.c:2326
-#, c-format
-msgid "file %s has wrong owner"
 msgstr ""
 
 #: src/mount_davfs.c:2329
 #, c-format
+msgid "file %s has wrong owner"
+msgstr ""
+
+#: src/mount_davfs.c:2332
+#, c-format
 msgid "file %s has wrong permissions"
 msgstr ""
 
-#: src/mount_davfs.c:2556
+#: src/mount_davfs.c:2559
 #, c-format
 msgid ""
 "Usage:\n"
@@ -529,14 +529,14 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/mount_davfs.c:2560
+#: src/mount_davfs.c:2563
 #, c-format
 msgid ""
 "To mount a WebDAV-resource don't call %s directly, but use\n"
 "`mount' instead.\n"
 msgstr ""
 
-#: src/mount_davfs.c:2562
+#: src/mount_davfs.c:2565
 #, c-format
 msgid ""
 "    mount <mountpoint>  : or\n"
@@ -544,7 +544,7 @@ msgid ""
 "                          /etc/fstab.\n"
 msgstr ""
 
-#: src/mount_davfs.c:2565
+#: src/mount_davfs.c:2568
 #, c-format
 msgid ""
 "    mount -t davfs <server-url> <mountpoint> [-o options]\n"
@@ -555,7 +555,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/mount_davfs.c:2570
+#: src/mount_davfs.c:2573
 #, c-format
 msgid ""
 "Recognised options:\n"
@@ -566,7 +566,7 @@ msgid ""
 "    dir_mode=    : default directory mode (octal)\n"
 msgstr ""
 
-#: src/mount_davfs.c:2576
+#: src/mount_davfs.c:2579
 #, c-format
 msgid ""
 "    ro           : mount read-only\n"

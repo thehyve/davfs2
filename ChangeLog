@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2009-06-13 Werner Baumann (werner.baumann@onlinehome.de)
+    * Released version 1.4.1.
+
 2009-06-12 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, set_next_upload_attempt:
       Max. retry intervall for files must not exceed max_retry.
@@ -43,14 +46,14 @@ ChangeLog for davfs2
 2009-05-31 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, cache.h, dav_coda.c, dav_fuse.c:
       Cache quota in global variable fs_stat.
-      Update with dir_refresh and when closing or
+      Update with dir_refresh when closing or
       deleting files.
       Function dav_stafs now returns a pointer.
 
 2009-05-30 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, webdav.h, dav_quota:
       Return total webspace instead of available.
-      Rember support for quota in static flag use_rfc.
+      Remember support for quota in static flag use_rfc.
       Add support for method USERINFO.
     * webdav.c:
       Rename block_writer into file_reader for consistency

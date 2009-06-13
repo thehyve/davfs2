@@ -24,6 +24,8 @@ useless attempts. When the davfs2 file system is unmounted while
 the connection is down changed files will stay in the cache and
 will be uploaded when the file system is mounted the next time.
 
+For minor changes and bug fixes please see ChangeLog.
+
 
 What is new in davfs2 1.4.0
 ===========================

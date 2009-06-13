@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.3.3\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-06-11 21:32+0200\n"
+"POT-Creation-Date: 2009-06-12 21:19+0200\n"
 "PO-Revision-Date: 2009-01-02 12:26+0100\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/cache.c:654
+#: src/cache.c:657
 msgid ""
 "connection timed out two times;\n"
 "trying one last time"
@@ -24,12 +24,12 @@ msgstr ""
 "die Verbindung wurde zweimal wegen Zeitüberschreitung abgebrochen;\n"
 "ich versuche es zum letzten mal"
 
-#: src/cache.c:659
+#: src/cache.c:662
 #, c-format
 msgid "Last try succeeded.\n"
 msgstr "Der letzte Versuch war erfolgreich.\n"
 
-#: src/cache.c:662
+#: src/cache.c:665
 msgid ""
 "server temporarily unreachable;\n"
 "mounting anyway"
@@ -37,7 +37,7 @@ msgstr ""
 "der Server ist zur Zeit nicht erreichbar;\n"
 "das Dateisystem wird trotzdem eingehängt"
 
-#: src/cache.c:665
+#: src/cache.c:668
 #, c-format
 msgid ""
 "Mounting failed.\n"
@@ -46,78 +46,78 @@ msgstr ""
 "das Einhängen schlug fehl;\n"
 "%s"
 
-#: src/cache.c:705
+#: src/cache.c:708
 #, c-format
 msgid "can't replace %s with %s"
 msgstr "kann %s nicht durch %s ersetzen"
 
-#: src/cache.c:709
+#: src/cache.c:712
 #, c-format
 msgid "error writing new index file %s"
 msgstr "Fehler beim Schreiben der neuen Indexdatei %s"
 
-#: src/cache.c:713
+#: src/cache.c:716
 #, c-format
 msgid "can't create new index file for %s"
 msgstr "kann keine neue Indexdatei für %s erzeugen"
 
-#: src/cache.c:2549 src/cache.c:2583
+#: src/cache.c:2552 src/cache.c:2586
 #, c-format
 msgid "can't create cache file %s"
 msgstr "kann die Cachedatei %s nicht erzeugen"
 
-#: src/cache.c:2598
+#: src/cache.c:2601
 #, c-format
 msgid "error writing directory %s"
 msgstr "Fehler beim Schreiben des Verzeichnisses %s"
 
-#: src/cache.c:2764 src/mount_davfs.c:594 src/mount_davfs.c:596
+#: src/cache.c:2767 src/mount_davfs.c:594 src/mount_davfs.c:596
 #: src/mount_davfs.c:773 src/mount_davfs.c:775 src/mount_davfs.c:781
 #: src/mount_davfs.c:821 src/mount_davfs.c:823 src/mount_davfs.c:840
 #: src/mount_davfs.c:842 src/mount_davfs.c:1685 src/mount_davfs.c:1687
 msgid "can't read user data base"
 msgstr "kann die Benutzerdatenbank nicht lesen"
 
-#: src/cache.c:2775
+#: src/cache.c:2778
 #, c-format
 msgid "can't open cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht öffnen"
 
-#: src/cache.c:2790
+#: src/cache.c:2793
 #, c-format
 msgid "can't create cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht erzeugen"
 
-#: src/cache.c:2797
+#: src/cache.c:2800
 #, c-format
 msgid "can't access cache directory %s"
 msgstr "Zugriff auf das Cachverzeichnis %s verweigert"
 
-#: src/cache.c:2800
+#: src/cache.c:2803
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr "das Cacheverzeichnis %s hat den falschen Besitzer"
 
-#: src/cache.c:2804
+#: src/cache.c:2807
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr "das Cachverzeichnis %s hat die falschen Dateirechte"
 
-#: src/cache.c:2834
+#: src/cache.c:2837
 msgid "found orphaned file in cache:"
 msgstr "fand verwaiste Datei im Cache:"
 
-#: src/cache.c:2907
+#: src/cache.c:2910
 #, c-format
 msgid "error parsing %s"
 msgstr "Syntaxfehler in %s"
 
-#: src/cache.c:2908
+#: src/cache.c:2911
 #, c-format
 msgid "  at line %i"
 msgstr "  in Zeile %i"
 
-#: src/cache.c:2953
+#: src/cache.c:2956
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
@@ -531,31 +531,31 @@ msgstr "die Option %s verlangt ein Argument"
 msgid "Unknown option %s.\n"
 msgstr "unbekannte Option %s.\n"
 
-#: src/mount_davfs.c:2101 src/mount_davfs.c:2322 src/mount_davfs.c:2334
+#: src/mount_davfs.c:2102 src/mount_davfs.c:2325 src/mount_davfs.c:2337
 #, c-format
 msgid "opening %s failed"
 msgstr "konnte %s nicht öffnen"
 
-#: src/mount_davfs.c:2122 src/mount_davfs.c:2162 src/mount_davfs.c:2249
-#: src/mount_davfs.c:2350 src/mount_davfs.c:2418
+#: src/mount_davfs.c:2123 src/mount_davfs.c:2163 src/mount_davfs.c:2252
+#: src/mount_davfs.c:2353 src/mount_davfs.c:2421
 msgid "malformed line"
 msgstr "Syntaxfehler in der Zeile"
 
-#: src/mount_davfs.c:2230 src/mount_davfs.c:2243
+#: src/mount_davfs.c:2233 src/mount_davfs.c:2246
 msgid "unknown option"
 msgstr "unbekannte Option"
 
-#: src/mount_davfs.c:2326
+#: src/mount_davfs.c:2329
 #, c-format
 msgid "file %s has wrong owner"
 msgstr "die Datei %s hat den falschen Besitzer"
 
-#: src/mount_davfs.c:2329
+#: src/mount_davfs.c:2332
 #, c-format
 msgid "file %s has wrong permissions"
 msgstr "die Dateirechte für %s sind falsch"
 
-#: src/mount_davfs.c:2556
+#: src/mount_davfs.c:2559
 #, c-format
 msgid ""
 "Usage:\n"
@@ -568,7 +568,7 @@ msgstr ""
 "    %s -h, --help     : diese Hilfe anzeigen\n"
 "\n"
 
-#: src/mount_davfs.c:2560
+#: src/mount_davfs.c:2563
 #, c-format
 msgid ""
 "To mount a WebDAV-resource don't call %s directly, but use\n"
@@ -577,7 +577,7 @@ msgstr ""
 "Um eine WebDAV-Resource zu einzuhängen, sollte %s nicht direkt\n"
 "aufgerufen werden; stattdessen sollte „mount” benutzt werden.\n"
 
-#: src/mount_davfs.c:2562
+#: src/mount_davfs.c:2565
 #, c-format
 msgid ""
 "    mount <mountpoint>  : or\n"
@@ -588,7 +588,7 @@ msgstr ""
 "    mount <server-url>  : hänge die WebDAV-Resource entsprechend den\n"
 "                          Angaben in /etc/fstab ein.\n"
 
-#: src/mount_davfs.c:2565
+#: src/mount_davfs.c:2568
 #, c-format
 msgid ""
 "    mount -t davfs <server-url> <mountpoint> [-o options]\n"
@@ -605,7 +605,7 @@ msgstr ""
 "                          Kommas unterteilte Liste von Optionen.\n"
 "\n"
 
-#: src/mount_davfs.c:2570
+#: src/mount_davfs.c:2573
 #, c-format
 msgid ""
 "Recognised options:\n"
@@ -622,7 +622,7 @@ msgstr ""
 "    file_mode=   : Standard-Rechte für Dateien (oktal)\n"
 "    dir_mode=    : Standard-Rechte für Verzeichnisse (oktal)\n"
 
-#: src/mount_davfs.c:2576
+#: src/mount_davfs.c:2579
 #, c-format
 msgid ""
 "    ro           : mount read-only\n"
