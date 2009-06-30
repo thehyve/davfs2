@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-06-30 Werner Baumann (werner.baumann@onlinehome.de)
+    * dav_fuse.c, fuse_stat:
+      Correct block counts according to block size.
+
 2009-06-13 Werner Baumann (werner.baumann@onlinehome.de)
     * Released version 1.4.1.
 

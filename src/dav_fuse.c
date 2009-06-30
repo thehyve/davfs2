@@ -978,13 +978,21 @@ fuse_stat(void)
         return sizeof(struct fuse_out_header);
     }
 
-    out->st.blocks = st->blocks;
-    out->st.bfree = st->bfree;
-    out->st.bavail = st->bavail;
+    int nblocks = (buf_size - sizeof(struct fuse_in_header)
+                     - sizeof(struct fuse_write_in) - 4095) / st->bsize;
+    if (nblocks > 1) {
+        out->st.blocks = st->blocks / nblocks;
+        out->st.bfree = st->bfree / nblocks;
+        out->st.bavail = st->bavail / nblocks;
+        out->st.bsize = st->bsize * nblocks;
+    } else {
+        out->st.blocks = st->blocks;
+        out->st.bfree = st->bfree;
+        out->st.bavail = st->bavail;
+        out->st.bsize = st->bsize;
+    }
     out->st.files = st->files;
     out->st.ffree = st->ffree;
-    out->st.bsize = (buf_size - sizeof(struct fuse_in_header)
-                     - sizeof(struct fuse_write_in) - 4095) & ~4095;
     out->st.namelen = st->namelen;
     out->st.frsize = 0;
     out->st.padding = 0;
