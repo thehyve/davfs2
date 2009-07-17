@@ -1685,9 +1685,8 @@ prop_result(void *userdata, const char *href, const ne_prop_result_set *set)
         return;
     }
 
-    dav_props *result = ne_calloc(sizeof(dav_props));
-    result->path = ne_path_unescape(uri.path);
-    ne_uri_free(&uri);
+    char *tmp_path = (char *) ne_malloc(strlen(uri.path) + 1);
+    const char *from = uri.path;
 
 #else /* NE_VERSION_MINOR >= 26 */
 
@@ -1698,10 +1697,26 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     if (!ctx || !uri || !uri->path || !set)
         return;
 
-    dav_props *result = ne_calloc(sizeof(dav_props));
-    result->path = ne_path_unescape(uri->path);
+    char *tmp_path = (char *) ne_malloc(strlen(uri->path) + 1);
+    const char *from = uri->path;
 
 #endif /* NE_VERSION_MINOR >= 26 */
+
+    char *to = tmp_path;
+    while (*from) {
+        while (*from == '/' && *(from + 1) == '/')
+            from++;
+        *to++ = *from++;
+    }
+    *to = 0;
+    dav_props *result = ne_calloc(sizeof(dav_props));
+    result->path = ne_path_unescape(tmp_path);
+    free (tmp_path);
+
+#if NE_VERSION_MINOR < 26
+    ne_uri_free(&uri);
+#endif
+
 
     if (!result->path || strlen(result->path) < 1) {
         dav_delete_props(result);

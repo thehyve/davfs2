@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-07-17 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, prop_result:
+      Remove double slashes from path.
+
 2009-06-30 Werner Baumann (werner.baumann@onlinehome.de)
     * dav_fuse.c, fuse_stat:
       Correct block counts according to block size.
