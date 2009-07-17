@@ -19,3 +19,6 @@ davfs2 TODO 2009-06-13
 - object oriented redisign of cache
 
 - multithreading for HTTP-requests and cache maintainance
+
+- restructure file name extraction and href construction
+
