@@ -3,6 +3,8 @@ davfs2 TODO 2009-06-13
 
 - write a GNU-style manual
 
+- use HTTP transport compression
+
 - remove unecessary calls to delete_cache_file(dir) in cache.c
 
 - calculate size of directories from number of files (not from
@@ -21,4 +23,11 @@ davfs2 TODO 2009-06-13
 - multithreading for HTTP-requests and cache maintainance
 
 - restructure file name extraction and href construction
+
+- add reference to sytax rules in 'man davfs2.conf' in config
+  file templates
+
+- add option to not ask any questions at all
+
+- how to deal with Microsft ASP backends? Translate: F
 
