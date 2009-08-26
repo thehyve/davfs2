@@ -836,7 +836,9 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), " close %s", node->path);
 
-    dav_handle *fh = get_file_handle(node, fd, flags & O_ACCMODE, pid, pgid);
+    dav_handle *fh = get_file_handle(node, fd,
+                                     is_dir(node) ? O_RDWR : flags & O_ACCMODE,
+                                     pid, pgid);
     if (!fh)
         return EBADF;
 
