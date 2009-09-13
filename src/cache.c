@@ -2710,9 +2710,11 @@ update_cache_file(dav_node *node)
                            &smtime, &node->mime_type, NULL);
         if (!ret) {
             node->etag = etag;
-            node->atime = smtime;
-            node->mtime = smtime;
-            node->smtime = smtime;
+            if (smtime) {
+                node->atime = smtime;
+                node->mtime = smtime;
+                node->smtime = smtime;
+            }
             node->utime = time(NULL);
             set_cache_file_times(node);
             cache_size += node->size;

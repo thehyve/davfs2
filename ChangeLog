@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2009-08-30 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.de, update_cache_file:
+      Don't chamge file times when Last-Modified-Header
+      is missing.
+
 2009-08-26 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_close:
       In call to get_file_handle set parameter accmode
