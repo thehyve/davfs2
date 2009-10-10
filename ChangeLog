@@ -1,9 +1,13 @@
 ChangeLog for davfs2
 --------------------
 
+2009-10-10 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, dav_head:
+      Ignore Last-Modified header if the value is 0.
+
 2009-08-30 Werner Baumann (werner.baumann@onlinehome.de)
-    * cache.de, update_cache_file:
-      Don't chamge file times when Last-Modified-Header
+    * cache.c, update_cache_file:
+      Don't change file times when Last-Modified-Header
       is missing.
 
 2009-08-26 Werner Baumann (werner.baumann@onlinehome.de)

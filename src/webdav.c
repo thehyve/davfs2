@@ -769,8 +769,11 @@ dav_head(const char *path, char **etag, time_t *mtime, off_t *length,
     }
 
     value = ne_get_response_header(req, "Last-Modified");
-    if (!ret && mtime && value)
-        *mtime = ne_httpdate_parse(value);
+    if (!ret && mtime && value) {
+        time_t lm = ne_httpdate_parse(value);
+        if (lm)
+            *mtime = lm;
+    }
 
     value = ne_get_response_header(req, "Content-Length");
     if (!ret && length && value)
