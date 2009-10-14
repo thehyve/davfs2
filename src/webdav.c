@@ -370,7 +370,11 @@ dav_init_webdav(const dav_args *args)
         username = ne_strdup(args->username);
     if (args->password)
         password = ne_strdup(args->password);
+#if NE_VERSION_MINOR < 26
     ne_set_server_auth(session, auth, "server");
+#else /* NE_VERSION_MINOR >= 26 */
+    ne_add_server_auth(session, NE_AUTH_ALL, auth, "server");
+#endif /* NE_VERSION_MINOR >= 26 */
 
     if (args->useproxy && args->p_host) {
         ne_session_proxy(session, args->p_host, args->p_port);
@@ -378,7 +382,11 @@ dav_init_webdav(const dav_args *args)
             p_username = ne_strdup(args->p_user);
         if (args->p_passwd)
             p_password = ne_strdup(args->p_passwd);
+#if NE_VERSION_MINOR < 26
         ne_set_proxy_auth(session, auth, "proxy");
+#else /* NE_VERSION_MINOR >= 26 */
+        ne_add_proxy_auth(session, NE_AUTH_ALL, auth, "proxy");
+#endif /* NE_VERSION_MINOR >= 26 */
     }
 
     if (strcmp(args->scheme, "https") == 0) {
