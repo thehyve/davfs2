@@ -1149,7 +1149,11 @@ parse_secrets(dav_args *args)
     if (args->askauth && args->useproxy && args->p_user && !args->p_passwd) {
         printf(_("Please enter the password to authenticate user %s with proxy\n"
                  "%s or hit enter for none.\n"), args->p_user, args->p_host);
-        args->p_passwd = dav_user_input_hidden(_("Password: "));
+        if (isatty(fileno(stdin))) {
+            args->p_passwd = dav_user_input_hidden(_("Password: "));
+        } else {
+            args->p_passwd = user_input(_("Password: "));
+        }
         if (args->p_passwd && strlen(args->p_passwd) == 0) {
             free(args->p_passwd);
             args->p_passwd = NULL;
@@ -1165,7 +1169,11 @@ parse_secrets(dav_args *args)
     if (args->askauth && args->username && !args->password) {
         printf(_("Please enter the password to authenticate user %s with "
                  "server\n%s or hit enter for none.\n"), args->username, url);
-        args->password = dav_user_input_hidden(_("Password: "));
+        if (isatty(fileno(stdin))) {
+            args->password = dav_user_input_hidden(_("Password: "));
+        } else {
+            args->password = user_input(_("Password: "));
+        }
         if (args->password && strlen(args->password) == 0) {
             free(args->password);
             args->password = NULL;
