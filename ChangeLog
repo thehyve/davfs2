@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-10-17 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, parse_secrets:
+      Check for tty before calling dav_user_input_hidden.
+
 2009-10-14 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac:
       Add support for neon 0.29.
