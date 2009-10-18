@@ -4,6 +4,21 @@
 # permitted in any medium without royalty.
 
 
+What is new in davfs2 1.4.2
+===========================
+
+Mainly bug fixes (see ChangeLog).
+
+Support for Neon 0.29.
+
+Support for NTLM authentication (with Neon 0.29 only).
+
+Experimental support for commandline option "username" for use
+with pam_mount. I am not sure wether this is really usefull because
+I think that for typical use cases of pam_mount davfs2 is not
+well suited. Please report your experience with this option.
+
+
 What is new in davfs2 1.4.1
 ===========================
 

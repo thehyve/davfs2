@@ -681,7 +681,7 @@ check_fstab(const dav_args *args)
 
     setfsent();
     struct fstab *ft = getfsfile(mpoint);
-    if (!ft)
+    if (!ft || !ft->fs_spec)
         error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), url,
               _PATH_FSTAB);
 
@@ -695,11 +695,20 @@ check_fstab(const dav_args *args)
     if (ft->fs_mntops)
         get_options(n_args, ft->fs_mntops);
 
-    if (strcmp(DAV_FS_TYPE, ft->fs_vfstype) != 0)
+    if (! ft->fs_vfstype || strcmp(DAV_FS_TYPE, ft->fs_vfstype) != 0)
         error(EXIT_FAILURE, 0, _("different file system type in %s"),
               _PATH_FSTAB);
-    if (strcmp(args->conf, n_args->conf) != 0)
-        error(EXIT_FAILURE, 0, _("different config file in %s"), _PATH_FSTAB);
+    if (args->conf || n_args->conf) {
+        if (!args->conf || !n_args->conf
+                || strcmp(args->conf, n_args->conf) != 0)
+            error(EXIT_FAILURE, 0, _("different config file in %s"),
+                  _PATH_FSTAB);
+    }
+    if (args->cl_username || n_args->cl_username) {
+        if (!args->cl_username || !n_args->cl_username
+                || strcmp(args->cl_username, n_args->cl_username) != 0)
+            error(EXIT_FAILURE, 0, _("different username in %s"), _PATH_FSTAB);
+    }
     if (!n_args->user && !n_args->users)
         error(EXIT_FAILURE, 0,
               _("neither option `user' nor option `users' set in %s"),
@@ -1140,6 +1149,15 @@ parse_secrets(dav_args *args)
         read_secrets(args, args->secrets);
     }
 
+    if (args->cl_username) {
+        if (args->username)
+            free(args->username);
+        if (args->password)
+            free(args->password);
+        args->username = args->cl_username;
+        args->cl_username = NULL;
+    }
+
     if (args->askauth && args->useproxy && !args->p_user) {
         printf(_("Please enter the username to authenticate with proxy\n"
                  "%s or hit enter for none.\n"), args->p_host);
@@ -1184,6 +1202,8 @@ parse_secrets(dav_args *args)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Secrets:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "  username: %s", args->username);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+               "  cl_username: %s", args->cl_username);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "  password: %s", args->password);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -1417,6 +1437,8 @@ delete_args(dav_args *args)
         memset(args->username, '\0', strlen(args->username));
         free(args->username);
     }
+    if (args->cl_username)
+        free(args->cl_username);
     if (args->password) {
         memset(args->password, '\0', strlen(args->password));
         free(args->password);
@@ -1502,6 +1524,7 @@ get_options(dav_args *args, char *option)
 {
     enum {
         CONF = 0,
+        USERNAME,
         UID,
         GID,
         FILE_MODE,
@@ -1527,6 +1550,7 @@ get_options(dav_args *args, char *option)
     };
     char *suboptions[] = {
         [CONF] = "conf",
+        [USERNAME] = "username",
         [UID] = "uid",
         [GID] = "gid",
         [FILE_MODE] = "file_mode",
@@ -1567,6 +1591,11 @@ get_options(dav_args *args, char *option)
             if (args->conf)
                 free(args->conf);
             args->conf = ne_strdup(argument);
+            break;
+        case USERNAME:
+            if (args->cl_username)
+                free(args->cl_username);
+            args->cl_username = ne_strdup(argument);
             break;
         case UID:
             pwd = getpwnam(argument);
@@ -1735,6 +1764,7 @@ new_args(void)
         args->secrets = NULL;
     }
     args->username = NULL;
+    args->cl_username = NULL;
     args->password = NULL;
     args->clicert = NULL;
     args->clicert_pw = NULL;

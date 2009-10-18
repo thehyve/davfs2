@@ -1,4 +1,4 @@
-davfs2 TODO 2009-06-13
+davfs2 TODO 2009-10-18
 ----------------------
 
 - write a GNU-style manual
@@ -24,10 +24,9 @@ davfs2 TODO 2009-06-13
 
 - restructure file name extraction and href construction
 
-- add reference to sytax rules in 'man davfs2.conf' in config
-  file templates
-
 - add option to not ask any questions at all
 
 - how to deal with Microsft ASP backends? Translate: F
+
+- revisit precedence rules for options (e.g. username)
 
