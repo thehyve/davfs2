@@ -18,6 +18,9 @@ with pam_mount. I am not sure wether this is really usefull because
 I think that for typical use cases of pam_mount davfs2 is not
 well suited. Please report your experience with this option.
 
+If option askauth ist set to 0 davfs2 will no longer ask the user
+if a servercert is not trusted but silently not accept the certificate.
+
 
 What is new in davfs2 1.4.1
 ===========================
