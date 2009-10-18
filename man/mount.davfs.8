@@ -1,4 +1,4 @@
-.TH @PROGRAM_NAME@ 8 "2009\-04\-13" @PACKAGE_STRING@
+.TH @PROGRAM_NAME@ 8 "2009\-10\-18" @PACKAGE_STRING@
 
 .SH NAME
 
@@ -183,6 +183,19 @@ Only when mounted by root, this may be different from the mounting user.
 .br
 Default: ID of the mounting user.
 .RE
+
+.TP
+.B username=\fIWebDAV_user\fP
+Use this name to authenticate with the WebDAV server. This option
+is intended for use with pam_mount only. When this option is set the
+credentials in the secrets files will be ignored. Do not use it in
+\fIfstab\fP. The username will be visible for everyone in the output of
+\fIps\fP.
+.br
+Default: no username.
+.br
+\fBExperimental:\fR This option is experimental and might be removed. If you
+think it useful and successfully use it please send a short report.
 
 
 .SH SECURITY POLICY

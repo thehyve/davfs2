@@ -58,6 +58,7 @@ typedef struct {
     char *servercert;         /* User config file, system config file */
     char *secrets;            /* User config file */
     char *username;           /* User secrets file, system secrets file */
+    char *cl_username;        /* Command line */
     char *password;           /* User secrets file, system secrets file */
     char *clicert;            /* User config file, system config file */
     char *clicert_pw;         /* User secrets file, system secrets file */
