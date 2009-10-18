@@ -354,6 +354,7 @@ main(int argc, char *argv[])
                    _("failed to release tty properly"));
             kill(getppid(), SIGHUP);
         }
+        dav_set_no_terminal();
     }
 
     if (!ret) {
@@ -1152,10 +1153,12 @@ parse_secrets(dav_args *args)
     if (args->cl_username) {
         if (args->username)
             free(args->username);
-        if (args->password)
-            free(args->password);
         args->username = args->cl_username;
         args->cl_username = NULL;
+        if (args->password)
+            free(args->password);
+        args->password = NULL;
+        args->p_passwd = user_input(_("Password: "));
     }
 
     if (args->askauth && args->useproxy && !args->p_user) {

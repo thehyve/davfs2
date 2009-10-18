@@ -193,7 +193,7 @@ static int initialized;
 /* Whether a terminal is available to communicate with the user.
    Should be reset with set_no_terminal() when forking into daemon mode.
    Needed by  ssl_verify() which may be called at any time. */
-static int have_terminal = 1;
+static int have_terminal;
 
 /* Handle to convert character encoding from utf-8 to LC_CTYPE.
    If NULL no conversion is done. */
@@ -438,6 +438,8 @@ dav_init_webdav(const dav_args *args)
             ne_ssl_clicert_free(client_cert);
         }
     }
+
+    have_terminal = args->askauth;
 
     if (args->locks) {
         locks = ne_lockstore_create();

@@ -202,7 +202,7 @@ secrets file is allways \fI@SYS_CONF_DIR@/@SECRETSFILE@\fP.
 .TP
 .B ask_auth
 Ask the user interactively for credentials and passwords if not found in the
-secretsfile. 0 = no, 1 = yes.
+secretsfile. Ask the user if a servercert cannot be verified. 0 = no, 1 = yes.
 .br
 Default: 1
 
@@ -364,7 +364,8 @@ Default: 15
 .B add_header
 Your server might expect special headers to do what you want. Different from
 other options, this one takes two values: the name of the header and its value.
-Example:
+Some ASP-backends to IIS seem to require the Microsoft specific header
+"Translate: F". You can add it like this: 
 .br
 add_header Translate F
 .br

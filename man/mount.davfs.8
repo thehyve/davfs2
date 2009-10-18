@@ -188,9 +188,10 @@ Default: ID of the mounting user.
 .B username=\fIWebDAV_user\fP
 Use this name to authenticate with the WebDAV server. This option
 is intended for use with pam_mount only. When this option is set the
-credentials in the secrets files will be ignored. Do not use it in
-\fIfstab\fP. The username will be visible for everyone in the output of
-\fIps\fP.
+credentials in the secrets files will be ignored. The password will
+always be read from stdin, even when option \fIaskauth\fP is set to 0.
+Do not use it in \fIfstab\fP. The username will be visible for everyone
+in the output of \fIps\fP.
 .br
 Default: no username.
 .br
