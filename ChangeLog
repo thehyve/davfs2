@@ -5,6 +5,7 @@ ChangeLog for davfs2
     * mount_davfs.c, webdav.c:
       Don't ask the user for unverified certificates
       if "askauth 0".
+    * Released version 1.4.3
 
 2009-10-18 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c:

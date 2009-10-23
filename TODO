@@ -1,4 +1,4 @@
-davfs2 TODO 2009-10-18
+davfs2 TODO 2009-10-23
 ----------------------
 
 - write a GNU-style manual
@@ -25,4 +25,8 @@ davfs2 TODO 2009-10-18
 - restructure file name extraction and href construction
 
 - revisit precedence rules for options (e.g. username)
+
+- create log message in case of errors that seem to be caused
+  by broken server implementations (see Debian bug #551782 - davfs2:
+  improve the output in case of a server with a broken LOCK)
 
