@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-10-18 18:17+0200\n"
+"POT-Creation-Date: 2009-11-01 20:01+0100\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -776,51 +776,51 @@ msgstr "%i nemůže otevřít soubor vyrovnávací paměti"
 msgid "%i error writing to cache file"
 msgstr "%i chyba při zápisu do souboru vyrovnávací paměti"
 
-#: src/webdav.c:1923 src/webdav.c:1926
+#: src/webdav.c:1922 src/webdav.c:1925
 msgid "error processing server certificate"
 msgstr "chyba při zpracování certifikátu serveru"
 
-#: src/webdav.c:1933 src/webdav.c:1969
+#: src/webdav.c:1936 src/webdav.c:1970
 msgid "the server certificate is not yet valid"
 msgstr "certifikát serveru zatím není platný"
 
-#: src/webdav.c:1935 src/webdav.c:1972
+#: src/webdav.c:1938 src/webdav.c:1973
 msgid "the server certificate has expired"
 msgstr "platnost certifikátu serveru vypršela"
 
-#: src/webdav.c:1937 src/webdav.c:1975
+#: src/webdav.c:1940 src/webdav.c:1976
 msgid "the server certificate does not match the server name"
 msgstr "certifikát serveru nedopovídá jménu serveru"
 
-#: src/webdav.c:1939 src/webdav.c:1978
+#: src/webdav.c:1942 src/webdav.c:1979
 msgid "the server certificate is not trusted"
 msgstr "certifikát serveru je nedůvěryhodný"
 
-#: src/webdav.c:1941 src/webdav.c:1981
+#: src/webdav.c:1944 src/webdav.c:1982
 msgid "unknown certificate error"
 msgstr "neznámá chyba certifikátu"
 
-#: src/webdav.c:1942
+#: src/webdav.c:1945
 #, c-format
 msgid "  issuer:      %s"
 msgstr "  vydavatel:      %s"
 
-#: src/webdav.c:1944
+#: src/webdav.c:1947
 #, c-format
 msgid "  subject:     %s"
 msgstr "  subjekt:     %s"
 
-#: src/webdav.c:1946
+#: src/webdav.c:1949
 #, c-format
 msgid "  identity:    %s"
 msgstr "  identita:    %s"
 
-#: src/webdav.c:1948
+#: src/webdav.c:1951
 #, c-format
 msgid "  fingerprint: %s"
 msgstr "  otisk: %s"
 
-#: src/webdav.c:1951
+#: src/webdav.c:1953
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -831,27 +831,27 @@ msgstr ""
 "ověřit jeho otisk! Server může být podvržen nebo může\n"
 "dojít k útoku s prostředníkem (man-in-the-middle attack).\n"
 
-#: src/webdav.c:1954
+#: src/webdav.c:1956
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr "Přijmout certifikát pro toto sezení? [y,N] "
 
-#: src/webdav.c:1982
+#: src/webdav.c:1983
 #, c-format
 msgid "  issuer: %s"
 msgstr "  vydavatel: %s"
 
-#: src/webdav.c:1983
+#: src/webdav.c:1984
 #, c-format
 msgid "  subject: %s"
 msgstr "  subjekt: %s"
 
-#: src/webdav.c:1984
+#: src/webdav.c:1985
 #, c-format
 msgid "  identity: %s"
 msgstr "  identita: %s"
 
-#: src/webdav.c:1987
+#: src/webdav.c:1988
 msgid "  accepted by user"
 msgstr "  přijat uživatelem"
 

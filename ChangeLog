@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2009-11-03 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, ssl_verify:
+      Don't accept suspidious certificates if !have_terminal.
+
 2009-10-18 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, webdav.c:
       Don't ask the user for unverified certificates

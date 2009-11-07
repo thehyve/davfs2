@@ -1917,7 +1917,6 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
     char *issuer = ne_ssl_readable_dname(ne_ssl_cert_issuer(cert));
     char *subject = ne_ssl_readable_dname(ne_ssl_cert_subject(cert));
     char *digest = ne_calloc(NE_SSL_DIGESTLEN);
-    int ret = 0;
     if (!issuer || !subject || ne_ssl_cert_digest(cert, digest) != 0) {
         if (have_terminal) {
             error(0, 0, _("error processing server certificate"));
@@ -1925,9 +1924,13 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                    _("error processing server certificate"));
         }
-        ret = -1;
+        if (issuer) free(issuer);
+        if (subject) free(subject);
+        if (digest) free(digest);
+        return -1;
     }
 
+    int ret = -1;
     if (have_terminal) {
         if (failures & NE_SSL_NOTYETVALID)
             error(0, 0, _("the server certificate is not yet valid"));
@@ -1947,7 +1950,6 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
         printf("\n");
         printf(_("  fingerprint: %s"), digest);
         printf("\n");
-        if (!ret) {
             printf(_("You only should accept this certificate, if you can\n"
                      "verify the fingerprint! The server might be faked\n"
                      "or there might be a man-in-the-middle-attack.\n"));
@@ -1958,10 +1960,9 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
             len = getline(&s, &n, stdin);
             if (len < 0)
                 abort();
-            if (rpmatch(s) < 1)
-                ret = -1;
+            if (rpmatch(s) > 0)
+                ret = 0;
             free(s);
-        }
     } 
 
     if (failures & NE_SSL_NOTYETVALID)
@@ -1987,9 +1988,9 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("  accepted by user"));
     }
 
-    free(issuer);
-    free(subject);
-    free(digest);
+    if (issuer) free(issuer);
+    if (subject) free(subject);
+    if (digest) free(digest);
     return ret;
 }
 
