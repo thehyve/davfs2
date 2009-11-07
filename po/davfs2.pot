@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-10-18 18:17+0200\n"
+"POT-Creation-Date: 2009-11-01 20:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -697,51 +697,51 @@ msgstr ""
 msgid "%i error writing to cache file"
 msgstr ""
 
-#: src/webdav.c:1923 src/webdav.c:1926
+#: src/webdav.c:1922 src/webdav.c:1925
 msgid "error processing server certificate"
 msgstr ""
 
-#: src/webdav.c:1933 src/webdav.c:1969
+#: src/webdav.c:1936 src/webdav.c:1970
 msgid "the server certificate is not yet valid"
 msgstr ""
 
-#: src/webdav.c:1935 src/webdav.c:1972
+#: src/webdav.c:1938 src/webdav.c:1973
 msgid "the server certificate has expired"
 msgstr ""
 
-#: src/webdav.c:1937 src/webdav.c:1975
+#: src/webdav.c:1940 src/webdav.c:1976
 msgid "the server certificate does not match the server name"
 msgstr ""
 
-#: src/webdav.c:1939 src/webdav.c:1978
+#: src/webdav.c:1942 src/webdav.c:1979
 msgid "the server certificate is not trusted"
 msgstr ""
 
-#: src/webdav.c:1941 src/webdav.c:1981
+#: src/webdav.c:1944 src/webdav.c:1982
 msgid "unknown certificate error"
 msgstr ""
 
-#: src/webdav.c:1942
+#: src/webdav.c:1945
 #, c-format
 msgid "  issuer:      %s"
 msgstr ""
 
-#: src/webdav.c:1944
+#: src/webdav.c:1947
 #, c-format
 msgid "  subject:     %s"
 msgstr ""
 
-#: src/webdav.c:1946
+#: src/webdav.c:1949
 #, c-format
 msgid "  identity:    %s"
 msgstr ""
 
-#: src/webdav.c:1948
+#: src/webdav.c:1951
 #, c-format
 msgid "  fingerprint: %s"
 msgstr ""
 
-#: src/webdav.c:1951
+#: src/webdav.c:1953
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -749,26 +749,26 @@ msgid ""
 "or there might be a man-in-the-middle-attack.\n"
 msgstr ""
 
-#: src/webdav.c:1954
+#: src/webdav.c:1956
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr ""
 
-#: src/webdav.c:1982
+#: src/webdav.c:1983
 #, c-format
 msgid "  issuer: %s"
 msgstr ""
 
-#: src/webdav.c:1983
+#: src/webdav.c:1984
 #, c-format
 msgid "  subject: %s"
 msgstr ""
 
-#: src/webdav.c:1984
+#: src/webdav.c:1985
 #, c-format
 msgid "  identity: %s"
 msgstr ""
 
-#: src/webdav.c:1987
+#: src/webdav.c:1988
 msgid "  accepted by user"
 msgstr ""
