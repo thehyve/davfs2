@@ -1,9 +1,13 @@
 ChangeLog for davfs2
 --------------------
 
+2009-11-14 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_init_cache:
+      Initialize fs_stat->files.
+
 2009-11-03 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, ssl_verify:
-      Don't accept suspidious certificates if !have_terminal.
+      Don't accept suspicious certificates if !have_terminal.
 
 2009-10-18 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, webdav.c:
