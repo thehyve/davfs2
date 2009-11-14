@@ -613,6 +613,20 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     fs_stat = (dav_stat *) malloc(sizeof(dav_stat));
     if (!fs_stat) abort();
 
+    fs_stat->blocks = 0x65B9AA;
+    fs_stat->bfree = 0x32DCD5;
+    fs_stat->bavail = 0x32DCD5;
+    fs_stat->files = 0;
+    fs_stat->ffree = 666666;
+    struct stat cache_st;
+    if (stat(cache_dir, &cache_st) == 0) {
+        fs_stat->bsize = cache_st.st_blksize;
+    } else {
+        fs_stat->bsize = 4096;
+    }
+    fs_stat->namelen = 256;
+    fs_stat->utime = 0;
+
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Checking cache directory");
     max_cache_size = args->cache_size * 0x100000;
@@ -634,19 +648,6 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     backup->mode = S_IFDIR | S_IRWXU;
 
     clean_cache();
-
-    fs_stat->blocks = 0x65B9AA;
-    fs_stat->bfree = 0x32DCD5;
-    fs_stat->bavail = 0x32DCD5;
-    fs_stat->ffree = 666666;
-    struct stat cache_st;
-    if (stat(cache_dir, &cache_st) == 0) {
-        fs_stat->bsize = cache_st.st_blksize;
-    } else {
-        fs_stat->bsize = 4096;
-    }
-    fs_stat->namelen = 256;
-    fs_stat->utime = 0;
 
     int ret = update_directory(root, 0);
     if (ret == EAGAIN) {
