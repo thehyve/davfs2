@@ -3,6 +3,10 @@ ChangeLog for davfs2
 
 2009-11-15 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_create:
+      Fix another error in the log message.
+
+2009-11-15 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_create:
       Fix log message.
     * Released version 1.4.5
 
