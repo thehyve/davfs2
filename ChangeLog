@@ -1,6 +1,14 @@
 ChangeLog for davfs2
 --------------------
 
+2009-11-15 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_create:
+      Fix log message.
+    * Released version 1.4.5
+
+2009-11-15 Werner Baumann (werner.baumann@onlinehome.de)
+    * Released version 1.4.4
+
 2009-11-14 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_init_cache:
       Initialize fs_stat->files.
