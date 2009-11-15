@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-11-14 13:26+0100\n"
+"POT-Creation-Date: 2009-11-15 10:23+0100\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -62,68 +62,69 @@ msgid "can't create new index file for %s"
 msgstr "nemohu vytvořit nový indexový soubor pro %s"
 
 #: src/cache.c:939
+#, c-format
 msgid ""
-"The server reports a file that should not exist.Maybe it is an error in the "
-"servers LOCK impementation.You may try option 'use_locks 0' in davfs2.conf."
+"File %s exists on the server but should not. Maybe it is an error in the "
+"servers LOCK impementation. You may try option 'use_locks 0' in davfs2.conf."
 msgstr ""
 
-#: src/cache.c:2562 src/cache.c:2596
+#: src/cache.c:2563 src/cache.c:2597
 #, c-format
 msgid "can't create cache file %s"
 msgstr "nemohu vytvořit soubor vyrovnávací paměti %s"
 
-#: src/cache.c:2611
+#: src/cache.c:2612
 #, c-format
 msgid "error writing directory %s"
 msgstr "chyba při zápisu adresáře %s"
 
-#: src/cache.c:2779 src/mount_davfs.c:595 src/mount_davfs.c:597
+#: src/cache.c:2780 src/mount_davfs.c:595 src/mount_davfs.c:597
 #: src/mount_davfs.c:783 src/mount_davfs.c:785 src/mount_davfs.c:791
 #: src/mount_davfs.c:831 src/mount_davfs.c:833 src/mount_davfs.c:850
 #: src/mount_davfs.c:852 src/mount_davfs.c:1725 src/mount_davfs.c:1727
 msgid "can't read user data base"
 msgstr "nemohu přečíst údaje o uživatelích"
 
-#: src/cache.c:2790
+#: src/cache.c:2791
 #, c-format
 msgid "can't open cache directory %s"
 msgstr "nemohu otevřít kešovací adresář %s"
 
-#: src/cache.c:2805
+#: src/cache.c:2806
 #, c-format
 msgid "can't create cache directory %s"
 msgstr "nemohu vytvořit kešovací adresář %s"
 
-#: src/cache.c:2812
+#: src/cache.c:2813
 #, c-format
 msgid "can't access cache directory %s"
 msgstr "nemohu přistoupit ke kešovacímu adresáři %s"
 
-#: src/cache.c:2815
+#: src/cache.c:2816
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr "chybný vlastník kešovacího adresáře %s"
 
-#: src/cache.c:2819
+#: src/cache.c:2820
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr "pro kešovací adresář %s nastaveno chybné oprávnění"
 
-#: src/cache.c:2849
+#: src/cache.c:2850
 msgid "found orphaned file in cache:"
 msgstr ""
 
-#: src/cache.c:2922
+#: src/cache.c:2923
 #, c-format
 msgid "error parsing %s"
 msgstr "chyba při zpracování %s"
 
-#: src/cache.c:2923
+#: src/cache.c:2924
 #, c-format
 msgid "  at line %i"
 msgstr ""
 
-#: src/cache.c:2968
+#: src/cache.c:2969
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""

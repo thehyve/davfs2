@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.3.3\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-11-14 13:26+0100\n"
+"POT-Creation-Date: 2009-11-15 10:23+0100\n"
 "PO-Revision-Date: 2009-01-02 12:26+0100\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
@@ -62,71 +62,72 @@ msgid "can't create new index file for %s"
 msgstr "kann keine neue Indexdatei für %s erzeugen"
 
 #: src/cache.c:939
+#, c-format
 msgid ""
-"The server reports a file that should not exist.Maybe it is an error in the "
-"servers LOCK impementation.You may try option 'use_locks 0' in davfs2.conf."
+"File %s exists on the server but should not. Maybe it is an error in the "
+"servers LOCK impementation. You may try option 'use_locks 0' in davfs2.conf."
 msgstr ""
-"Der Server meldet eine Datei, die es nicht geben sollte. Vielleicht "
+"Die Datei %s existiert auf dem Server, sollte es aber nicht. Vielleicht "
 "behandelt der Server LOCK-Requests fehlerhaft. Du kannst es mit der Option "
 "'use_locks 0' in davfs2.conf versuchen."
 
-#: src/cache.c:2562 src/cache.c:2596
+#: src/cache.c:2563 src/cache.c:2597
 #, c-format
 msgid "can't create cache file %s"
 msgstr "kann die Cachedatei %s nicht erzeugen"
 
-#: src/cache.c:2611
+#: src/cache.c:2612
 #, c-format
 msgid "error writing directory %s"
 msgstr "Fehler beim Schreiben des Verzeichnisses %s"
 
-#: src/cache.c:2779 src/mount_davfs.c:595 src/mount_davfs.c:597
+#: src/cache.c:2780 src/mount_davfs.c:595 src/mount_davfs.c:597
 #: src/mount_davfs.c:783 src/mount_davfs.c:785 src/mount_davfs.c:791
 #: src/mount_davfs.c:831 src/mount_davfs.c:833 src/mount_davfs.c:850
 #: src/mount_davfs.c:852 src/mount_davfs.c:1725 src/mount_davfs.c:1727
 msgid "can't read user data base"
 msgstr "kann die Benutzerdatenbank nicht lesen"
 
-#: src/cache.c:2790
+#: src/cache.c:2791
 #, c-format
 msgid "can't open cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht öffnen"
 
-#: src/cache.c:2805
+#: src/cache.c:2806
 #, c-format
 msgid "can't create cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht erzeugen"
 
-#: src/cache.c:2812
+#: src/cache.c:2813
 #, c-format
 msgid "can't access cache directory %s"
 msgstr "Zugriff auf das Cachverzeichnis %s verweigert"
 
-#: src/cache.c:2815
+#: src/cache.c:2816
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr "das Cacheverzeichnis %s hat den falschen Besitzer"
 
-#: src/cache.c:2819
+#: src/cache.c:2820
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr "das Cachverzeichnis %s hat die falschen Dateirechte"
 
-#: src/cache.c:2849
+#: src/cache.c:2850
 msgid "found orphaned file in cache:"
 msgstr "fand verwaiste Datei im Cache:"
 
-#: src/cache.c:2922
+#: src/cache.c:2923
 #, c-format
 msgid "error parsing %s"
 msgstr "Syntaxfehler in %s"
 
-#: src/cache.c:2923
+#: src/cache.c:2924
 #, c-format
 msgid "  at line %i"
 msgstr "  in Zeile %i"
 
-#: src/cache.c:2968
+#: src/cache.c:2969
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
