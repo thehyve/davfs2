@@ -4,6 +4,13 @@
 # permitted in any medium without royalty.
 
 
+What is new in davfs2 1.4.4
+===========================
+
+If option 'ask_auth 0' is set, davfs2 will no langer prompt the user
+for suspicious server certificates but terminate silently.
+
+
 What is new in davfs2 1.4.2
 ===========================
 

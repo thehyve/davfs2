@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-11-01 20:01+0100\n"
+"POT-Creation-Date: 2009-11-14 13:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,102 +17,108 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/cache.c:657
+#: src/cache.c:658
 msgid ""
 "connection timed out two times;\n"
 "trying one last time"
 msgstr ""
 
-#: src/cache.c:662
+#: src/cache.c:663
 #, c-format
 msgid "Last try succeeded.\n"
 msgstr ""
 
-#: src/cache.c:665
+#: src/cache.c:666
 msgid ""
 "server temporarily unreachable;\n"
 "mounting anyway"
 msgstr ""
 
-#: src/cache.c:668
+#: src/cache.c:669
 #, c-format
 msgid ""
 "Mounting failed.\n"
 "%s"
 msgstr ""
 
-#: src/cache.c:708
+#: src/cache.c:709
 #, c-format
 msgid "can't replace %s with %s"
 msgstr ""
 
-#: src/cache.c:712
+#: src/cache.c:713
 #, c-format
 msgid "error writing new index file %s"
 msgstr ""
 
-#: src/cache.c:716
+#: src/cache.c:717
 #, c-format
 msgid "can't create new index file for %s"
 msgstr ""
 
-#: src/cache.c:2554 src/cache.c:2588
+#: src/cache.c:939
+msgid ""
+"The server reports a file that should not exist.Maybe it is an error in the "
+"servers LOCK impementation.You may try option 'use_locks 0' in davfs2.conf."
+msgstr ""
+
+#: src/cache.c:2562 src/cache.c:2596
 #, c-format
 msgid "can't create cache file %s"
 msgstr ""
 
-#: src/cache.c:2603
+#: src/cache.c:2611
 #, c-format
 msgid "error writing directory %s"
 msgstr ""
 
-#: src/cache.c:2771 src/mount_davfs.c:595 src/mount_davfs.c:597
+#: src/cache.c:2779 src/mount_davfs.c:595 src/mount_davfs.c:597
 #: src/mount_davfs.c:783 src/mount_davfs.c:785 src/mount_davfs.c:791
 #: src/mount_davfs.c:831 src/mount_davfs.c:833 src/mount_davfs.c:850
 #: src/mount_davfs.c:852 src/mount_davfs.c:1725 src/mount_davfs.c:1727
 msgid "can't read user data base"
 msgstr ""
 
-#: src/cache.c:2782
+#: src/cache.c:2790
 #, c-format
 msgid "can't open cache directory %s"
 msgstr ""
 
-#: src/cache.c:2797
+#: src/cache.c:2805
 #, c-format
 msgid "can't create cache directory %s"
 msgstr ""
 
-#: src/cache.c:2804
+#: src/cache.c:2812
 #, c-format
 msgid "can't access cache directory %s"
 msgstr ""
 
-#: src/cache.c:2807
+#: src/cache.c:2815
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr ""
 
-#: src/cache.c:2811
+#: src/cache.c:2819
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr ""
 
-#: src/cache.c:2841
+#: src/cache.c:2849
 msgid "found orphaned file in cache:"
 msgstr ""
 
-#: src/cache.c:2914
+#: src/cache.c:2922
 #, c-format
 msgid "error parsing %s"
 msgstr ""
 
-#: src/cache.c:2915
+#: src/cache.c:2923
 #, c-format
 msgid "  at line %i"
 msgstr ""
 
-#: src/cache.c:2960
+#: src/cache.c:2968
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
