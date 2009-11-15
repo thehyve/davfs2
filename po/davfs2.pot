@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-11-15 10:23+0100\n"
+"POT-Creation-Date: 2009-11-15 11:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr ""
 #, c-format
 msgid ""
 "File %s exists on the server but should not. Maybe it is an error in the "
-"servers LOCK impementation. You may try option 'use_locks 0' in davfs2.conf."
+"server's LOCK impementation. You may try option 'use_locks 0' in davfs2.conf."
 msgstr ""
 
 #: src/cache.c:2563 src/cache.c:2597
