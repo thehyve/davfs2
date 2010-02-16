@@ -48,6 +48,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 #include <ne_alloc.h>
 #include <ne_auth.h>
 #include <ne_basic.h>

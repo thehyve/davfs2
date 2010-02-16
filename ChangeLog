@@ -1,9 +1,13 @@
 ChangeLog for davfs2
 --------------------
 
+2010-02-16 Werner Baumann (werner.baumann@onlinehome.de)
+    * dav_coda.c, dav_fuse.c, kernel_interface.c, webdav.c:
+      Add missing "#include <sys/stat.h> (bug #28916).
+
 2010-01-21 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, parse_secrets:
-      Wrong assignment of password from pam_mount
+      Wrong assignment of password from pam_mount.
       (bug #28706);
 
 2009-11-15 Werner Baumann (werner.baumann@onlinehome.de)

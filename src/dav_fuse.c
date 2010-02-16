@@ -42,6 +42,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 #include "defaults.h"
 #include "mount_davfs.h"
 #include "cache.h"
