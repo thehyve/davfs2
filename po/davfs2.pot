@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2009-11-15 11:15+0100\n"
+"POT-Creation-Date: 2010-04-30 21:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,45 +124,45 @@ msgstr ""
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
 
-#: src/dav_coda.c:163 src/dav_fuse.c:162
+#: src/dav_coda.c:166 src/dav_fuse.c:166
 msgid "can't allocate message buffer"
 msgstr ""
 
-#: src/kernel_interface.c:108
+#: src/kernel_interface.c:111
 msgid "trying fuse kernel file system"
 msgstr ""
 
-#: src/kernel_interface.c:116
+#: src/kernel_interface.c:119
 msgid "fuse device opened successfully"
 msgstr ""
 
-#: src/kernel_interface.c:128
+#: src/kernel_interface.c:131
 msgid "trying coda kernel file system"
 msgstr ""
 
-#: src/kernel_interface.c:134
+#: src/kernel_interface.c:137
 msgid "coda device opened successfully"
 msgstr ""
 
-#: src/kernel_interface.c:142
+#: src/kernel_interface.c:145
 #, c-format
 msgid "unknown kernel file system %s"
 msgstr ""
 
-#: src/kernel_interface.c:189
+#: src/kernel_interface.c:192
 msgid "no free coda device to mount"
 msgstr ""
 
-#: src/kernel_interface.c:198
+#: src/kernel_interface.c:201
 #, c-format
 msgid "CODA_KERNEL_VERSION %u not supported"
 msgstr ""
 
-#: src/kernel_interface.c:237
+#: src/kernel_interface.c:240
 msgid "can't open fuse device"
 msgstr ""
 
-#: src/kernel_interface.c:263
+#: src/kernel_interface.c:266
 msgid "can't mount using fuse kernel file system"
 msgstr ""
 
@@ -416,7 +416,7 @@ msgstr ""
 msgid "can't determine home directory"
 msgstr ""
 
-#: src/mount_davfs.c:1100 src/webdav.c:415
+#: src/mount_davfs.c:1100 src/webdav.c:419
 #, c-format
 msgid "can't read client certificate %s"
 msgstr ""
@@ -432,7 +432,7 @@ msgid "client certificate file %s has wrong permissions"
 msgstr ""
 
 #: src/mount_davfs.c:1161 src/mount_davfs.c:1174 src/mount_davfs.c:1176
-#: src/mount_davfs.c:1194 src/mount_davfs.c:1196 src/webdav.c:422
+#: src/mount_davfs.c:1194 src/mount_davfs.c:1196 src/webdav.c:426
 msgid "Password: "
 msgstr ""
 
@@ -653,102 +653,102 @@ msgstr ""
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr ""
 
-#: src/webdav.c:340
+#: src/webdav.c:344
 msgid "socket library initialization failed"
 msgstr ""
 
-#: src/webdav.c:353
+#: src/webdav.c:357
 msgid "can't open stream to log neon-messages"
 msgstr ""
 
-#: src/webdav.c:394
+#: src/webdav.c:398
 msgid "neon library does not support TLS/SSL"
 msgstr ""
 
-#: src/webdav.c:402
+#: src/webdav.c:406
 #, c-format
 msgid "can't read server certificate %s"
 msgstr ""
 
-#: src/webdav.c:420
+#: src/webdav.c:424
 #, c-format
 msgid ""
 "Please enter the password to decrypt client\n"
 "certificate %s.\n"
 msgstr ""
 
-#: src/webdav.c:434
+#: src/webdav.c:438
 #, c-format
 msgid "can't decrypt client certificate %s"
 msgstr ""
 
-#: src/webdav.c:488 src/webdav.c:491
+#: src/webdav.c:492 src/webdav.c:495
 msgid "mounting failed; the server does not support WebDAV"
 msgstr ""
 
-#: src/webdav.c:499
+#: src/webdav.c:503
 msgid "warning: the server does not support locks"
 msgstr ""
 
-#: src/webdav.c:1567
+#: src/webdav.c:1571
 msgid "authentication failure:"
 msgstr ""
 
-#: src/webdav.c:1605
+#: src/webdav.c:1609
 #, c-format
 msgid "%i can't open cache file"
 msgstr ""
 
-#: src/webdav.c:1613
+#: src/webdav.c:1617
 #, c-format
 msgid "%i error writing to cache file"
 msgstr ""
 
-#: src/webdav.c:1922 src/webdav.c:1925
+#: src/webdav.c:1926 src/webdav.c:1929
 msgid "error processing server certificate"
 msgstr ""
 
-#: src/webdav.c:1936 src/webdav.c:1970
+#: src/webdav.c:1940 src/webdav.c:1974
 msgid "the server certificate is not yet valid"
 msgstr ""
 
-#: src/webdav.c:1938 src/webdav.c:1973
+#: src/webdav.c:1942 src/webdav.c:1977
 msgid "the server certificate has expired"
 msgstr ""
 
-#: src/webdav.c:1940 src/webdav.c:1976
+#: src/webdav.c:1944 src/webdav.c:1980
 msgid "the server certificate does not match the server name"
 msgstr ""
 
-#: src/webdav.c:1942 src/webdav.c:1979
+#: src/webdav.c:1946 src/webdav.c:1983
 msgid "the server certificate is not trusted"
 msgstr ""
 
-#: src/webdav.c:1944 src/webdav.c:1982
+#: src/webdav.c:1948 src/webdav.c:1986
 msgid "unknown certificate error"
-msgstr ""
-
-#: src/webdav.c:1945
-#, c-format
-msgid "  issuer:      %s"
-msgstr ""
-
-#: src/webdav.c:1947
-#, c-format
-msgid "  subject:     %s"
 msgstr ""
 
 #: src/webdav.c:1949
 #, c-format
-msgid "  identity:    %s"
+msgid "  issuer:      %s"
 msgstr ""
 
 #: src/webdav.c:1951
 #, c-format
-msgid "  fingerprint: %s"
+msgid "  subject:     %s"
 msgstr ""
 
 #: src/webdav.c:1953
+#, c-format
+msgid "  identity:    %s"
+msgstr ""
+
+#: src/webdav.c:1955
+#, c-format
+msgid "  fingerprint: %s"
+msgstr ""
+
+#: src/webdav.c:1957
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -756,26 +756,26 @@ msgid ""
 "or there might be a man-in-the-middle-attack.\n"
 msgstr ""
 
-#: src/webdav.c:1956
+#: src/webdav.c:1960
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr ""
 
-#: src/webdav.c:1983
+#: src/webdav.c:1987
 #, c-format
 msgid "  issuer: %s"
 msgstr ""
 
-#: src/webdav.c:1984
+#: src/webdav.c:1988
 #, c-format
 msgid "  subject: %s"
 msgstr ""
 
-#: src/webdav.c:1985
+#: src/webdav.c:1989
 #, c-format
 msgid "  identity: %s"
 msgstr ""
 
-#: src/webdav.c:1988
+#: src/webdav.c:1992
 msgid "  accepted by user"
 msgstr ""
