@@ -682,6 +682,12 @@ check_fstab(const dav_args *args)
 
     setfsent();
     struct fstab *ft = getfsfile(mpoint);
+    if (!ft) {
+        char *mp = NULL;
+        if (asprintf(&mp, "%s/", mpoint) < 0) abort();
+        ft = getfsfile(mp);
+        if (mp) free(mp);
+    }
     if (!ft || !ft->fs_spec)
         error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), url,
               _PATH_FSTAB);
