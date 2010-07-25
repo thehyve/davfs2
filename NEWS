@@ -4,6 +4,14 @@
 # permitted in any medium without royalty.
 
 
+What is new in davfs2 NEXT_VERSION
+===========================
+
+New option 'minimize_mem' to recurrently remove unused nodes.
+It is intended for small systems, which may run out of memory
+with huge davfs2 file systems. It may slow down davfs2.
+
+
 What is new in davfs2 1.4.6
 ===========================
 

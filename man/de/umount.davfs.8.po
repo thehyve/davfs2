@@ -6,19 +6,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2009-04-27 18:47+0300\n"
+"POT-Creation-Date: 2010-07-25 17:24+0300\n"
 "PO-Revision-Date: 2009-04-27 18:49+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-# type: TH
-#: davfs2.conf.5:1 mount.davfs.8:1 umount.davfs.8:1
-#, no-wrap
-msgid "2009-04-13"
-msgstr "2009-04-13"
 
 # type: TH
 #: davfs2.conf.5:1 mount.davfs.8:1 umount.davfs.8:1
@@ -39,24 +33,24 @@ msgid "DESCRIPTION"
 msgstr "BESCHREIBUNG"
 
 # type: SH
-#: davfs2.conf.5:501 mount.davfs.8:513 umount.davfs.8:79
+#: davfs2.conf.5:524 mount.davfs.8:532 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
 # type: SH
-#: davfs2.conf.5:507 mount.davfs.8:530 umount.davfs.8:84
+#: davfs2.conf.5:530 mount.davfs.8:549 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
-#: davfs2.conf.5:510 mount.davfs.8:533 umount.davfs.8:87
+#: davfs2.conf.5:533 mount.davfs.8:552 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
-#: davfs2.conf.5:512 mount.davfs.8:535 umount.davfs.8:89
+#: davfs2.conf.5:535 mount.davfs.8:554 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
@@ -111,19 +105,19 @@ msgid "Print a help message."
 msgstr "Zeige einen Hilfe-Text an."
 
 # type: SH
-#: mount.davfs.8:344 umount.davfs.8:67
+#: mount.davfs.8:361 umount.davfs.8:67
 #, no-wrap
 msgid "FILES"
 msgstr "DATEIEN"
 
 # type: TP
-#: mount.davfs.8:405 umount.davfs.8:69
+#: mount.davfs.8:422 umount.davfs.8:69
 #, no-wrap
 msgid "I<@SYS_RUN@>"
 msgstr "I<@SYS_RUN@>"
 
 # type: SH
-#: mount.davfs.8:508 umount.davfs.8:74
+#: mount.davfs.8:525 umount.davfs.8:74
 #, no-wrap
 msgid "BUGS"
 msgstr "FEHLER"
@@ -133,6 +127,12 @@ msgstr "FEHLER"
 #, no-wrap
 msgid "u@PROGRAM_NAME@"
 msgstr "u@PROGRAM_NAME@"
+
+# type: TH
+#: umount.davfs.8:1
+#, no-wrap
+msgid "2009-04-13"
+msgstr "2009-04-13"
 
 # type: Plain text
 #: umount.davfs.8:6
