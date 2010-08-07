@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2010-08-07 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c:
+      Added missing '\r' in constant none_match_header
+
+2010-08-07 Werner Baumann (werner.baumann@onlinehome.de)
     * Undoing changes of 2010-07-25
 
 2010-07-25 Werner Baumann (werner.baumann@onlinehome.de)
