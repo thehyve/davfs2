@@ -1,4 +1,4 @@
-.TH @CONFIGFILE@ 5 2010\-07\-25 @PACKAGE_STRING@
+.TH @CONFIGFILE@ 5 2009\-04\-13 @PACKAGE_STRING@
 
 
 .SH NAME
@@ -449,16 +449,6 @@ whether there is a newer version. Graphical User Interfaces tend to open
 just any file, slowing down things dramatically for large directories.
 With this option \fB@PROGRAM_NAME@\fR will try to get this information
 from all files in a directory with one PROPFIND request. 0 = no, 1 = yes.
-.br
-Default: 0
-
-.TP
-.B minimize_mem
-Minimize the amount of memory used for file and directory nodes. The list
-of nodes will be recurrently scaned and all nodes currently not used will
-be removed. It is intended for small systems which might run out of memory
-with huge file systems. Local changes of file permissions will be lost and
-performance is degraded.
 .br
 Default: 0
 

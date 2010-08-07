@@ -1,7 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
-2010-05-04 Werner Baumann (werner.baumann@onlinehome.de)
+2010-08-07 Werner Baumann (werner.baumann@onlinehome.de)
+    * Undoing changes of 2010-07-25
+
+2010-07-25 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, defaults.h, mount_davfs.c, mount_davfs.h
       davfs2.conf:
       Added option to minimize memory usage by recurrently
