@@ -150,7 +150,7 @@ static const ne_propname quota_names[] = {
 
 static size_t log_bufsize = 512;
 
-static char *none_match_header = "If-None-Match: *\n";
+static char *none_match_header = "If-None-Match: *\r\n";
 
 
 /* Private global variables */
