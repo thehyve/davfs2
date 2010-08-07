@@ -101,9 +101,6 @@
    May be overridden by system config file and user config file. */
 #define DAV_GUI_OPTIMIZE 0
 
-/* Remove nodes that are currently not needed to minimize memory usage. */
-#define DAV_MINIMIZE_MEM 0
-
 
 /* HTTP */
 /*======*/

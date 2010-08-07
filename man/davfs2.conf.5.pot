@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2010-07-25 17:31+0300\n"
+"POT-Creation-Date: 2009-10-18 18:01+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,9 +22,9 @@ msgid "@CONFIGFILE@"
 msgstr ""
 
 # type: TH
-#: davfs2.conf.5:1
+#: davfs2.conf.5:1 umount.davfs.8:1
 #, no-wrap
-msgid "2010-07-25"
+msgid "2009-04-13"
 msgstr ""
 
 # type: TH
@@ -392,7 +392,7 @@ msgid ""
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:191 davfs2.conf.5:515
+#: davfs2.conf.5:191 davfs2.conf.5:505
 #, no-wrap
 msgid "B<secrets>"
 msgstr ""
@@ -517,7 +517,7 @@ msgstr ""
 
 # type: Plain text
 #: davfs2.conf.5:247 davfs2.conf.5:255 davfs2.conf.5:273 davfs2.conf.5:283
-#: davfs2.conf.5:300 davfs2.conf.5:454 davfs2.conf.5:464
+#: davfs2.conf.5:300 davfs2.conf.5:454
 msgid "Default: 0"
 msgstr ""
 
@@ -927,36 +927,20 @@ msgid ""
 "files in a directory with one PROPFIND request. 0 = no, 1 = yes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:455
-#, no-wrap
-msgid "B<minimize_mem>"
-msgstr ""
-
-# type: Plain text
-#: davfs2.conf.5:462
-msgid ""
-"Minimize the amount of memory used for file and directory nodes. The list of "
-"nodes will be recurrently scaned and all nodes currently not used will be "
-"removed. It is intended for small systems which might run out of memory with "
-"huge file systems. Local changes of file permissions will be lost and "
-"performance is degraded."
-msgstr ""
-
 # type: SH
-#: davfs2.conf.5:466
+#: davfs2.conf.5:456
 #, no-wrap
 msgid "Debugging Options"
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:468
+#: davfs2.conf.5:458
 #, no-wrap
 msgid "B<debug>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:476
+#: davfs2.conf.5:466
 msgid ""
 "Send debug messages to the syslog daemon. The value tells what kind of "
 "information shall be logged. The messages are send with facility LOG_DAEMON "
@@ -967,7 +951,7 @@ msgid ""
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:480
+#: davfs2.conf.5:470
 msgid ""
 "Unlike other options, this option is cumulative. If there are several debug "
 "entries with different values, all of them will be applied. Also debug "
@@ -976,171 +960,171 @@ msgid ""
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:483
+#: davfs2.conf.5:473
 msgid ""
 "B<Note:> Debug messages let the log-files grow quickly. Never use this "
 "option in normal operation of mount.davfs."
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:485
+#: davfs2.conf.5:475
 msgid "Default: no debugging messages"
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:486
+#: davfs2.conf.5:476
 #, no-wrap
 msgid "B<Recognized values:>"
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:488
+#: davfs2.conf.5:478
 #, no-wrap
 msgid "B<config>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:491
+#: davfs2.conf.5:481
 msgid "Command line and configuration options."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:491
+#: davfs2.conf.5:481
 #, no-wrap
 msgid "B<kernel>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:494
+#: davfs2.conf.5:484
 msgid "Upcalls from the kernel file system."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:494
+#: davfs2.conf.5:484
 #, no-wrap
 msgid "B<cache>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:497
+#: davfs2.conf.5:487
 msgid "Cache operations like adding and removing nodes."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:497
+#: davfs2.conf.5:487
 #, no-wrap
 msgid "B<http>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:500
+#: davfs2.conf.5:490
 msgid "HTTP headers."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:500
+#: davfs2.conf.5:490
 #, no-wrap
 msgid "B<xml>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:503
+#: davfs2.conf.5:493
 msgid "Parsing of the XML-body of WebDAV-requests."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:503
+#: davfs2.conf.5:493
 #, no-wrap
 msgid "B<httpauth>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:506
+#: davfs2.conf.5:496
 msgid "Negotiation of authentication."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:506
+#: davfs2.conf.5:496
 #, no-wrap
 msgid "B<locks>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:509
+#: davfs2.conf.5:499
 msgid "Information about locks."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:509
+#: davfs2.conf.5:499
 #, no-wrap
 msgid "B<ssl>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:512
+#: davfs2.conf.5:502
 msgid "TLS/SSL related stuff like certificates."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:512
+#: davfs2.conf.5:502
 #, no-wrap
 msgid "B<httpbody>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:515
+#: davfs2.conf.5:505
 msgid "Complete body of HTTP-responses."
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:518
+#: davfs2.conf.5:508
 msgid ""
 "Also print confidential information, which is usually omitted or obscured."
 msgstr ""
 
 # type: TP
-#: davfs2.conf.5:518
+#: davfs2.conf.5:508
 #, no-wrap
 msgid "B<most>"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:521
+#: davfs2.conf.5:511
 msgid "Includes config, kernel, cache and http."
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:524 mount.davfs.8:532 umount.davfs.8:79
+#: davfs2.conf.5:514 mount.davfs.8:532 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:528
+#: davfs2.conf.5:518
 msgid ""
 "This man page was written by by Werner Baumann E<lt>werner."
 "baumann@onlinehome.deE<gt>."
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:530 mount.davfs.8:549 umount.davfs.8:84
+#: davfs2.conf.5:520 mount.davfs.8:549 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:533 mount.davfs.8:552 umount.davfs.8:87
+#: davfs2.conf.5:523 mount.davfs.8:552 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr ""
 
 # type: SH
-#: davfs2.conf.5:535 mount.davfs.8:554 umount.davfs.8:89
+#: davfs2.conf.5:525 mount.davfs.8:554 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr ""
 
 # type: Plain text
-#: davfs2.conf.5:541
+#: davfs2.conf.5:531
 msgid ""
 "B<@PROGRAM_NAME@>(8), B<u@PROGRAM_NAME@>(8), B<mount>(8), B<umount>(8), "
 "B<fstab>(5)"
