@@ -29,7 +29,6 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#include <fstab.h>
 #include <getopt.h>
 #include <grp.h>
 #ifdef HAVE_LIBINTL_H
@@ -680,64 +679,66 @@ check_fstab(const dav_args *args)
     dav_args *n_args = new_args();
     n_args->mopts = DAV_USER_MOPTS;
 
-    setfsent();
-    struct fstab *ft = getfsfile(mpoint);
-    if (!ft) {
-        char *mp = NULL;
-        if (asprintf(&mp, "%s/", mpoint) < 0) abort();
-        ft = getfsfile(mp);
-        if (mp) free(mp);
-    }
-    if (!ft || !ft->fs_spec)
-        error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), url,
-              _PATH_FSTAB);
+    FILE *fstab = setmntent(_PATH_MNTTAB, "r");
+    if (!fstab)
+        error(EXIT_FAILURE, errno, _("can't open file %s"), _PATH_MNTTAB);
 
-    if (strcmp(url, ft->fs_spec) != 0) {
-        char *fstab_url = decode_octal(ft->fs_spec);
+    char *mp = NULL;
+    if (asprintf(&mp, "%s/", mpoint) < 0) abort();
+    struct mntent *ft = getmntent(fstab);
+    while (ft && ft->mnt_dir) {
+        if (strcmp(ft->mnt_dir, mpoint) == 0 || strcmp(ft->mnt_dir, mp) == 0)
+            break;
+        ft = getmntent(fstab);
+    }
+    if (!ft || !ft->mnt_dir)
+        error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), url,
+              _PATH_MNTTAB);
+    if (mp) free(mp);
+
+    if (strcmp(url, ft->mnt_fsname) != 0) {
+        char *fstab_url = decode_octal(ft->mnt_fsname);
         if (strcmp(url, fstab_url) != 0)
-            error(EXIT_FAILURE, 0, _("different URL in %s"), _PATH_FSTAB);
+            error(EXIT_FAILURE, 0, _("different URL in %s"), _PATH_MNTTAB);
         free(fstab_url);
     }
 
-    if (ft->fs_mntops)
-        get_options(n_args, ft->fs_mntops);
-
-    if (! ft->fs_vfstype || strcmp(DAV_FS_TYPE, ft->fs_vfstype) != 0)
+    if (!ft->mnt_type || strcmp(DAV_FS_TYPE, ft->mnt_type) != 0)
         error(EXIT_FAILURE, 0, _("different file system type in %s"),
-              _PATH_FSTAB);
+              _PATH_MNTTAB);
+
+    if (ft->mnt_opts)
+        get_options(n_args, ft->mnt_opts);
+
+    endmntent(fstab);
+
     if (args->conf || n_args->conf) {
         if (!args->conf || !n_args->conf
                 || strcmp(args->conf, n_args->conf) != 0)
             error(EXIT_FAILURE, 0, _("different config file in %s"),
-                  _PATH_FSTAB);
+                  _PATH_MNTTAB);
     }
     if (args->cl_username || n_args->cl_username) {
         if (!args->cl_username || !n_args->cl_username
                 || strcmp(args->cl_username, n_args->cl_username) != 0)
-            error(EXIT_FAILURE, 0, _("different username in %s"), _PATH_FSTAB);
+            error(EXIT_FAILURE, 0, _("different username in %s"), _PATH_MNTTAB);
     }
     if (!n_args->user && !n_args->users)
         error(EXIT_FAILURE, 0,
               _("neither option `user' nor option `users' set in %s"),
-              _PATH_FSTAB);
-    if (args->user != n_args->user)
-        error(EXIT_FAILURE, 0, _("different option `user' in %s"), _PATH_FSTAB);
-    if (args->users != n_args->users)
-        error(EXIT_FAILURE, 0, _("different option `users' in %s"),
-              _PATH_FSTAB);
+              _PATH_MNTTAB);
     if (args->mopts != n_args->mopts)
         error(EXIT_FAILURE, 0, _("different mount options in %s"),
-              _PATH_FSTAB);
+              _PATH_MNTTAB);
     if (args->uid != n_args->uid)
-        error(EXIT_FAILURE, 0, _("different uid in %s"), _PATH_FSTAB);
+        error(EXIT_FAILURE, 0, _("different uid in %s"), _PATH_MNTTAB);
     if (args->gid != n_args->gid)
-        error(EXIT_FAILURE, 0, _("different gid in %s"), _PATH_FSTAB);
+        error(EXIT_FAILURE, 0, _("different gid in %s"), _PATH_MNTTAB);
     if (args->dir_mode != n_args->dir_mode)
-        error(EXIT_FAILURE, 0, _("different dir_mode in %s"), _PATH_FSTAB);
+        error(EXIT_FAILURE, 0, _("different dir_mode in %s"), _PATH_MNTTAB);
     if (args->file_mode != n_args->file_mode)
-        error(EXIT_FAILURE, 0, _("different file_mode in %s"), _PATH_FSTAB);
+        error(EXIT_FAILURE, 0, _("different file_mode in %s"), _PATH_MNTTAB);
 
-    endfsent();
     delete_args(n_args);
 }
 
