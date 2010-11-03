@@ -758,23 +758,23 @@ check_mountpoint(dav_args *args)
 {
 
     struct passwd *pw;
+    int relative = (*mpoint != '/');
 
-    if (*mpoint != '/') {
-        char *mp = canonicalize_file_name(mpoint);
-        if (!mp)
+    char *mp = canonicalize_file_name(mpoint);
+    if (!mp)
+        error(EXIT_FAILURE, 0,
+              _("can't evaluate path of mount point %s"), mpoint);
+    free(mpoint);
+    mpoint = mp;
+
+    if (relative && getuid() != 0) {
+        pw = getpwuid(getuid());
+        if (!pw || !pw->pw_dir)
             error(EXIT_FAILURE, 0,
-                  _("can't evaluate path of mount point %s"), mpoint);
-        if (getuid() != 0) {
-            pw = getpwuid(getuid());
-            if (!pw || !pw->pw_dir)
-                error(EXIT_FAILURE, 0,
-                      _("can't get home directory for uid %i"), getuid());
-            if (strstr(mp, pw->pw_dir) != mp)
-                error(EXIT_FAILURE, 0, _("A relative mount point must lie "
-                      "within your home directory"));
-        }
-        free(mpoint);
-        mpoint = mp;
+                  _("can't get home directory for uid %i"), getuid());
+        if (strstr(mp, pw->pw_dir) != mp)
+            error(EXIT_FAILURE, 0, _("A relative mount point must lie "
+                  "within your home directory"));
     }
 
     if (strcmp(mpoint, "/") == 0 || strlen(mpoint) < 2)
