@@ -8,8 +8,8 @@ ChangeLog for davfs2
       Replace xxfsent functions by xxmntent functions.
       Don't compare commandline and fstab for options
       'user' and 'users', only check fstab for presence.
-    * mount_davfs.c, log_dbg_cmdline:
-      Replace argz.
+    * mount_davfs.h, mount_davfs.c:
+      Replace log_dbg_cmdline.
 
 2010-08-07 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c:
