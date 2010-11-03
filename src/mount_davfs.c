@@ -191,9 +191,6 @@ static dav_args *
 new_args(void);
 
 static void
-log_dbg_cmdline(int argc, char *argv[]);
-
-static void
 log_dbg_config(char *argv[], dav_args *args);
 
 static int
@@ -935,8 +932,22 @@ is_mounted(void)
 static dav_args *
 parse_commandline(int argc, char *argv[])
 {
-    log_dbg_cmdline(argc, argv);
     dav_args *args = new_args();
+
+    size_t len = argc;
+    int i;
+    for (i = 0; i < argc; i++)
+        len += strlen(argv[i]);
+    args->cmdline = malloc(len);
+    if (!args->cmdline) abort();
+    char *p = args->cmdline;
+    for (i = 0; i < argc - 1; i++) {
+        strcpy(p, argv[i]);
+        p += strlen(argv[i]);
+        *p = ' ';
+        p++;
+    }
+    strcpy(p, argv[argc - 1]);
 
     char *short_options = "vwVho:";
     static const struct option options[] = {
@@ -973,7 +984,7 @@ parse_commandline(int argc, char *argv[])
         o = getopt_long(argc, argv, short_options, options, NULL);
     }
 
-    int i = optind;
+    i = optind;
     switch (argc - i) {
     case 0:
     case 1:
@@ -1418,6 +1429,8 @@ decode_octal(const char *s)
 static void
 delete_args(dav_args *args)
 {
+    if (args->cmdline)
+        free(args->cmdline);
     if (args->dav_user)
         free(args->dav_user);
     if (args->dav_group)
@@ -1734,6 +1747,7 @@ new_args(void)
 
     dav_args *args = ne_malloc(sizeof(*args));
 
+    args->cmdline = NULL;
     args->dav_user = ne_strdup(DAV_USER);
     args->dav_group = ne_strdup(DAV_GROUP);
     args->ignore_home = NULL;
@@ -1826,32 +1840,10 @@ new_args(void)
 
 
 static void
-log_dbg_cmdline(int argc, char *argv[])
-{
-    size_t len = argc;
-    int i;
-    for (i = 0; i < argc; i++)
-        len += strlen(argv[i]);
-    char *cmdline = malloc(len);
-    if (!cmdline) abort();
-
-    char *p = cmdline;
-    for (i = 0; i < argc - 1; i++) {
-        strcpy(p, argv[i]);
-        p += strlen(argv[i]);
-        *p = ' ';
-        p++;
-    }
-    strcpy(p, argv[argc - 1]);
-
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), cmdline);
-    free(cmdline);
-}
-
-
-static void
 log_dbg_config(char *argv[], dav_args *args)
 {
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "%s", args->cmdline);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "Configuration:");
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),

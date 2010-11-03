@@ -31,6 +31,7 @@
    Some data will be copied into global or local variables to be available in
    daemon mode. The rest will be freed when forking into daemon mode. */
 typedef struct {
+    char *cmdline;
     char *dav_user;           /* System config file */
     char *dav_group;          /* System config file */
     char *ignore_home;        /* System config file */
