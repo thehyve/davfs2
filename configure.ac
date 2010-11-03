@@ -42,7 +42,7 @@ DAV_CHECK_NEON
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS([argz.h fcntl.h libintl.h langinfo.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
+AC_CHECK_HEADERS([fcntl.h libintl.h langinfo.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

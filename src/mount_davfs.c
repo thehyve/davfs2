@@ -20,9 +20,6 @@
 
 #include "config.h"
 
-#ifdef HAVE_ARGZ_H
-#include <argz.h>
-#endif
 #include <ctype.h>
 #include <errno.h>
 #include <error.h>
@@ -150,7 +147,7 @@ static dav_args *
 parse_commandline(int argc, char *argv[]);
 
 static void
-parse_config(char *argv[], dav_args *args);
+parse_config(int argc, char *argv[], dav_args *args);
 
 static void
 parse_secrets(dav_args *args);
@@ -194,7 +191,7 @@ static dav_args *
 new_args(void);
 
 static void
-log_dbg_cmdline(char *argv[]);
+log_dbg_cmdline(int argc, char *argv[]);
 
 static void
 log_dbg_config(char *argv[], dav_args *args);
@@ -246,7 +243,7 @@ main(int argc, char *argv[])
     if (getuid() != 0)
         check_fstab(args);
 
-    parse_config(argv, args);
+    parse_config(argc, argv, args);
 
     check_mountpoint(args);
 
@@ -938,7 +935,7 @@ is_mounted(void)
 static dav_args *
 parse_commandline(int argc, char *argv[])
 {
-    log_dbg_cmdline(argv);
+    log_dbg_cmdline(argc, argv);
     dav_args *args = new_args();
 
     char *short_options = "vwVho:";
@@ -1020,7 +1017,7 @@ parse_commandline(int argc, char *argv[])
    given it will be parsed too and overwrites the values from the system
    wide configuration file. */
 static void
-parse_config(char *argv[], dav_args *args)
+parse_config(int argc, char *argv[], dav_args *args)
 {
     read_config(args, DAV_SYS_CONF_DIR "/" DAV_CONFIG, 1);
 
@@ -1829,15 +1826,26 @@ new_args(void)
 
 
 static void
-log_dbg_cmdline(char *argv[])
+log_dbg_cmdline(int argc, char *argv[])
 {
-    size_t len;
-    char *cmdline;
-    if (argz_create(argv, &cmdline, &len) == 0) {
-        argz_stringify(cmdline, len, ' ');
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), cmdline);
-        free(cmdline);
+    size_t len = argc;
+    int i;
+    for (i = 0; i < argc; i++)
+        len += strlen(argv[i]);
+    char *cmdline = malloc(len);
+    if (!cmdline) abort();
+
+    char *p = cmdline;
+    for (i = 0; i < argc - 1; i++) {
+        strcpy(p, argv[i]);
+        p += strlen(argv[i]);
+        *p = ' ';
+        p++;
     }
+    strcpy(p, argv[argc - 1]);
+
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), cmdline);
+    free(cmdline);
 }
 
 
