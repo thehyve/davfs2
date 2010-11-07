@@ -72,6 +72,7 @@
 #include <ne_utils.h>
 
 #include "defaults.h"
+#include "../gl/canonicalize.h"
 #include "mount_davfs.h"
 #include "kernel_interface.h"
 #include "cache.h"
@@ -528,7 +529,7 @@ check_dirs(dav_args *args)
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_CONFIG, NULL);
                 char *command = ne_concat("cp ", template, " ", file_name,
                                           NULL);
-                system(command);
+                if (system(command) != 0);
                 free(command);
                 free(template);
             }
