@@ -167,8 +167,7 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
         ++minor;
     }
 
-    if (*dev <= 0) {
-        system("/sbin/modprobe coda &>/dev/null");
+    if (*dev <= 0 && system("/sbin/modprobe coda &>/dev/null") == 0) {
         minor = 0;
         while (*dev <= 0 && minor < MAX_CODADEVS) {
             char *path;
@@ -223,8 +222,7 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
             abort();
 
     *dev = open(path, O_RDWR | O_NONBLOCK);
-    if (*dev <= 0) {
-        system("/sbin/modprobe fuse &>/dev/null");
+    if (*dev <= 0 && system("/sbin/modprobe fuse &>/dev/null") == 0) {
         *dev = open(path, O_RDWR | O_NONBLOCK);
     }
     if (*dev <= 0) {
