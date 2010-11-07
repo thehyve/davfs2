@@ -1493,7 +1493,7 @@ log_writer(void *cookie, const char *buffer, size_t size)
             written++;
         }
         *cpos = '\0';
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), (char *) cookie);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "%s", (char *) cookie);
     }
     return written;
 }
