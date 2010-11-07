@@ -2561,7 +2561,7 @@ create_cache_file(dav_node *node)
     if (fd <= 0) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                _("can't create cache file %s"), node->cache_path);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), strerror(errno));
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), "%s", strerror(errno));
         free(node->cache_path);
         node->cache_path = NULL;
         return EIO;
@@ -2595,7 +2595,7 @@ create_dir_cache_file(dav_node *dir)
     if (fd <= 0) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                _("can't create cache file %s"), dir->cache_path);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), strerror(errno));
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), "%s", strerror(errno));
         free(dir->cache_path);
         dir->cache_path = NULL;
         return EIO;
