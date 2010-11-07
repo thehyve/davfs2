@@ -177,9 +177,12 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
             *dev = open(path, O_RDWR | O_NONBLOCK);
             if (*dev <= 0) {
                 if (mknod(path, S_IFCHR, makedev(CODA_MAJOR, minor)) == 0) {
-                    chown(path, 0, 0);
-                    chmod(path, S_IRUSR | S_IWUSR);
-                    *dev = open(path, O_RDWR | O_NONBLOCK);
+                    if (chown(path, 0, 0) == 0
+                            && chmod(path, S_IRUSR | S_IWUSR) == 0) {
+                        *dev = open(path, O_RDWR | O_NONBLOCK);
+                    } else {
+                        remove(path);
+                    }
                 }
             }
             free(path);
@@ -227,9 +230,11 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
     }
     if (*dev <= 0) {
         if (mknod(path, S_IFCHR, makedev(FUSE_MAJOR, FUSE_MINOR)) == 0) {
-            chown(path, 0, 0);
-            chmod(path, S_IRUSR | S_IWUSR);
-            *dev = open(path, O_RDWR | O_NONBLOCK);
+            if (chown(path, 0, 0) == 0 && chmod(path, S_IRUSR | S_IWUSR) == 0) {
+                *dev = open(path, O_RDWR | O_NONBLOCK);
+            } else {
+                remove(path);
+            }
         }
     }
 
