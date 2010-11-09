@@ -1,18 +1,28 @@
-davfs2 AUTHORS 2009-04-12
+davfs2 AUTHORS 2009-11-09
 -------------------------
 
 This package is based on davfs2 0.2.3 by
 Sun Kim <hunkim@cs.ucsc.edu> and
 Robert Spier <robrt@users.sourceforge.net>.
 This version is a complete rewrite by Werner Baumann.
+
 The kernel interface definitions are copyright by
-Miklos Szeredi and Carnegie Mellon University, respectively.
+Miklos Szeredi and Carnegie Mellon University, respectively
+(license text below).
+
+The files in the gl directory are from Gnulib
+(http://www.gnu.org/software/gnulib/) and usually under GPL,
+Copyright (C) Free Software Foundation. You should look at the
+copyright notices of individual files before distributing them.
+
+The files in the config directory are from the GNU Autotools
+and Gnulib. Each file has a short copyright notice. 
 
 
 Copyright:
 ==========
 
-Copyright (c) 2005, 2006, 2007, 2008, 2009
+Copyright (c) 2005, 2006, 2007, 2008, 2009, 2010
               Werner Baumann <werner.baumann@onlinehome.de>
 
     davfs2 is free software; you can redistribute it and/or modify
