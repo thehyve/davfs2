@@ -1,4 +1,4 @@
-2010-04-30
+2010-11-09
 ----------
 
 # Copyright (C) 2006, 2007, 2008, 2009, 2010 Werner Baumann
@@ -7,7 +7,7 @@
 # permitted in any medium without royalty.
 
 
-DAVFS2 1.4.6 INSTALLATION
+DAVFS2 1.???? INSTALLATION
 =========================
 
     1 UPDATING FROM PREVIOUS VERSION
@@ -74,6 +74,10 @@ build tools:
 - GNU Automake 1.10 or newer
 - GNU gettext-tools 0.16.1 or newer
 - po4a 0.29 or newer
+- Gnulib
+  The bootstrap script must be able to find gnulib-tool. For this you
+  should create a symboli link to gnulib-tool in a directory that is in
+  your PATH environment variable.
 
 Change into the top level source directory and run
     $ ./bootstrap

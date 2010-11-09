@@ -4,6 +4,18 @@
 # permitted in any medium without royalty.
 
 
+What is new in davfs2 1.????
+===========================
+
+davfs2 now uses Gnulib to solve portability issues. At the moment it
+make use of modules canonicalize and rpmatch. If you build davfs2 on
+some other system than standard GNU/Linux and encouter problems please
+file an support request. Many of these problem should be sovable by
+importing additional Gnulib modules.
+
+TODO
+
+
 What is new in davfs2 1.4.6
 ===========================
 
