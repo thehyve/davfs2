@@ -32,6 +32,7 @@ mount_davfs_SOURCES = cache.c dav_coda.c \
         kernel_interface.h mount_davfs.h webdav.h
 umount_davfs_SOURCES = umount_davfs.c defaults.h
 
+AM_CPPFLAGS = -I$(top_srcdir)/gl
 AM_CFLAGS = -Wall
 DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_SYS_CONF_DIR=\"$(pkgsysconfdir)\" \
@@ -46,6 +47,8 @@ DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_USER=\"$(dav_user)\" \
        -DDAV_GROUP=\"$(dav_group)\" @DEFS@
 LIBS = $(NEON_LIBS) @LIBS@
+mount_davfs_LDADD = $(LIBINTL)
+umount_davfs_LDADD = $(LIBINTL)
 
 install-exec-hook:
 	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \

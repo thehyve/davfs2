@@ -8,6 +8,7 @@
 
 set -ex
 autopoint --force
+gnulib-tool --update
 cd man; po4a po4a.conf; cd ..
 aclocal -I config
 autoheader
