@@ -30,8 +30,10 @@ AC_CONFIG_HEADER([config.h])
 
 # Checks for programs.
 AC_PROG_CC
+gl_EARLY
 AC_PROG_INSTALL
 AC_PROG_LN_S
+gl_INIT
 
 # Checks for libraries.
 AM_GNU_GETTEXT_VERSION(0.14.4)
@@ -42,7 +44,7 @@ DAV_CHECK_NEON
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h libintl.h langinfo.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
+AC_CHECK_HEADERS([fcntl.h iconv.h libintl.h langinfo.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -77,7 +79,7 @@ AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STRFTIME
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
-AC_CHECK_FUNCS([endpwent ftruncate getmntent memset mkdir nl_langinfo rpmatch select setlocale strcasecmp strchr strdup strerror strpbrk strrchr strstr strtol utime])
+AC_CHECK_FUNCS([endpwent ftruncate getmntent iconv memset mkdir nl_langinfo rpmatch select setlocale strcasecmp strchr strdup strerror strpbrk strrchr strstr strtol utime])
 
 # Misc.
 DAV_DEFAULTS
@@ -91,6 +93,7 @@ AC_CONFIG_FILES([Makefile
                  man/Makefile
                  man/de/Makefile
                  man/es/Makefile
-                 src/Makefile])
+                 src/Makefile
+                 gl/Makefile])
 AC_OUTPUT
 DAV_MESSAGE

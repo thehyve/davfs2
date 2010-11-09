@@ -72,7 +72,7 @@
 #include <ne_utils.h>
 
 #include "defaults.h"
-#include "../gl/canonicalize.h"
+#include "canonicalize.h"
 #include "mount_davfs.h"
 #include "kernel_interface.h"
 #include "cache.h"
