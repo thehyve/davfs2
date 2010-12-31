@@ -227,6 +227,7 @@ main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "");
     bindtextdomain(PACKAGE, LOCALEDIR);
+    bindtextdomain(PACKAGE "-gnulib", LOCALEDIR);
     textdomain(PACKAGE);
 
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), PACKAGE_STRING);

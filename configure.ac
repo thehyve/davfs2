@@ -94,6 +94,7 @@ AC_CONFIG_FILES([Makefile
                  man/de/Makefile
                  man/es/Makefile
                  src/Makefile
-                 gl/Makefile])
+                 gl/Makefile
+                 glpo/Makefile.in])
 AC_OUTPUT
 DAV_MESSAGE
