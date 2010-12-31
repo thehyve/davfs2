@@ -1,4 +1,4 @@
-2010-11-09
+2010-12-31
 ----------
 
 # Copyright (C) 2006, 2007, 2008, 2009, 2010 Werner Baumann
@@ -51,7 +51,7 @@ the files from the backup directory you may need some day.
 ----------------
 
 davfs2 uses the neon libraries for communication with the server.
-libneon (2.5, 2.6, 2.7, 2.8 or 2.9) must be installed. Your distribution will most
+libneon (2.6, 2.7, 2.8 or 2.9) must be installed. Your distribution will most
 likely provide a package.
 You will also need the neon header files. Distributions usually provide
 development packages for this.
@@ -71,12 +71,13 @@ To build davfs2 from the CVS sources you need recent versions of the some
 build tools:
 
 - GNU Autoconf 2.61 or newer
-- GNU Automake 1.10 or newer
-- GNU gettext-tools 0.16.1 or newer
-- po4a 0.29 or newer
+- GNU Automake 1.10.1 or newer
+- GNU gettext-tools 0.17 or newer
+- po4a 0.34 or newer
+- gperf 3.0.3 or newer
 - Gnulib
   The bootstrap script must be able to find gnulib-tool. For this you
-  should create a symboli link to gnulib-tool in a directory that is in
+  should create a symbolic link to gnulib-tool in a directory that is in
   your PATH environment variable.
 
 Change into the top level source directory and run
