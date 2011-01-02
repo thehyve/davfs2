@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2011-01-02 Werner Baumann (werner.baumann@onlinehome.de)
+    * configure.ac, davfs2.m4, webdav.c:
+      Add option --disable-iconv.
+
 2010-12-31 Werner Baumann (werner.baumann@onlinehome.de)
     * Add Gnulib module iconv_open.
     * Add gettext support for Gnulib

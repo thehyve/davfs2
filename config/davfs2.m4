@@ -22,7 +22,7 @@
 # Looks for the binary 'neon-config'. If a directory is given with
 # --with-neon=, it looks in the bin-subdirectory of this, else it uses
 # AC_PATH_PROG to find 'neon-config'.
-# If found, it sets variable NRON_CONFIG and calls NEON_USE_EXTERNAL.
+# If found, it sets variable NEON_CONFIG and calls NEON_USE_EXTERNAL.
 # if not found, or if NEON_USE_EXTERNAL does not set neon_got_library
 # to yes, configration is stopped with an error message.
 
@@ -145,6 +145,22 @@ AC_DEFUN([DAV_LFS],[
 ])
 
 
+# Disable character conversion.
+
+AC_DEFUN([DAV_ICONV],[
+    AC_ARG_ENABLE([iconv],
+      [  --disable-iconv         disable character conversion],
+      [dav_iconv=$enableval],
+      [dav_iconv=yes])
+
+    if test "$dav_iconv" = "yes"; then
+        AC_DEFINE([DAV_USE_ICONV], [1],
+          [Define to enable charcter conversion])
+    fi
+
+])
+
+
 # Output summary
 
 AC_DEFUN([DAV_MESSAGE],[
@@ -164,7 +180,7 @@ Configuration for building davfs2 AC_PACKAGE_VERSION:
   Large File Support:        ${dav_lfs}
   Neon Library:              ${neon_library_message}
                              ${ne_SSL_message}
-  National Language Support: ${dav_nls}
+  Native Language Support:   ${dav_nls}
 
 EOF
 ])

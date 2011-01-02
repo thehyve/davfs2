@@ -51,8 +51,8 @@ the files from the backup directory you may need some day.
 ----------------
 
 davfs2 uses the neon libraries for communication with the server.
-libneon (2.6, 2.7, 2.8 or 2.9) must be installed. Your distribution will most
-likely provide a package.
+libneon (0.25, 0.26, 0.27, 0.28 or 0.29) must be installed. Your distribution
+will most likely provide a package.
 You will also need the neon header files. Distributions usually provide
 development packages for this.
 If your distribution don't come with libneon or it does not support TLS and
