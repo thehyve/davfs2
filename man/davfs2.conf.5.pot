@@ -7,50 +7,51 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2009-10-18 18:01+0300\n"
+"POT-Creation-Date: 2011-04-03 10:20+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
-"Content-Transfer-Encoding: ENCODING"
+"Content-Transfer-Encoding: 8bit\n"
 
-# type: TH
+#. type: TH
 #: davfs2.conf.5:1
 #, no-wrap
 msgid "@CONFIGFILE@"
 msgstr ""
 
-# type: TH
-#: davfs2.conf.5:1 umount.davfs.8:1
+#. type: TH
+#: davfs2.conf.5:1 mount.davfs.8:1
 #, no-wrap
-msgid "2009-04-13"
+msgid "2011-04-03"
 msgstr ""
 
-# type: TH
+#. type: TH
 #: davfs2.conf.5:1 mount.davfs.8:1 umount.davfs.8:1
 #, no-wrap
 msgid "@PACKAGE_STRING@"
 msgstr ""
 
-# type: SH
+#. type: SH
 #: davfs2.conf.5:4 mount.davfs.8:3 umount.davfs.8:3
 #, no-wrap
 msgid "NAME"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:7
 msgid "B<@CONFIGFILE@> - Configuration file for B<@PROGRAM_NAME@>"
 msgstr ""
 
-# type: SH
+#. type: SH
 #: davfs2.conf.5:9 mount.davfs.8:22 umount.davfs.8:20
 #, no-wrap
 msgid "DESCRIPTION"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:17
 msgid ""
 "There is a system wide configuration file I<@SYS_CONF_DIR@/@CONFIGFILE@> and "
@@ -61,14 +62,14 @@ msgid ""
 "precedence over the system wide configuration."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:21
 msgid ""
 "The configuration file consists of lines where each line contains a keyword "
 "value pair. Keyword and value are seperated by spaces and/or tabs."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:29
 msgid ""
 "The file may contain sections that are for one specific mount point only.  "
@@ -79,48 +80,48 @@ msgid ""
 "specific section will have precedence."
 msgstr ""
 
-# type: SH
+#. type: SH
 #: davfs2.conf.5:31
 #, no-wrap
 msgid "EXAMPLE"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:34
 msgid "kernel_fs coda"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:36
 msgid "proxy\tfoo.bar:8080"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:38
 msgid "use_locks 0"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:41
 msgid "[/media/dav]"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:43
 msgid "use_locks 1"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:46
 msgid "[/home/otto/mywebspace]"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:48
 msgid "gui_optimize 1"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:53
 msgid ""
 "All mounted @PACKAGE@ file systems will use the coda kernel file system and "
@@ -128,33 +129,33 @@ msgid ""
 "the use of the locks. /home/otto/mywebspace will use the gui_optimize option."
 msgstr ""
 
-# type: SH
+#. type: SH
 #: davfs2.conf.5:54
 #, no-wrap
 msgid "GENERAL SYNTAX RULES"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:57
 msgid "Lines that only contain spaces and tabs (empty lines) are ignored."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:60
 msgid "# indicates a comment. The rest of the line is ignored."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:63
 msgid "\\(rs is the escape character."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:66
 msgid "\"\" is used for quotation."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:72
 msgid ""
 "If a value contains one of the special characters space, tab, #, \\(rs, or "
@@ -164,7 +165,7 @@ msgid ""
 "instead of \\(cq\"\\(cq."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:78
 msgid ""
 "Values containing spaces, tabs or # may instead be enclosed in double "
@@ -173,56 +174,55 @@ msgid ""
 "must be within the quotes (like \"[/home/otto/with space]\")."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:82
 msgid ""
 "Boolean option values (yes/no) must be given as numerical value.  0 for no, "
 "1 for yes."
 msgstr ""
 
-# type: SH
+#. type: SH
 #: davfs2.conf.5:84
 #, no-wrap
 msgid "AVAILABLE CONFIGURATION OPTIONS"
 msgstr ""
 
-# type: SH
+#. type: SH
 #: davfs2.conf.5:86
 #, no-wrap
 msgid "General Options"
 msgstr ""
 
-# type: TP
+#. type: TP
 #: davfs2.conf.5:88
 #, no-wrap
 msgid "B<dav_user>"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:92
 msgid ""
 "When invoked by root the B<@PROGRAM_NAME@> daemon will run as this user.  "
 "Value must be given as I<name>, B<not> as numerical id."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:94
 msgid "Default: @USER@"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:96 davfs2.conf.5:106 davfs2.conf.5:116 davfs2.conf.5:145
-#: davfs2.conf.5:154
+#. type: Plain text
+#: davfs2.conf.5:96 davfs2.conf.5:106 davfs2.conf.5:135 davfs2.conf.5:144
 msgid "B<Only allowed in the system wide configuration file.>"
 msgstr ""
 
-# type: TP
+#. type: TP
 #: davfs2.conf.5:97
 #, no-wrap
 msgid "B<dav_group>"
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:102
 msgid ""
 "The group of the running B<@PROGRAM_NAME@> daemon. Ordinary users must be "
@@ -230,112 +230,96 @@ msgid ""
 "be given as I<name>, B<not> as numerical id."
 msgstr ""
 
-# type: Plain text
+#. type: Plain text
 #: davfs2.conf.5:104
 msgid "Default: @GROUP@"
 msgstr ""
 
-# type: TP
+#. type: TP
 #: davfs2.conf.5:107
-#, no-wrap
-msgid "B<ignore_home>"
-msgstr ""
-
-# type: Plain text
-#: davfs2.conf.5:114
-msgid ""
-"An ordinary user is not allowed to mount within the home directory of "
-"another user. But sometimes system users (like I<nobody>) get assigned home "
-"directories (like /), that include common mount points. This option allows "
-"to give a comma seperated list of system users that will be excluded from "
-"this check."
-msgstr ""
-
-# type: TP
-#: davfs2.conf.5:117
 #, no-wrap
 msgid "B<kernel_fs>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:121
+#. type: Plain text
+#: davfs2.conf.5:111
 msgid ""
 "Which kernel file system to use, to integrate into the virtual file system.  "
 "Possible values are I<fuse> and I<coda>."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:123
+#. type: Plain text
+#: davfs2.conf.5:113
 msgid "Default: fuse"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:124
+#. type: TP
+#: davfs2.conf.5:114
 #, no-wrap
 msgid "B<buf_size>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:129
+#. type: Plain text
+#: davfs2.conf.5:119
 msgid ""
 "Size in KiByte of the buffer used to communicate with the kernel file "
 "system.  Only usefull with I<fuse>, where read and write operations may "
 "profit from a larger buffer."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:131
+#. type: Plain text
+#: davfs2.conf.5:121
 msgid "Default: 16"
 msgstr ""
 
-# type: SH
-#: davfs2.conf.5:133
+#. type: SH
+#: davfs2.conf.5:123
 #, no-wrap
 msgid "WebDAV Related Options"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:135
+#. type: TP
+#: davfs2.conf.5:125
 #, no-wrap
 msgid "B<use_proxy>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:141
+#. type: Plain text
+#: davfs2.conf.5:131
 msgid ""
 "Whether to use a proxy to connect to the WebDAV server. 0 = no, 1 = yes.  If "
 "no proxy is defined in the configration file or the environment variables "
 "B<https_proxy>, B<http_proxy> and B<all_proxy>, this option has no effect."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:143 davfs2.conf.5:208 davfs2.conf.5:215 davfs2.conf.5:293
-#: davfs2.conf.5:434
+#. type: Plain text
+#: davfs2.conf.5:133 davfs2.conf.5:198 davfs2.conf.5:205 davfs2.conf.5:283
+#: davfs2.conf.5:424
 msgid "Default: 1"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:146
+#. type: TP
+#: davfs2.conf.5:136
 #, no-wrap
 msgid "B<proxy>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:152
+#. type: Plain text
+#: davfs2.conf.5:142
 msgid ""
 "Name of the proxy. The name must be the fully qualified domain name (no "
 "scheme). If the proxy port differs from the default of 8080, it must be "
 "appended, seperated by a colon. Examples: I<foo.bar:1704> or I<foo.bar>"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:155
+#. type: TP
+#: davfs2.conf.5:145
 #, no-wrap
 msgid "B<servercert>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:161
+#. type: Plain text
+#: davfs2.conf.5:151
 msgid ""
 "Name of a certificate file in PEM format. The name of the file may be given "
 "as absolute path or as file name only. In the latter case the directories "
@@ -343,16 +327,16 @@ msgid ""
 "searched."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:165
+#. type: Plain text
+#: davfs2.conf.5:155
 msgid ""
 "This option is intended for self-signed server certificates. Self-signed "
 "means issuer and subject are the same. Common name (CN) must be the domain "
 "name of the server."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:175
+#. type: Plain text
+#: davfs2.conf.5:165
 msgid ""
 "In case the server certificate is not self-singed, this file must contain "
 "the certificate of the certificate authority (CA) that signed the server "
@@ -365,8 +349,8 @@ msgid ""
 "the CA-certificates involved."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:182
+#. type: Plain text
+#: davfs2.conf.5:172
 msgid ""
 "B<Note:> Even if the certificate is trusted, that does not mean it is "
 "accepted. There is the additional constraint, that the certificate presented "
@@ -375,14 +359,14 @@ msgid ""
 "automatically accept certificates that don't belong to the server."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:183
+#. type: TP
+#: davfs2.conf.5:173
 #, no-wrap
 msgid "B<clientcert>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:190
+#. type: Plain text
+#: davfs2.conf.5:180
 msgid ""
 "Name of a certificate in PKCS#12 format that will be used to authenticate "
 "with the server. The name of the file may be given as absolute path or as "
@@ -391,123 +375,123 @@ msgid ""
 "will be searched."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:191 davfs2.conf.5:505
+#. type: TP
+#: davfs2.conf.5:181 davfs2.conf.5:495
 #, no-wrap
 msgid "B<secrets>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:196
+#. type: Plain text
+#: davfs2.conf.5:186
 msgid ""
 "Name of a file that holds the credentials for servers and the proxy, and "
 "passwords to decrypt the client certificate. The name must be an absolute "
 "path. The file must be read and writable by the owner only (mode 600)."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:198
+#. type: Plain text
+#: davfs2.conf.5:188
 msgid "Default: ~/.@PACKAGE@/@SECRETSFILE@"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:201
+#. type: Plain text
+#: davfs2.conf.5:191
 msgid ""
 "B<Only allowed in the user configuration file.> The system wide secrets file "
 "is allways I<@SYS_CONF_DIR@/@SECRETSFILE@>."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:202
+#. type: TP
+#: davfs2.conf.5:192
 #, no-wrap
 msgid "B<ask_auth>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:206
+#. type: Plain text
+#: davfs2.conf.5:196
 msgid ""
 "Ask the user interactively for credentials and passwords if not found in the "
 "secretsfile. Ask the user if a servercert cannot be verified. 0 = no, 1 = "
 "yes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:209
+#. type: TP
+#: davfs2.conf.5:199
 #, no-wrap
 msgid "B<use_locks>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:213
+#. type: Plain text
+#: davfs2.conf.5:203
 msgid ""
 "Whether to lock files on the server when they are opened for writing.  0 = "
 "no, 1 = yes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:216
+#. type: TP
+#: davfs2.conf.5:206
 #, no-wrap
 msgid "B<lock_owner>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:221
+#. type: Plain text
+#: davfs2.conf.5:211
 msgid ""
 "A string send to the server to identify the owner of a lock. If a WebDAV "
 "resource is used at the same time by different clients using the same "
 "credentials, different values for lock_owner should be choosen."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:223
+#. type: Plain text
+#: davfs2.conf.5:213
 msgid "Default: the username from the credentials"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:224
+#. type: TP
+#: davfs2.conf.5:214
 #, no-wrap
 msgid "B<lock_timeout>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:228
+#. type: Plain text
+#: davfs2.conf.5:218
 msgid ""
 "How long in seconds locks should be valid, before the server removes them.  "
 "The server may ignore this and set its own timeout value."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:230
+#. type: Plain text
+#: davfs2.conf.5:220
 msgid "Default: 1800"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:231
+#. type: TP
+#: davfs2.conf.5:221
 #, no-wrap
 msgid "B<lock_refresh>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:236
+#. type: Plain text
+#: davfs2.conf.5:226
 msgid ""
 "That many seconds before the lock times out, B<@PROGRAM_NAME@> will try to "
 "refresh the lock. The value should be substantially greater than "
 "B<delay_upload>."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:238 davfs2.conf.5:424
+#. type: Plain text
+#: davfs2.conf.5:228 davfs2.conf.5:414
 msgid "Default: 60"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:239
+#. type: TP
+#: davfs2.conf.5:229
 #, no-wrap
 msgid "B<use_expect100>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:245
+#. type: Plain text
+#: davfs2.conf.5:235
 msgid ""
 "To avoid uploading big files that will be refused by the server, "
 "B<@PROGRAM_NAME@> uses the header I<expect: 100-continue> to get the o.k.  "
@@ -515,34 +499,34 @@ msgid ""
 "1 = yes."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:247 davfs2.conf.5:255 davfs2.conf.5:273 davfs2.conf.5:283
-#: davfs2.conf.5:300 davfs2.conf.5:454
+#. type: Plain text
+#: davfs2.conf.5:237 davfs2.conf.5:245 davfs2.conf.5:263 davfs2.conf.5:273
+#: davfs2.conf.5:290 davfs2.conf.5:444
 msgid "Default: 0"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:248
+#. type: TP
+#: davfs2.conf.5:238
 #, no-wrap
 msgid "B<if_match_bug>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:253
+#. type: Plain text
+#: davfs2.conf.5:243
 msgid ""
 "Some servers do not handle If-Match and If-None-Match-headers correctly.  "
 "This otion tells B<@PROGRAM_NAME@> to use HEAD instead of thes headers.  0 = "
 "no, 1 = yes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:256
+#. type: TP
+#: davfs2.conf.5:246
 #, no-wrap
 msgid "B<drop_weak_etags>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:265
+#. type: Plain text
+#: davfs2.conf.5:255
 msgid ""
 "Popular servers send a weak etag whenever they are not able to calculate a "
 "strong one. This weak etag will never be valid, but after one second it is "
@@ -553,27 +537,27 @@ msgid ""
 "minimized when using locks."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:269
+#. type: Plain text
+#: davfs2.conf.5:259
 msgid ""
 "You should turn this on, when you can't use locks and there is the danger of "
 "concurrent access to the same resource. In this case the etag is not used at "
 "all and the resource cannot be cached."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:271
+#. type: Plain text
+#: davfs2.conf.5:261
 msgid "0 = no, 1 = yes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:274
+#. type: TP
+#: davfs2.conf.5:264
 #, no-wrap
 msgid "B<allow_cookie>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:281
+#. type: Plain text
+#: davfs2.conf.5:271
 msgid ""
 "Some servers will only work when they are allowed to set a cookie and this "
 "cookie is returned in subsequent requests. This option adds very simple "
@@ -581,14 +565,14 @@ msgid ""
 "session ID.  0 = no, 1 = yes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:284
+#. type: TP
+#: davfs2.conf.5:274
 #, no-wrap
 msgid "B<precheck>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:291
+#. type: Plain text
+#: davfs2.conf.5:281
 msgid ""
 "If option B<if_match_bug> is set: use HEAD-requests to check for existence "
 "or modification of a file to avoid unintended overwriting what somebody else "
@@ -596,27 +580,27 @@ msgid ""
 "it 0, if there is no concurrent access to the server.  0 = no, 1 = yes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:294
+#. type: TP
+#: davfs2.conf.5:284
 #, no-wrap
 msgid "B<ignore_dav_header>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:298
+#. type: Plain text
+#: davfs2.conf.5:288
 msgid ""
 "Some servers send wrong information about their capabilities in the DAV-"
 "header.  In this case the header should be ignored."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:301
+#. type: TP
+#: davfs2.conf.5:291
 #, no-wrap
 msgid "B<server_charset>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:307
+#. type: Plain text
+#: davfs2.conf.5:297
 msgid ""
 "When extracting file names from the path component of the URL, "
 "B<@PROGRAM_NAME@> will assume they are encoded using this character set and "
@@ -624,8 +608,8 @@ msgid ""
 "encoding of file contents and B<not> about HTTP escaping rules."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:315
+#. type: Plain text
+#: davfs2.conf.5:305
 msgid ""
 "There is no means in HTTP to know the character encoding of the path "
 "component. There may be even different encodings within the same path, as "
@@ -636,19 +620,19 @@ msgid ""
 "have a special function on some operating systems (like /, : and \\(rs)."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:317
+#. type: Plain text
+#: davfs2.conf.5:307
 msgid "Default: no character set conversion"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:318
+#. type: TP
+#: davfs2.conf.5:308
 #, no-wrap
 msgid "B<connect_timeout>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:324
+#. type: Plain text
+#: davfs2.conf.5:314
 msgid ""
 "When creating a TCP connection to the server B<@PROGRAM_NAME@> will wait "
 "that many seconds for an answer before assuming an error. If a value of '0' "
@@ -656,100 +640,100 @@ msgid ""
 "only timeout as dictated by the TCP stack."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:327
+#. type: Plain text
+#: davfs2.conf.5:317
 msgid ""
 "This parameter only takes effect if the version of neon in use (neon version "
 "E<gt> 0.26) and the OS support non-blocking I/O."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:329 davfs2.conf.5:444
+#. type: Plain text
+#: davfs2.conf.5:319 davfs2.conf.5:434
 msgid "Default: 10"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:330
+#. type: TP
+#: davfs2.conf.5:320
 #, no-wrap
 msgid "B<read_timeout>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:334
+#. type: Plain text
+#: davfs2.conf.5:324
 msgid ""
 "How long in seconds B<@PROGRAM_NAME@> will wait for an answer from the "
 "server before assuming an error."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:336 davfs2.conf.5:344
+#. type: Plain text
+#: davfs2.conf.5:326 davfs2.conf.5:334
 msgid "Default: 30"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:337
+#. type: TP
+#: davfs2.conf.5:327
 #, no-wrap
 msgid "B<retry>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:342
+#. type: Plain text
+#: davfs2.conf.5:332
 msgid ""
 "When B<@PROGRAM_NAME@> can not reach the server it will try again after "
 "B<retry> seconds. For subsequent retries the interval will be increased up "
 "to B<max_retry> seconds."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:345
+#. type: TP
+#: davfs2.conf.5:335
 #, no-wrap
 msgid "B<max_retry>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:348
+#. type: Plain text
+#: davfs2.conf.5:338
 msgid "Maximum value of the retry interval."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:350
+#. type: Plain text
+#: davfs2.conf.5:340
 msgid "Default: 300"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:351
+#. type: TP
+#: davfs2.conf.5:341
 #, no-wrap
 msgid "B<max_upload_attempts>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:355
+#. type: Plain text
+#: davfs2.conf.5:345
 msgid ""
 "When uploading a changed file fails temporarily B<@PROGRAM_NAME@> will retry "
 "with increasing intervals, but not more often than this."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:360
+#. type: Plain text
+#: davfs2.conf.5:350
 msgid ""
 "With a bad connection this will cause additional traffic. To reduce traffic "
 "caused by unsuccessful attempts option B<use_expect100> can be set. But "
 "please test it. Most proxies and some servers don't support this header."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:362
+#. type: Plain text
+#: davfs2.conf.5:352
 msgid "Default: 15"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:363
+#. type: TP
+#: davfs2.conf.5:353
 #, no-wrap
 msgid "B<add_header>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:369
+#. type: Plain text
+#: davfs2.conf.5:359
 msgid ""
 "Your server might expect special headers to do what you want. Different from "
 "other options, this one takes two values: the name of the header and its "
@@ -757,102 +741,102 @@ msgid ""
 "header \"Translate: F\". You can add it like this:"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:371
+#. type: Plain text
+#: davfs2.conf.5:361
 msgid "add_header Translate F"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:373
+#. type: Plain text
+#: davfs2.conf.5:363
 msgid "B<@PROGRAM_NAME@> will add header \"Translate: F\" on all requests."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:377
+#. type: Plain text
+#: davfs2.conf.5:367
 msgid ""
 "This option is cumulative. You can enter more than one add_header option and "
 "all of them will be added. Also add_header options from @SYS_CONF_DIR@/"
 "@CONFIGFILE@ and ~/.@PACKAGE@/@CONFIGFILE@ are merged."
 msgstr ""
 
-# type: SH
-#: davfs2.conf.5:379
+#. type: SH
+#: davfs2.conf.5:369
 #, no-wrap
 msgid "Cache Related Options"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:381
+#. type: TP
+#: davfs2.conf.5:371
 #, no-wrap
 msgid "B<backup_dir>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:386
+#. type: Plain text
+#: davfs2.conf.5:376
 msgid ""
 "Each mounted @PACKAGE@ file system has a directory to store backups of files "
 "that could not be stored back to the server. This sets the name of this "
 "directory. You should regularly check this directory."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:388
+#. type: Plain text
+#: davfs2.conf.5:378
 msgid "Default: lost+found"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:389
+#. type: TP
+#: davfs2.conf.5:379
 #, no-wrap
 msgid "B<cache_dir>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:393
+#. type: Plain text
+#: davfs2.conf.5:383
 msgid ""
 "The directory where B<@PROGRAM_NAME@> will store cached files. For every "
 "mount point a subdirectory will be created."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:397
+#. type: Plain text
+#: davfs2.conf.5:387
 msgid ""
 "In the systemwide configuration file this will set the system wide cache, "
 "used by root. In a users configuration file it will set the cache used by "
 "this user."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:399
+#. type: Plain text
+#: davfs2.conf.5:389
 msgid "Defaults: @SYS_CACHE_DIR@ and ~/.@PACKAGE@/cache"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:400
+#. type: TP
+#: davfs2.conf.5:390
 #, no-wrap
 msgid "B<cache_size>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:405
+#. type: Plain text
+#: davfs2.conf.5:395
 msgid ""
 "The amount of disk space in MiByte that may be used. B<@PROGRAM_NAME@> will "
 "always take enough space to cache open files, ignoring this value if "
 "necessary."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:407
+#. type: Plain text
+#: davfs2.conf.5:397
 msgid "Default: 50"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:408
+#. type: TP
+#: davfs2.conf.5:398
 #, no-wrap
 msgid "B<table_size>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:414
+#. type: Plain text
+#: davfs2.conf.5:404
 msgid ""
 "B<@PROGRAM_NAME@> maintains a hash table with an entry for each known file "
 "or directory. This gives the number of entries in this table. For large file "
@@ -860,33 +844,33 @@ msgid ""
 "up file operations. The value should be a power of 2."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:416
+#. type: Plain text
+#: davfs2.conf.5:406
 msgid "Default: 1024"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:417
+#. type: TP
+#: davfs2.conf.5:407
 #, no-wrap
 msgid "B<dir_refresh>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:422
+#. type: Plain text
+#: davfs2.conf.5:412
 msgid ""
 "After B<@PROGRAM_NAME@> has got information about files in a directory it "
 "considers it valid for this time in seconds. Note: This does not affect "
 "opening of files and reading a directory by an application."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:425
+#. type: TP
+#: davfs2.conf.5:415
 #, no-wrap
 msgid "B<file_refresh>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:432
+#. type: Plain text
+#: davfs2.conf.5:422
 msgid ""
 "When a file or directory is opened by an application, B<@PROGRAM_NAME@> will "
 "first check the server for a newer version. But some applications do open "
@@ -895,14 +879,14 @@ msgid ""
 "for the same information."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:435
+#. type: TP
+#: davfs2.conf.5:425
 #, no-wrap
 msgid "B<delay_upload>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:442
+#. type: Plain text
+#: davfs2.conf.5:432
 msgid ""
 "When a file that has been changed is closed, B<@PROGRAM_NAME@> will wait "
 "that many seconds before it will upload it to the server. This will avoid "
@@ -911,14 +895,14 @@ msgid ""
 "closing, set this option to 0."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:445
+#. type: TP
+#: davfs2.conf.5:435
 #, no-wrap
 msgid "B<gui_optimize>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:452
+#. type: Plain text
+#: davfs2.conf.5:442
 msgid ""
 "When a file is opened, B<@PROGRAM_NAME@> will have to check the server "
 "whether there is a newer version. Graphical User Interfaces tend to open "
@@ -927,20 +911,20 @@ msgid ""
 "files in a directory with one PROPFIND request. 0 = no, 1 = yes."
 msgstr ""
 
-# type: SH
-#: davfs2.conf.5:456
+#. type: SH
+#: davfs2.conf.5:446
 #, no-wrap
 msgid "Debugging Options"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:458
+#. type: TP
+#: davfs2.conf.5:448
 #, no-wrap
 msgid "B<debug>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:466
+#. type: Plain text
+#: davfs2.conf.5:456
 msgid ""
 "Send debug messages to the syslog daemon. The value tells what kind of "
 "information shall be logged. The messages are send with facility LOG_DAEMON "
@@ -950,8 +934,8 @@ msgid ""
 "available depends on your neon library."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:470
+#. type: Plain text
+#: davfs2.conf.5:460
 msgid ""
 "Unlike other options, this option is cumulative. If there are several debug "
 "entries with different values, all of them will be applied. Also debug "
@@ -959,172 +943,172 @@ msgid ""
 "merged."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:473
+#. type: Plain text
+#: davfs2.conf.5:463
 msgid ""
 "B<Note:> Debug messages let the log-files grow quickly. Never use this "
 "option in normal operation of mount.davfs."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:475
+#. type: Plain text
+#: davfs2.conf.5:465
 msgid "Default: no debugging messages"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:476
+#. type: TP
+#: davfs2.conf.5:466
 #, no-wrap
 msgid "B<Recognized values:>"
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:478
+#. type: TP
+#: davfs2.conf.5:468
 #, no-wrap
 msgid "B<config>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:481
+#. type: Plain text
+#: davfs2.conf.5:471
 msgid "Command line and configuration options."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:481
+#. type: TP
+#: davfs2.conf.5:471
 #, no-wrap
 msgid "B<kernel>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:484
+#. type: Plain text
+#: davfs2.conf.5:474
 msgid "Upcalls from the kernel file system."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:484
+#. type: TP
+#: davfs2.conf.5:474
 #, no-wrap
 msgid "B<cache>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:487
+#. type: Plain text
+#: davfs2.conf.5:477
 msgid "Cache operations like adding and removing nodes."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:487
+#. type: TP
+#: davfs2.conf.5:477
 #, no-wrap
 msgid "B<http>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:490
+#. type: Plain text
+#: davfs2.conf.5:480
 msgid "HTTP headers."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:490
+#. type: TP
+#: davfs2.conf.5:480
 #, no-wrap
 msgid "B<xml>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:493
+#. type: Plain text
+#: davfs2.conf.5:483
 msgid "Parsing of the XML-body of WebDAV-requests."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:493
+#. type: TP
+#: davfs2.conf.5:483
 #, no-wrap
 msgid "B<httpauth>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:496
+#. type: Plain text
+#: davfs2.conf.5:486
 msgid "Negotiation of authentication."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:496
+#. type: TP
+#: davfs2.conf.5:486
 #, no-wrap
 msgid "B<locks>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:499
+#. type: Plain text
+#: davfs2.conf.5:489
 msgid "Information about locks."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:499
+#. type: TP
+#: davfs2.conf.5:489
 #, no-wrap
 msgid "B<ssl>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:502
+#. type: Plain text
+#: davfs2.conf.5:492
 msgid "TLS/SSL related stuff like certificates."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:502
+#. type: TP
+#: davfs2.conf.5:492
 #, no-wrap
 msgid "B<httpbody>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:505
+#. type: Plain text
+#: davfs2.conf.5:495
 msgid "Complete body of HTTP-responses."
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:508
+#. type: Plain text
+#: davfs2.conf.5:498
 msgid ""
 "Also print confidential information, which is usually omitted or obscured."
 msgstr ""
 
-# type: TP
-#: davfs2.conf.5:508
+#. type: TP
+#: davfs2.conf.5:498
 #, no-wrap
 msgid "B<most>"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:511
+#. type: Plain text
+#: davfs2.conf.5:501
 msgid "Includes config, kernel, cache and http."
 msgstr ""
 
-# type: SH
-#: davfs2.conf.5:514 mount.davfs.8:532 umount.davfs.8:79
+#. type: SH
+#: davfs2.conf.5:504 mount.davfs.8:533 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:518
+#. type: Plain text
+#: davfs2.conf.5:508
 msgid ""
 "This man page was written by by Werner Baumann E<lt>werner."
 "baumann@onlinehome.deE<gt>."
 msgstr ""
 
-# type: SH
-#: davfs2.conf.5:520 mount.davfs.8:549 umount.davfs.8:84
+#. type: SH
+#: davfs2.conf.5:510 mount.davfs.8:550 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:523 mount.davfs.8:552 umount.davfs.8:87
+#. type: Plain text
+#: davfs2.conf.5:513 mount.davfs.8:553 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr ""
 
-# type: SH
-#: davfs2.conf.5:525 mount.davfs.8:554 umount.davfs.8:89
+#. type: SH
+#: davfs2.conf.5:515 mount.davfs.8:555 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr ""
 
-# type: Plain text
-#: davfs2.conf.5:531
+#. type: Plain text
+#: davfs2.conf.5:521
 msgid ""
 "B<@PROGRAM_NAME@>(8), B<u@PROGRAM_NAME@>(8), B<mount>(8), B<umount>(8), "
 "B<fstab>(5)"

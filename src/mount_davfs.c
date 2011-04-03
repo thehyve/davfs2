@@ -187,9 +187,6 @@ eval_modes(dav_args *args);
 static void
 get_options(dav_args *args, char *option);
 
-static int
-ignore_home(const char *name, const char *ignore_list);
-
 static dav_args *
 new_args(void);
 
@@ -781,31 +778,6 @@ check_mountpoint(dav_args *args)
 
     if (access(mpoint, F_OK) != 0)
         error(EXIT_FAILURE, 0, _("mount point %s does not exist"), mpoint);
-
-    if (getuid() != 0) {
-        pw = getpwuid(getuid());
-        if (!pw)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
-        if (!pw->pw_dir)
-            error(EXIT_FAILURE, 0, _("can't read user data base"));
-        if(strstr(mpoint, pw->pw_dir) != mpoint) {
-            setpwent();
-            pw = getpwent();
-            while (pw) {
-                if (!pw->pw_dir || !pw->pw_name)
-                    error(EXIT_FAILURE, 0, _("can't read user data base"));
-                if (pw->pw_uid != args->uid && strlen(pw->pw_dir) > 0
-                        && strstr(mpoint, pw->pw_dir) == mpoint
-                        && !ignore_home(pw->pw_name, args->ignore_home))
-                    error(EXIT_FAILURE, 0,
-                          _("%s is the home directory of user %s.\n"
-                          "You can't mount into another users home directory"),
-                          pw->pw_dir, pw->pw_name);
-                pw = getpwent();
-            }
-            endpwent();
-        }
-    }
 
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mountpoint: %s", mpoint);
@@ -1439,8 +1411,6 @@ delete_args(dav_args *args)
         free(args->dav_user);
     if (args->dav_group)
         free(args->dav_group);
-    if (args->ignore_home)
-        free(args->ignore_home);
     if (args->conf)
         free(args->conf);
     if (args->add_mopts)
@@ -1714,26 +1684,6 @@ get_options(dav_args *args, char *option)
 }
 
 
-/* Checks whether name ist in ignore_list.
-   name        : name of a system user. Must not be NULL.
-   ignore_list : comma seperated list of system users. May be NULL.
-   return value : 1 if name is in ignore_list, 0 otherwise. */
-static int
-ignore_home(const char *name, const char *ignore_list)
-{
-    if (!ignore_list)
-        return 0;
-    char * s = strstr(ignore_list, name);
-    if (!s)
-        return 0;
-    if (s != ignore_list && *(s - 1) != ',')
-        return 0;
-    if (*(s + strlen(name)) != '\0' && *(s + strlen(name)) != ',')
-        return 0;
-    return 1;
-}
-
-
 /* Allocates a new dav_args-structure and initializes it.
    All members are set to reasonable defaults. */
 static dav_args *
@@ -1754,7 +1704,6 @@ new_args(void)
     args->cmdline = NULL;
     args->dav_user = ne_strdup(DAV_USER);
     args->dav_group = ne_strdup(DAV_GROUP);
-    args->ignore_home = NULL;
 
     if (getuid() != 0) {
         args->conf = ne_concat(user_dir, "/", DAV_CONFIG, NULL);
@@ -1858,8 +1807,6 @@ log_dbg_config(char *argv[], dav_args *args)
            "  dav_user: %s", args->dav_user);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  dav_group: %s", args->dav_group);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  ignore_home: %s", args->ignore_home);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  conf: %s", args->conf);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2186,10 +2133,6 @@ read_config(dav_args *args, const char * filename, int system)
                 if (args->dav_group)
                     free(args->dav_group);
                 args->dav_group = ne_strdup(parmv[1]); 
-            } else if (system && strcmp(parmv[0], "ignore_home") == 0) {
-                if (args->ignore_home)
-                    free(args->ignore_home);
-                args->ignore_home = ne_strdup(parmv[1]); 
             } else if (strcmp(parmv[0], "kernel_fs") == 0) {
                 if (args->kernel_fs)
                     free(args->kernel_fs);

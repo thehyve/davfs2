@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007 Free Software Foundation, Inc.
+# Copyright (C) 2002-2010 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -15,11 +15,15 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=config --po-base=glpo --doc-base=doc --aux-dir=config --no-libtool --macro-prefix=gl --po-domain=davfs2 canonicalize iconv_open rpmatch
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=config --po-base=glpo --doc-base=doc --tests-base=tests --aux-dir=config --no-libtool --macro-prefix=gl --po-domain=davfs2 canonicalize iconv_open rpmatch
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
-gl_MODULES([canonicalize iconv_open rpmatch])
+gl_MODULES([
+  canonicalize
+  iconv_open
+  rpmatch
+])
 gl_AVOID([])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([config])

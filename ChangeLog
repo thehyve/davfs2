@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2011-04-03 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, mount_davfs.h:
+      Remove check for someone elses home directory
+      (sr #107641).
+
 2011-01-02 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac, davfs2.m4, webdav.c:
       Add option --disable-iconv.
