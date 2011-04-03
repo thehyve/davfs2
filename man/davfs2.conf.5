@@ -1,4 +1,4 @@
-.TH @CONFIGFILE@ 5 2009\-04\-13 @PACKAGE_STRING@
+.TH @CONFIGFILE@ 5 2011\-04\-03 @PACKAGE_STRING@
 
 
 .SH NAME
@@ -101,16 +101,6 @@ be member of this group in order to mount a @PACKAGE@ file system.
 Value must be given as \fIname\fP, \fBnot\fR as numerical id.
 .br
 Default: @GROUP@
-.br
-\fBOnly allowed in the system wide configuration file.\fR
-
-.TP
-.B ignore_home
-An ordinary user is not allowed to mount within the home directory of another
-user. But sometimes system users (like \fInobody\fP) get assigned home
-directories (like /), that include common mount points. This option allows to
-give a comma seperated list of system users that will be excluded from this
-check.
 .br
 \fBOnly allowed in the system wide configuration file.\fR
 

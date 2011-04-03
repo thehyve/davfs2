@@ -13,6 +13,8 @@ some other system than standard GNU/Linux and encouter problems please
 file an support request. Many of these problem should be sovable by
 importing additional Gnulib modules.
 
+No longer check for somone esles home directory.
+
 TODO
 
 

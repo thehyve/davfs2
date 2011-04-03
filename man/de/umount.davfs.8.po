@@ -6,74 +6,79 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2009-04-27 18:47+0300\n"
+"POT-Creation-Date: 2011-04-03 10:20+0300\n"
 "PO-Revision-Date: 2009-04-27 18:49+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 # type: TH
-#: davfs2.conf.5:1 mount.davfs.8:1 umount.davfs.8:1
-#, no-wrap
-msgid "2009-04-13"
-msgstr "2009-04-13"
-
-# type: TH
+#. type: TH
 #: davfs2.conf.5:1 mount.davfs.8:1 umount.davfs.8:1
 #, no-wrap
 msgid "@PACKAGE_STRING@"
 msgstr "@PACKAGE_STRING@"
 
 # type: SH
+#. type: SH
 #: davfs2.conf.5:4 mount.davfs.8:3 umount.davfs.8:3
 #, no-wrap
 msgid "NAME"
 msgstr "BEZEICHNUNG"
 
 # type: SH
+#. type: SH
 #: davfs2.conf.5:9 mount.davfs.8:22 umount.davfs.8:20
 #, no-wrap
 msgid "DESCRIPTION"
 msgstr "BESCHREIBUNG"
 
 # type: SH
-#: davfs2.conf.5:501 mount.davfs.8:513 umount.davfs.8:79
+#. type: SH
+#: davfs2.conf.5:504 mount.davfs.8:533 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
 # type: SH
-#: davfs2.conf.5:507 mount.davfs.8:530 umount.davfs.8:84
+#. type: SH
+#: davfs2.conf.5:510 mount.davfs.8:550 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
-#: davfs2.conf.5:510 mount.davfs.8:533 umount.davfs.8:87
+#. type: Plain text
+#: davfs2.conf.5:513 mount.davfs.8:553 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
-#: davfs2.conf.5:512 mount.davfs.8:535 umount.davfs.8:89
+#. type: SH
+#: davfs2.conf.5:515 mount.davfs.8:555 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
 
 # type: SH
+#. type: SH
 #: mount.davfs.8:8 umount.davfs.8:8
 #, no-wrap
 msgid "SYNOPSIS"
 msgstr "ÜBERSICHT"
 
 # type: SH
+#. type: SH
 #: mount.davfs.8:15 umount.davfs.8:15
 #, no-wrap
 msgid "SYNOPSIS (root only)"
 msgstr "ÜBERSICHT (nur für root)"
 
 # type: Plain text
+#. type: Plain text
 #: mount.davfs.8:60 umount.davfs.8:30
 msgid ""
 "I<dir> is the mountpoint where the WebDAV resource is mounted on.  It may be "
@@ -83,78 +88,99 @@ msgstr ""
 "sein."
 
 # type: SH
+#. type: SH
 #: mount.davfs.8:67 umount.davfs.8:51
 #, no-wrap
 msgid "OPTIONS"
 msgstr "OPTIONEN"
 
 # type: TP
+#. type: TP
 #: mount.davfs.8:69 umount.davfs.8:53
 #, no-wrap
 msgid "B<-V --version>"
 msgstr "B<-V --version>"
 
 # type: Plain text
+#. type: Plain text
 #: mount.davfs.8:72 umount.davfs.8:56
 msgid "Output version."
 msgstr "Zeige die Version an."
 
 # type: TP
+#. type: TP
 #: mount.davfs.8:73 umount.davfs.8:57
 #, no-wrap
 msgid "B<-h --help>"
 msgstr "B<-h --help>"
 
 # type: Plain text
+#. type: Plain text
 #: mount.davfs.8:76 umount.davfs.8:60
 msgid "Print a help message."
 msgstr "Zeige einen Hilfe-Text an."
 
 # type: SH
-#: mount.davfs.8:344 umount.davfs.8:67
+#. type: SH
+#: mount.davfs.8:362 umount.davfs.8:67
 #, no-wrap
 msgid "FILES"
 msgstr "DATEIEN"
 
 # type: TP
-#: mount.davfs.8:405 umount.davfs.8:69
+#. type: TP
+#: mount.davfs.8:423 umount.davfs.8:69
 #, no-wrap
 msgid "I<@SYS_RUN@>"
 msgstr "I<@SYS_RUN@>"
 
 # type: SH
-#: mount.davfs.8:508 umount.davfs.8:74
+#. type: SH
+#: mount.davfs.8:526 umount.davfs.8:74
 #, no-wrap
 msgid "BUGS"
 msgstr "FEHLER"
 
 # type: TH
+#. type: TH
 #: umount.davfs.8:1
 #, no-wrap
 msgid "u@PROGRAM_NAME@"
 msgstr "u@PROGRAM_NAME@"
 
+# type: TH
+#. type: TH
+#: umount.davfs.8:1
+#, no-wrap
+msgid "2009-04-13"
+msgstr "2009-04-13"
+
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:6
 msgid "u@PROGRAM_NAME@ - Umount-helper to unmount a @PACKAGE@ file system"
 msgstr "u@PROGRAM_NAME@ - Umount-Hilfsprogramm für @PACKAGE@ Dateisysteme"
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:11
 msgid "B<u@PROGRAM_NAME@ [-h | --help] [-V | --version]>"
 msgstr "B<u@PROGRAM_NAME@ [-h | --help] [-V | --version]>"
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:13
 msgid "B<umount >I<dir>"
 msgstr "B<umount >I<dir>"
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:18
 msgid "B<u@PROGRAM_NAME@ >I<dir>"
 msgstr "B<u@PROGRAM_NAME@ >I<dir>"
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:26
 msgid ""
 "B<u@PROGRAM_NAME@> is a umount helper program. It is called by the B<umount>"
@@ -168,6 +194,7 @@ msgstr ""
 "Server zurück sichern konnte."
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:39
 msgid ""
 "While for local file systems B<umount>(8) will only return when all cached "
@@ -186,6 +213,7 @@ msgstr ""
 "Dateisystem eine Netzwerkverbindung braucht."
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:43
 msgid ""
 "Depending on the amount of data and the quality of the connection, "
@@ -195,6 +223,7 @@ msgstr ""
 "Aushängen ein paar Sekunden, aber auch einige Stunden dauern."
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:49
 msgid ""
 "If the B<@PROGRAM_NAME@> daemon encountered serious errors, "
@@ -208,12 +237,14 @@ msgstr ""
 "B<-i> hindert B<umount>(8) daran, B<u@PROGRAM_NAME@> aufzurufen."
 
 # type: TP
+#. type: TP
 #: umount.davfs.8:61
 #, no-wrap
 msgid "B<-f -l -n -r -v>"
 msgstr "B<-f -l -n -r -v>"
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:65
 msgid ""
 "This options are B<ignored>. They are only recognized for compatibility with "
@@ -223,6 +254,7 @@ msgstr ""
 "ignoriert."
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:72
 msgid "PID-files of running B<u@PROGRAM_NAME@> processes are looked up here."
 msgstr ""
@@ -230,11 +262,13 @@ msgstr ""
 "in diesem Verzeichnis gesucht."
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:77
 msgid "No known bugs."
 msgstr "Derzeit keine bekannten."
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:82
 msgid ""
 "This man page was written by Werner Baumann E<lt>werner.baumann@onlinehome."
@@ -244,6 +278,7 @@ msgstr ""
 "geschrieben."
 
 # type: Plain text
+#. type: Plain text
 #: umount.davfs.8:94
 msgid "B<@PROGRAM_NAME@>(8), B<umount>(8), B<@CONFIGFILE@>(5), B<fstab>(5)"
 msgstr "B<@PROGRAM_NAME@>(8), B<umount>(8), B<@CONFIGFILE@>(5), B<fstab>(5)"

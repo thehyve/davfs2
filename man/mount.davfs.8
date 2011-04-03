@@ -1,4 +1,4 @@
-.TH @PROGRAM_NAME@ 8 "2009\-10\-18" @PACKAGE_STRING@
+.TH @PROGRAM_NAME@ 8 "2011\-04\-03" @PACKAGE_STRING@
 
 .SH NAME
 
@@ -230,8 +230,9 @@ For ordinary users to be able to mount, they must be member of group
 \fB@GROUP@\fR and there must be an entry in \fIfstab\fP.
 
 .PP
-When mounted by an ordinary user, the mount point must not lie within the
-home directory of another user.
+When the mount point given in \fIfstab\fP is a relative file name and the
+file system is mounted by an unprivileged user, the mount point must lie within
+the home directory of the mounting user.
 
 .PP
 If in \fIfstab\fP option \fBuid\fR and/or \fBgid\fR are given, an ordinary

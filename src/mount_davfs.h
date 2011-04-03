@@ -34,7 +34,6 @@ typedef struct {
     char *cmdline;
     char *dav_user;           /* System config file */
     char *dav_group;          /* System config file */
-    char *ignore_home;        /* System config file */
     char *conf;               /* Command line */
     /* Mount options */
     int user;                 /* Command line */
