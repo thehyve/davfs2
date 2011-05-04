@@ -32,3 +32,7 @@ davfs2 TODO 2009-10-23
 
 - integrate with gnome-keyring?
 
+- ranged requests for GET (partial download)
+
+- config option for server cert instead of CA cert
+
