@@ -43,6 +43,7 @@
 #include <ne_string.h>
 
 #include "defaults.h"
+#include "canonicalize.h"
 
 #ifdef ENABLE_NLS
 #define _(String) gettext(String)

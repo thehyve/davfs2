@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2011-05-27 Werner Baumann (werner.baumann@onlinehome.de)
+    * umount_davfs.c:
+      Missing #include "canonicalize.h"
+
 2011-04-03 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h:
       Remove check for someone elses home directory
