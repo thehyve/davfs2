@@ -1923,11 +1923,11 @@ log_dbg_config(char *argv[], dav_args *args)
    it must be escaped if there is more than on '\'-character in succession.
    Whitespace characters other than ' ' and tab must only occur at the end of
    the line.
-   line    : the line to be parsed
+   line    : the line to be parsed. It will be changed by this function.
    parmc   : the max. number of parameters. It is an error, if more than parmc
              parameters are found
-   parmv[] : the parameters found are returned in this array. They are newly
-             allocated strings and must be freed by the calling function.
+   parmv[] : the parameters found are returned in this array. It contains
+             pointers into the rearranged line parameter.
    reurn value : the numer of parameters or -1 if an error occurs. */
 static int
 parse_line(char *line, int parmc, char *parmv[])
@@ -1945,27 +1945,27 @@ parse_line(char *line, int parmc, char *parmv[])
 
     int state = SPACE;
     int parm_no = 0;
-    char buf[254];
-    char *pos = buf;
-    char *end = buf + 253;
+    char *pos = line;
     char *p = line;
+    parmv[0] = line;
 
-    while ((state != END) && (state != ERROR)) {
+    while (state != END) {
         switch (state) {
         case SPACE:
             if (*p == '\0' || *p == '#' || *p == '\f' || *p == '\n'
                     || *p == '\r' || *p == '\v') {
                 state = END;
             } else if (*p == '\"') {
-                state = (parm_no < parmc) ? PARM_QUO : ERROR;
+                state = PARM_QUO;
             } else if (*p == '\\') {
-                state = (parm_no < parmc) ? PARM_ESC : ERROR;
+                state = PARM_ESC;
             } else if (isspace(*p)) {
                 ;
             } else {
                 *pos++ = *p;
-                state = (parm_no < parmc) ? PARM : ERROR;
+                state = PARM;
             }
+            if (parm_no >= parmc) return -1;
             break;
         case SPACE_EXP:
             if (*p == ' ' || *p == '\t') {
@@ -1974,65 +1974,60 @@ parse_line(char *line, int parmc, char *parmv[])
                        || *p == '\r' || *p == '\v') {
                 state = END;
             } else {
-                state = ERROR;
+                return -1;
             }
             break;
         case PARM:
             if (*p == '\"') {
-                state = ERROR;
+                return -1;
             } else if (*p == '\\') {
                 state = PARM_ESC;
             } else if (*p == ' ' || *p == '\t') {
-                parmv[parm_no++] = ne_strndup(buf, pos - buf);
-                pos = buf;
+                *pos++ = '\0';
+                parmv[++parm_no] = pos;
                 state = SPACE;
             } else if (isspace(*p) || *p == '\0' || *p == '#') {
-                parmv[parm_no++] = ne_strndup(buf, pos - buf);
-                pos = buf;
+                *pos = '\0';
+                parm_no++;
                 state = END;
             } else {
                 *pos++ = *p;
-                state = (pos < end) ? PARM : ERROR;
             }
             break;
         case PARM_ESC:
             if (*p == '\"' || *p == '\\' || *p == '#' || *p == ' '
                     || *p == '\t') {
                 *pos++ = *p;
-                state = (pos < end) ? PARM : ERROR;
+                state = PARM;
             } else {
-                state = ERROR;
+                return -1;
             }
             break;
         case PARM_QUO:
             if (*p == '\\') {
                 state = PARM_QUO_ESC;
             } else if (*p == '\"') {
-                parmv[parm_no++] = ne_strndup(buf, pos - buf);
-                pos = buf;
+                *pos++ = '\0';
+                parmv[++parm_no] = pos;
                 state = SPACE_EXP;
             } else if (*p == '\0' || *p == '\f' || *p == '\n'
                        || *p == '\r' || *p == '\v') {
-                state = ERROR;
+                return -1;
             } else {
                 *pos++ = *p;
-                state = (pos < end) ? PARM_QUO : ERROR;
             }
             break;
         case PARM_QUO_ESC:
             if (*p == '\"' || *p == '\\') {
                 *pos++ = *p;
-                state = (pos < end) ? PARM_QUO : ERROR;
+                state = PARM_QUO;
             } else if (*p == '\0' || *p == '\f' || *p == '\n'
                        || *p == '\r' || *p == '\v') {
-                state = ERROR;
+                return -1;
             } else {
                 *pos++ = '\\';
-                state = (pos < end) ? PARM_QUO : ERROR;
-                if (state == PARM_QUO) {
-                    *pos++ = *p;
-                    state = (pos < end) ? PARM_QUO : ERROR;
-                }
+                *pos++ = *p;
+                state = PARM_QUO;
             }
             break;
         }
@@ -2040,17 +2035,9 @@ parse_line(char *line, int parmc, char *parmv[])
     }
 
     int i;
-    if (state == END) {
-        for (i = parm_no; i < parmc; i++)
-            parmv[i] = NULL;
-        return parm_no;
-    } else {
-        for (i = 0; i < parm_no; i++) {
-            free(parmv[i]);
-            parmv[i] = NULL;
-        }
-        return -1;
-    }
+    for (i = parm_no; i < parmc; i++)
+        parmv[i] = NULL;
+    return parm_no;
 }
 
 
@@ -2247,8 +2234,6 @@ read_config(dav_args *args, const char * filename, int system)
                           _("malformed line"));
         }
 
-        for (parmc = 0; parmc < count; parmc++)
-            free(parmv[parmc]);
         length = getline(&line, &n, file);
         lineno++;
     }
@@ -2426,10 +2411,6 @@ read_secrets(dav_args *args, const char *filename)
             if (path) free(path);
         }
 
-        for (parmc = 0; parmc < count; parmc++) {
-            memset(parmv[parmc], '\0', strlen(parmv[parmc]));
-            free(parmv[parmc]);
-        }
         memset(line, '\0', strlen(line));
         length = getline(&line, &n, file);
         lineno++;
