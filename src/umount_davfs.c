@@ -141,7 +141,7 @@ main(int argc, char *argv[])
     char *pidfile = ne_concat(DAV_SYS_RUN, "/", mp, ".pid", NULL);
     free(mp);
 
-    char *umount_command = ne_concat("umount -i ", mpoint, NULL);
+    char *umount_command = ne_concat("umount -i '", mpoint, "'", NULL);
 
     char *pid = NULL;
     FILE *file = fopen(pidfile, "r");
