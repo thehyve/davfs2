@@ -756,9 +756,8 @@ check_mountpoint(dav_args *args)
 {
 
     struct passwd *pw;
-    int relative = (*mpoint != '/');
 
-    if (relative && getuid() != 0) {
+    if (args->relative_mpoint && getuid() != 0) {
         pw = getpwuid(getuid());
         if (!pw || !pw->pw_dir)
             error(EXIT_FAILURE, 0,
@@ -967,6 +966,7 @@ parse_commandline(int argc, char *argv[])
         if (!mpoint)
             error(EXIT_FAILURE, 0,
                   _("can't evaluate path of mount point %s"), mpoint);
+        args->relative_mpoint = (*argv[i] != '/');
         break;
     default:
         error(0, 0, _("too many arguments"));
@@ -1692,6 +1692,7 @@ new_args(void)
     dav_args *args = ne_malloc(sizeof(*args));
 
     args->cmdline = NULL;
+    args->relative_mpoint = 0;
     args->dav_user = ne_strdup(DAV_USER);
     args->dav_group = ne_strdup(DAV_GROUP);
 
@@ -1793,6 +1794,8 @@ log_dbg_config(char *argv[], dav_args *args)
            "  url: %s", url);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  mount point: %s", mpoint);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  relative_mpoint: %i", args->relative_mpoint);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  dav_user: %s", args->dav_user);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
