@@ -32,6 +32,7 @@
    daemon mode. The rest will be freed when forking into daemon mode. */
 typedef struct {
     char *cmdline;
+    int relative_mpoint;
     char *dav_user;           /* System config file */
     char *dav_group;          /* System config file */
     char *conf;               /* Command line */
