@@ -691,7 +691,7 @@ coda_statfs(void)
 
     dav_stat *st = dav_statfs();
     if (!st) {
-        oh->result = EIO;
+        oh->result = ENOSYS;
         return sizeof(struct coda_out_hdr);
     }
 
