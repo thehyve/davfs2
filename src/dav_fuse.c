@@ -980,7 +980,7 @@ fuse_stat(void)
 
     dav_stat *st = dav_statfs();
     if (!st) {
-        oh->error = -EIO;
+        oh->error = -ENOSYS;
         return sizeof(struct fuse_out_header);
     }
 

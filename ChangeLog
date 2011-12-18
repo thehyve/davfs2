@@ -1,6 +1,14 @@
 ChangeLog for davfs2
 --------------------
 
+2011-12-18 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, dav_quota:
+      Check for all but temporary errors on USERINFO.
+    * dav_fuse.c, fuse_stat:
+      dav_coda.c, coda_statfs:
+      Return ENOSYS if dav_statfs fails (this should never
+      happen).
+
 2011-06-29 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h:
       Check for relative mount point.

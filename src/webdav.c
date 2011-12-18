@@ -1136,6 +1136,9 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
     static int use_rfc = 1;
     static int use_userinfo = 1;
 
+    if (!use_rfc && !use_userinfo)
+        return EIO;
+
     quota_context ctx;
     ctx.error = 0;
     ctx.total = 0;
@@ -1168,7 +1171,7 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
         if (!ret) {
             if (ctx.error)
                 ret = EIO;
-        } else if (ret == EINVAL) {
+        } else if (ret != EAGAIN) {
             use_userinfo = 0;
         }
     }
