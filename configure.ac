@@ -37,7 +37,7 @@ AC_PROG_LN_S
 gl_INIT
 
 # Checks for libraries.
-AM_GNU_GETTEXT_VERSION(1.18)
+AM_GNU_GETTEXT_VERSION(0.18)
 AM_GNU_GETTEXT([external])
 NE_REQUIRE_VERSIONS([0], [25 26 27 28 29])
 DAV_CHECK_NEON
@@ -47,7 +47,7 @@ AC_HEADER_DIRENT
 AC_HEADER_MAJOR
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS([fcntl.h iconv.h langinfo.h libintl.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
+AC_CHECK_HEADERS([fcntl.h langinfo.h libintl.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -79,7 +79,7 @@ AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STRFTIME
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
-AC_CHECK_FUNCS([endpwent ftruncate getmntent iconv memset mkdir nl_langinfo rpmatch select setlocale strcasecmp strchr strdup strerror strpbrk strrchr strstr strtol strtoull utime])
+AC_CHECK_FUNCS([ftruncate getmntent memset mkdir nl_langinfo rpmatch select setlocale strcasecmp strchr strdup strerror strndup strpbrk strrchr strstr strtol strtoull utime])
 
 # Misc.
 DAV_DEFAULTS
