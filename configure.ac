@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-# Copyright (C) 2006, 2007, 2008, 2009 Werner Baumann
+# Copyright (C) 2006, 2007, 2008, 2009, 2012 Werner Baumann
 #
 # This file is part of davfs2.
 #
@@ -20,7 +20,7 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.67)
 AC_INIT(davfs2, 1.4.6, http://savannah.nongnu.org/projects/davfs2)
 AC_CONFIG_SRCDIR([src/cache.c])
 AC_CONFIG_AUX_DIR([config])
@@ -37,7 +37,7 @@ AC_PROG_LN_S
 gl_INIT
 
 # Checks for libraries.
-AM_GNU_GETTEXT_VERSION(0.14.4)
+AM_GNU_GETTEXT_VERSION(1.18)
 AM_GNU_GETTEXT([external])
 NE_REQUIRE_VERSIONS([0], [25 26 27 28 29])
 DAV_CHECK_NEON
