@@ -1,4 +1,4 @@
-2010-12-31
+2012-01-07
 ----------
 
 # Copyright (C) 2006, 2007, 2008, 2009, 2010 Werner Baumann
@@ -34,16 +34,6 @@ installed the user may merge the changes form the old files into
 the new versions.
 
 
-UPDATING FROM 1.0.x
--------------------
-
-In davfs2 1.1.0 the organization of the permanent cache has changed
-compared to the 1.0.x releases and the cache needs to be rebuild. Files
-in the backup directory will be lost. So before installing the new version,
-you should start your old version of mount.davfs a last time and save all
-the files from the backup directory you may need some day.
-
-
 2 INSTALLATION
 ==============
 
@@ -60,7 +50,7 @@ large files, you may build your own neon library. You can get it from
 http://www.webdav.org/neon/
 
 Your kernel must include either the coda file system or the fuse file system
-or both. They may be loadable modules. Almost all Linux 2.4 and 2.6 kernels
+or both. They may be loadable modules. Almost all Linux 2.6 kernels or newer
 support at least one of them.
 
 
@@ -68,17 +58,21 @@ support at least one of them.
 ---------------------------------
 
 To build davfs2 from the CVS sources you need recent versions of the some
-build tools:
+build tools. The build process is tested with the versions mentioned below.
+Other versions may work but you have to take care of possible incombatibilities
+between some versions of these tools and may need to tweak configure.ac.
+Gnulib will require to use a version of gettext that was recent at the time
+Gnulib was taken from the repository.
 
-- GNU Autoconf 2.61 or newer
-- GNU Automake 1.10.1 or newer
-- GNU gettext-tools 0.17 or newer
-- po4a 0.34 or newer
-- gperf 3.0.3 or newer
-- Gnulib
-  The bootstrap script must be able to find gnulib-tool. For this you
-  should create a symbolic link to gnulib-tool in a directory that is in
-  your PATH environment variable.
+- GNU Autoconf 2.67
+- GNU Automake 1.11.1
+- GNU gettext-tools 0.18.1
+- po4a 0.40.2
+- gperf 3.0.3
+- Gnulib from 2010-07-04
+  The bootstrap script must be able to find gnulib-tool. If you are not using
+  gnulib from your distribution you might create a symbolic link to gnulib-tool
+  in a directory that is in your PATH environment variable.
 
 Change into the top level source directory and run
     $ ./bootstrap
