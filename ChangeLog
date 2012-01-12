@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2012-01-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * dav_coda.c, dav_fuse.c:
+      Add missing #include <stdlib.h>
+
 2012-01-07 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac:
       Use newer versions of auto-tools.
