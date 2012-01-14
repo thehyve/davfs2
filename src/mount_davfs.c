@@ -730,9 +730,9 @@ check_fstab(const dav_args *args)
     if (args->mopts != n_args->mopts)
         error(EXIT_FAILURE, 0, _("different mount options in %s"),
               _PATH_MNTTAB);
-    if (args->uid != n_args->uid)
+    if (args->fsuid != n_args->fsuid)
         error(EXIT_FAILURE, 0, _("different uid in %s"), _PATH_MNTTAB);
-    if (args->gid != n_args->gid)
+    if (args->fsgid != n_args->fsgid)
         error(EXIT_FAILURE, 0, _("different gid in %s"), _PATH_MNTTAB);
     if (args->dir_mode != n_args->dir_mode)
         error(EXIT_FAILURE, 0, _("different dir_mode in %s"), _PATH_MNTTAB);
@@ -784,19 +784,19 @@ check_permissions(dav_args *args)
     if (getuid() == 0)
         return;
 
-    if (args->uid != getuid())
+    if (args->fsuid != getuid())
         error(EXIT_FAILURE, 0,
               _("you can't set file owner different from your uid"));
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "uid ok");
 
-    if (getgid() != args->gid) {
+    if (getgid() != args->fsgid) {
         struct passwd *pw = getpwuid(getuid());
         if (!pw)
             error(EXIT_FAILURE, errno, _("can't read user data base"));
         if (!pw->pw_name)
             error(EXIT_FAILURE, 0, _("can't read user data base"));
-        struct group *grp = getgrgid(args->gid);
+        struct group *grp = getgrgid(args->fsgid);
         if (!grp)
             error(EXIT_FAILURE, 0, _("can't read group data base"));
         char **members = grp->gr_mem;
@@ -1584,13 +1584,13 @@ get_options(dav_args *args, char *option)
         case UID:
             pwd = getpwnam(argument);
             if (!pwd) {
-                args->uid = arg_to_int(argument, 10, suboptions[so]);
+                args->fsuid = arg_to_int(argument, 10, suboptions[so]);
             } else {
-                args->uid = pwd->pw_uid;
+                args->fsuid = pwd->pw_uid;
             }
             if (asprintf(&add_mopts, "%s,uid=%i",
                          (args->add_mopts) ? args->add_mopts : "",
-                         args->uid) < 0)
+                         args->fsuid) < 0)
                 abort();
             if (args->add_mopts)
                 free(args->add_mopts);
@@ -1600,13 +1600,13 @@ get_options(dav_args *args, char *option)
         case GID:
             grp = getgrnam(argument);
             if (!grp) {
-                args->gid = arg_to_int(argument, 10, suboptions[so]);
+                args->fsgid = arg_to_int(argument, 10, suboptions[so]);
             } else {
-                args->gid = grp->gr_gid;
+                args->fsgid = grp->gr_gid;
             }
             if (asprintf(&add_mopts, "%s,gid=%i",
                          (args->add_mopts) ? args->add_mopts : "",
-                         args->gid) < 0)
+                         args->fsgid) < 0)
                 abort();
             if (args->add_mopts)
                 free(args->add_mopts);
@@ -1710,8 +1710,8 @@ new_args(void)
     args->kernel_fs = NULL;
     args->buf_size = 0;
 
-    args->uid = getuid();
-    args->gid = getgid();
+    args->fsuid = getuid();
+    args->fsgid = getgid();
     args->dir_umask = 0;
     args->file_umask = 0;
     args->dir_mode = 0;
@@ -1815,9 +1815,9 @@ log_dbg_config(char *argv[], dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  buf_size: %i KiB", args->buf_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  uid: %i", args->uid);
+           "  uid: %i", args->fsuid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  gid: %i", args->gid);
+           "  gid: %i", args->fsgid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  dir_umask: %#o", args->dir_umask);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
