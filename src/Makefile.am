@@ -47,8 +47,8 @@ DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_USER=\"$(dav_user)\" \
        -DDAV_GROUP=\"$(dav_group)\" @DEFS@
 LIBS = $(NEON_LIBS) @LIBS@
-mount_davfs_LDADD = $(LIBINTL) $(LIBICONV)
-umount_davfs_LDADD = $(LIBINTL)
+mount_davfs_LDADD = $(LIBINTL) $(LIBICONV) ../gl/libgnu.a
+umount_davfs_LDADD = $(LIBINTL) ../gl/libgnu.a
 
 install-exec-hook:
 	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \
