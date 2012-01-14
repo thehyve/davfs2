@@ -8,6 +8,8 @@ ChangeLog for davfs2
       thanks Tomi).
       mount_davfs.h, mount_davfs.c, cache.c, kernel_interface.c:
       Rename members uid and gid of args into fsuid and fsgid.
+      mount_davfs.h, mount_davfs.c:
+      Store process persona in args.
 
 2012-01-12 Werner Baumann (werner.baumann@onlinehome.de)
     * dav_coda.c, dav_fuse.c:

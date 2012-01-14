@@ -33,8 +33,18 @@
 typedef struct {
     char *cmdline;
     int relative_mpoint;
+    /* Persona */
+    int privileged;
+    uid_t uid;
+    char *uid_name;
+    gid_t gid;
+    int ngroups;
+    gid_t *groups;
+    char *home;
     char *dav_user;           /* System config file */
     char *dav_group;          /* System config file */
+    uid_t dav_uid;
+    gid_t dav_gid;
     char *conf;               /* Command line */
     /* Mount options */
     int user;                 /* Command line */

@@ -140,6 +140,9 @@ check_mountpoint(dav_args *args);
 static void
 check_permissions(dav_args *args);
 
+static void
+check_persona(dav_args *args);
+
 static int
 do_mount(unsigned long int mopts, void *mdata);
 
@@ -147,7 +150,7 @@ static int
 is_mounted(void);
 
 static dav_args *
-parse_commandline(int argc, char *argv[]);
+parse_commandline(dav_args *args, int argc, char *argv[]);
 
 static void
 parse_config(int argc, char *argv[], dav_args *args);
@@ -231,7 +234,11 @@ main(int argc, char *argv[])
 
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), PACKAGE_STRING);
 
-    dav_args *args = parse_commandline(argc, argv);
+    dav_args *args = new_args();
+
+    check_persona(args);
+
+    parse_commandline(args, argc, argv);
 
     if (geteuid() != 0)
         error(EXIT_FAILURE, errno, _("program is not setuid root"));
@@ -833,6 +840,41 @@ check_permissions(dav_args *args)
 }
 
 
+/* Checks whether the process is setuid 0 and fills persona related members
+   of args (privileged, uid, uid_name, gid, ngroups, groups, home, fsuid, fsgid).
+   If euid != 0 or an error occurs it prints an error message and calls
+   exit(EXIT_FAILURE). */
+static void
+check_persona(dav_args *args)
+{
+    if (geteuid() != 0)
+        error(EXIT_FAILURE, errno, _("program is not setuid root"));
+
+    args->uid = getuid();
+    args->fsuid = args->uid;
+    args->gid = getgid();
+    args->fsgid = args->gid;
+    args->privileged = (args->uid == 0);
+
+    if (!args->privileged) {
+        struct passwd *pw = getpwuid(args->uid);
+        if (!pw || !pw->pw_name || !pw->pw_dir)
+            error(EXIT_FAILURE, errno, _("can't read user data base"));
+        args->uid_name = strdup(pw->pw_name);
+        args->home = canonicalize_file_name(pw->pw_dir);
+        if (!args->uid_name || !args->home) abort();
+    }
+
+    args->ngroups = getgroups(0, NULL);
+    if (args->ngroups) {
+        args->groups = (gid_t *) malloc(args->ngroups * sizeof(gid_t));
+        if (!args->groups) abort();
+        if (getgroups(args->ngroups, args->groups) < 0)
+            error(EXIT_FAILURE, 0, _("can't read group data base"));
+    }
+}
+
+
 /* Calls the mount()-function to mount the file system.
    Uses private global variables url and mpoint as device and mount point,
    kernel_fs as file system type, mopts as mount options and mdata
@@ -894,10 +936,8 @@ is_mounted(void)
                   structure and all strings are newly allocated. The calling
                   function is responsible to free them. */
 static dav_args *
-parse_commandline(int argc, char *argv[])
+parse_commandline(dav_args *args, int argc, char *argv[])
 {
-    dav_args *args = new_args();
-
     size_t len = argc;
     int i;
     for (i = 0; i < argc; i++)
@@ -1397,6 +1437,12 @@ delete_args(dav_args *args)
 {
     if (args->cmdline)
         free(args->cmdline);
+    if (args->uid_name)
+        free(args->uid_name);
+    if (args->groups)
+        free(args->groups);
+    if (args->home)
+        free(args->home);
     if (args->dav_user)
         free(args->dav_user);
     if (args->dav_group)
@@ -1815,9 +1861,9 @@ log_dbg_config(char *argv[], dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  buf_size: %i KiB", args->buf_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  uid: %i", args->fsuid);
+           "  fsuid: %i", args->fsuid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  gid: %i", args->fsgid);
+           "  fsgid: %i", args->fsgid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  dir_umask: %#o", args->dir_umask);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
