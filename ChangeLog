@@ -6,10 +6,12 @@ ChangeLog for davfs2
       Typo in $(top_builddir)
       Added ../gl/libgnu.a to _LDADD (bug #31537,
       thanks Tomi).
-      mount_davfs.h, mount_davfs.c, cache.c, kernel_interface.c:
+    * mount_davfs.h, mount_davfs.c, cache.c, kernel_interface.c:
       Rename members uid and gid of args into fsuid and fsgid.
-      mount_davfs.h, mount_davfs.c:
+    * mount_davfs.h, mount_davfs.c:
       Store process persona in args.
+    * mount_davfs.c, parse_config, new_args:
+      Set default user config file in parse_config.
 
 2012-01-12 Werner Baumann (werner.baumann@onlinehome.de)
     * dav_coda.c, dav_fuse.c:

@@ -153,7 +153,7 @@ static dav_args *
 parse_commandline(dav_args *args, int argc, char *argv[]);
 
 static void
-parse_config(int argc, char *argv[], dav_args *args);
+parse_config(dav_args *args);
 
 static void
 parse_secrets(dav_args *args);
@@ -194,7 +194,7 @@ static dav_args *
 new_args(void);
 
 static void
-log_dbg_config(char *argv[], dav_args *args);
+log_dbg_config(dav_args *args);
 
 static int
 parse_line(char *line, int parmc, char *parmv[]);
@@ -248,7 +248,7 @@ main(int argc, char *argv[])
     if (getuid() != 0)
         check_fstab(args);
 
-    parse_config(argc, argv, args);
+    parse_config(args);
 
     check_mountpoint(args);
 
@@ -1034,9 +1034,13 @@ parse_commandline(dav_args *args, int argc, char *argv[])
    given it will be parsed too and overwrites the values from the system
    wide configuration file. */
 static void
-parse_config(int argc, char *argv[], dav_args *args)
+parse_config(dav_args *args)
 {
     read_config(args, DAV_SYS_CONF_DIR "/" DAV_CONFIG, 1);
+
+    if (!args->privileged && !args->conf)
+        args->conf = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CONFIG,
+                               NULL);
 
     struct passwd *pw = getpwuid(getuid());
     if (!pw || !pw->pw_dir)
@@ -1153,7 +1157,7 @@ parse_config(int argc, char *argv[], dav_args *args)
     }
 
     if (args->debug & DAV_DBG_CONFIG)
-        log_dbg_config(argv, args);
+        log_dbg_config(args);
 }
 
 
@@ -1742,12 +1746,6 @@ new_args(void)
     args->dav_user = ne_strdup(DAV_USER);
     args->dav_group = ne_strdup(DAV_GROUP);
 
-    if (getuid() != 0) {
-        args->conf = ne_concat(user_dir, "/", DAV_CONFIG, NULL);
-    } else {
-        args->conf = NULL;
-    }
-
     args->user = 0;
     args->users = 0;
     args->netdev = 1;
@@ -1830,7 +1828,7 @@ new_args(void)
 
 
 static void
-log_dbg_config(char *argv[], dav_args *args)
+log_dbg_config(dav_args *args)
 {
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "%s", args->cmdline);
