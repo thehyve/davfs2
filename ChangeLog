@@ -14,6 +14,8 @@ ChangeLog for davfs2
       Set default user config file in parse_config.
     * mount_davfs.c, parse_config, new_args:
       Set default user secrets file in parse_config.
+    * mount_davfs.c, parse_config, new_args:
+      Set default cache directory in parse_config.
 
 2012-01-12 Werner Baumann (werner.baumann@onlinehome.de)
     * dav_coda.c, dav_fuse.c:
