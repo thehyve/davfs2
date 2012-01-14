@@ -38,15 +38,15 @@ typedef struct {
     char *conf;               /* Command line */
     /* Mount options */
     int user;                 /* Command line */
-    int users;                 /* Command line */
+    int users;                /* Command line */
     int netdev;               /* Command line */
     unsigned long int mopts;  /* Command line */
     char *add_mopts;
     char *kernel_fs;          /* User config file, system config file */
     size_t buf_size;          /* User config file, system config file */
     /* File mode */
-    uid_t uid;                /* Command line */
-    gid_t gid;                /* Command line */
+    uid_t fsuid;              /* Command line */
+    gid_t fsgid;              /* Command line */
     mode_t dir_umask;
     mode_t file_umask;
     mode_t dir_mode;          /* Command line */

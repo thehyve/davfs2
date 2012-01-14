@@ -591,8 +591,8 @@ dav_init_cache(const dav_args *args, const char *mpoint)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Alignment of dav_node: %i",
                alignment);
 
-    default_uid = args->uid;
-    default_gid = args->gid;
+    default_uid = args->fsuid;
+    default_gid = args->fsgid;
 
     default_file_mode = args->file_mode;
     default_dir_mode = args->dir_mode;

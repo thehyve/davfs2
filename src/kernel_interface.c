@@ -112,7 +112,7 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
         if (init_coda(dev, msg_loop, mdata) != 0) {
             error(0, 0, _("trying fuse kernel file system"));
             if (init_fuse(dev, msg_loop, mdata, buf_size, url, mpoint,
-                          args->mopts, args->uid, args->gid, args->dir_mode)
+                          args->mopts, args->fsuid, args->fsgid, args->dir_mode)
                                                                         == 0) {
                 free(*kernel_fs);
                 *kernel_fs = strdup("fuse");
@@ -127,7 +127,7 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
     } else if (strcmp(*kernel_fs, "fuse") == 0) {
 
         if (init_fuse(dev, msg_loop, mdata, buf_size, url, mpoint, args->mopts,
-                      args->uid, args->gid, args->dir_mode) == 0) {
+                      args->fsuid, args->fsgid, args->dir_mode) == 0) {
             mounted = 1;
         } else {
             error(0, 0, _("trying coda kernel file system"));
