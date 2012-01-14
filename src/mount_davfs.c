@@ -1149,8 +1149,14 @@ parse_config(dav_args *args)
         args->useproxy = 0;
 
     if (!args->cache_dir) {
-        args->cache_dir = ne_strdup(args->sys_cache);
-    } else if (*args->cache_dir == '~') {
+        if (args->privileged) {
+            args->cache_dir = ne_strdup(args->sys_cache);
+        } else {
+            args->cache_dir = ne_concat(args->home, "/.", PACKAGE, "/",
+                                        DAV_CACHE, NULL);
+        }
+    }
+    if (*args->cache_dir == '~') {
         int p = 1;
         if (*(args->cache_dir + p) == '/')
             p++;
@@ -1732,17 +1738,8 @@ get_options(dav_args *args, char *option)
 static dav_args *
 new_args(void)
 {
-    char *user_dir = NULL;
-    if (getuid() != 0) {
-        struct passwd *pw = getpwuid(getuid());
-        if (!pw)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
-        if (!pw->pw_dir)
-            error(EXIT_FAILURE, 0, _("can't read user data base"));
-        user_dir = ne_concat(pw->pw_dir, "/.", PACKAGE, NULL);
-    }
-
-    dav_args *args = ne_malloc(sizeof(*args));
+    dav_args *args = (dav_args *) calloc(1, sizeof(dav_args));
+    if (!args) abort();
 
     args->cmdline = NULL;
     args->relative_mpoint = 0;
@@ -1803,11 +1800,6 @@ new_args(void)
     args->header = NULL;
 
     args->sys_cache = ne_strdup(DAV_SYS_CACHE);
-    if (getuid() != 0) {
-        args->cache_dir = ne_concat(user_dir, "/", DAV_CACHE, NULL);
-    } else {
-        args->cache_dir = NULL;
-    }
     args->backup_dir = ne_strdup(DAV_BACKUP_DIR);
     args->cache_size = DAV_CACHE_SIZE;
     args->table_size = DAV_TABLE_SIZE;
@@ -1819,8 +1811,6 @@ new_args(void)
     args->debug = 0;
     args->neon_debug = 0;
 
-    if (user_dir)
-        free(user_dir);
     return args;
 }
 
