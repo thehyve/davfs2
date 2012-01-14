@@ -4,6 +4,8 @@ ChangeLog for davfs2
 2012-01-14 Werner Baumann (werner.baumann@onlinehome.de)
     * src/Makefile.am:
       Typo in $(top_builddir)
+      Added ../gl/libgnu.a to _LDADD (bug #31537,
+      thanks Tomi).
 
 2012-01-12 Werner Baumann (werner.baumann@onlinehome.de)
     * dav_coda.c, dav_fuse.c:
