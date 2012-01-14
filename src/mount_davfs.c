@@ -1087,6 +1087,9 @@ parse_config(dav_args *args)
         args->servercert = f;
     }
 
+    if (!args->privileged && !args->secrets)
+        args->secrets = ne_concat(args->home, "/.", PACKAGE, "/", DAV_SECRETS,
+                                  NULL);
     if (args->secrets && *args->secrets == '~') {
         int p = 1;
         if (*(args->secrets + p) == '/')
@@ -1767,11 +1770,6 @@ new_args(void)
     args->path = NULL;
     args->servercert = NULL;
 
-    if (getuid() != 0) {
-        args->secrets = ne_concat(user_dir, "/", DAV_SECRETS, NULL);
-    } else {
-        args->secrets = NULL;
-    }
     args->username = NULL;
     args->cl_username = NULL;
     args->password = NULL;
