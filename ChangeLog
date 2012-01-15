@@ -11,6 +11,8 @@ ChangeLog for davfs2
     * mount_davfs.c, kernel_interface.c:
       Check for _POSIX_SAVED_IDS,
       add gain_privileges and release_privileges.
+    * mount_davfs, get_options:
+      Get default fsuid and fsgid from getuid and getgid.
 
 2012-01-14 Werner Baumann (werner.baumann@onlinehome.de)
     * src/Makefile.am:

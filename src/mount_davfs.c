@@ -1668,8 +1668,8 @@ get_options(dav_args *args, char *option)
     } else {
         args->mopts = DAV_MOPTS;
     }
-    args->fsuid = args->uid;
-    args->fsgid = args->gid;
+    args->fsuid = getuid();
+    args->fsgid = getgid();
     
 
     int so;
