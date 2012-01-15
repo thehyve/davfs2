@@ -143,8 +143,11 @@ check_permissions(dav_args *args);
 static void
 check_persona(dav_args *args);
 
+static void
+gain_privileges(const dav_args *args);
+
 static int
-do_mount(unsigned long int mopts, void *mdata);
+do_mount(dav_args *args, void *mdata);
 
 static int
 is_mounted(void);
@@ -157,6 +160,9 @@ parse_config(dav_args *args);
 
 static void
 parse_secrets(dav_args *args);
+
+static void
+release_privileges(const dav_args *args);
 
 static int
 save_pid(void);
@@ -238,14 +244,11 @@ main(int argc, char *argv[])
 
     check_persona(args);
 
+    release_privileges(args);
+
     parse_commandline(args, argc, argv);
 
-    if (geteuid() != 0)
-        error(EXIT_FAILURE, errno, _("program is not setuid root"));
-    if (seteuid(getuid()) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
-
-    if (getuid() != 0)
+    if (!args->privileged)
         check_fstab(args);
 
     parse_config(args);
@@ -272,9 +275,11 @@ main(int argc, char *argv[])
     if (args->kernel_fs)
         kernel_fs = ne_strdup(args->kernel_fs);
     size_t buf_size = args->buf_size * 1024;
+    gain_privileges(args);
     int mounted = dav_init_kernel_interface(&dev, &run_msgloop, &mdata,
                                             &kernel_fs, &buf_size, url, mpoint,
                                             args);
+    release_privileges(args);
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "kernel_fs: %s", kernel_fs);
 
@@ -290,7 +295,7 @@ main(int argc, char *argv[])
             if (args->debug & DAV_DBG_CONFIG)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                        "Parent: mounting filesystem");
-            if (do_mount(args->mopts, mdata) != 0) {
+            if (do_mount(args, mdata) != 0) {
                 kill(childpid, SIGTERM);
                 delete_args(args);
                 exit(EXIT_FAILURE);
@@ -328,7 +333,7 @@ main(int argc, char *argv[])
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Releasing root privileges");
     uid_t daemon_id = geteuid();
-    seteuid(0);
+    gain_privileges(args);
     ret = setuid(daemon_id);
     if (ret) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
@@ -425,32 +430,23 @@ dav_user_input_hidden(const char *prompt)
 /* Private functions */
 /*===================*/
 
-/* Changes the group id of the process permanently to dav_group. The
-   effective user id of the process will be changed too, but the real
+/* Changes the group id of the process permanently to dav_group.
+   If the process is privileged args->uid will be changed to
+   args->dav_uid. This way release_privileges will set the
+   effective uid to dav_uid.
+   The process is still able to gain root privileges. The real
    user id still has to be changed permanently. */
 static void
 change_persona(dav_args *args)
 {
-    struct group *grp = getgrnam(args->dav_group);
-    if (!grp)
-        error(EXIT_FAILURE, errno, _("group %s does not exist"),
-              args->dav_group);
-    seteuid(0);
-    if (setgid(grp->gr_gid) != 0)
+    gain_privileges(args);
+    if (setgid(args->dav_gid) != 0)
         error(EXIT_FAILURE, errno, _("can't change group id"));
 
-    if (getuid() == 0) {
-        struct passwd *pw = getpwnam(args->dav_user);
-        if (!pw)
-            error(EXIT_FAILURE, errno, _("user %s does not exist"),
-                  args->dav_user);
-        if (seteuid(pw->pw_uid) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
-    
-    } else {
-        if (seteuid(getuid()) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
-    }
+    if (args->privileged)
+        args->uid = args->dav_uid;
+    release_privileges(args);
+
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "changing persona: euid %i, gid %i", geteuid(), getgid());
@@ -478,7 +474,7 @@ check_dirs(dav_args *args)
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mounts in: %s", mounts);
 
-    seteuid(0);
+    gain_privileges(args);
     if (access(DAV_SYS_RUN, F_OK) != 0) {
         if (mkdir(DAV_SYS_RUN, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_ISVTX)
                 != 0)
@@ -503,9 +499,9 @@ check_dirs(dav_args *args)
             error(EXIT_FAILURE, errno,
                   _("can't change group of directory %s"), DAV_SYS_RUN);
     }
-    seteuid(getuid());
+    release_privileges(args);
 
-    if (getuid() != 0) {
+    if (!args->privileged) {
 
         char *path = NULL;
         struct passwd *pw = getpwuid(getuid());
@@ -560,7 +556,7 @@ check_dirs(dav_args *args)
 
     if (strcmp(args->cache_dir, args->sys_cache) == 0) {
 
-        seteuid(0);
+        gain_privileges(args);
         if (access(args->sys_cache, F_OK) != 0) {
             if (mkdir(args->sys_cache, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
@@ -587,7 +583,7 @@ check_dirs(dav_args *args)
                       _("can't change group of directory %s"),
                       args->sys_cache);
         }
-        seteuid(getuid());
+        release_privileges(args);
 
     } else {
 
@@ -763,7 +759,7 @@ check_mountpoint(dav_args *args)
 
     struct passwd *pw;
 
-    if (args->relative_mpoint && getuid() != 0) {
+    if (args->relative_mpoint && !args->privileged) {
         pw = getpwuid(getuid());
         if (!pw || !pw->pw_dir)
             error(EXIT_FAILURE, 0,
@@ -787,7 +783,7 @@ check_mountpoint(dav_args *args)
 static void
 check_permissions(dav_args *args)
 {
-    if (getuid() == 0)
+    if (args->privileged)
         return;
 
     if (args->fsuid != getuid())
@@ -880,12 +876,11 @@ check_persona(dav_args *args)
    as mount data.
    return value : 0 on success, -1 if mount() fails. */
 static int
-do_mount(unsigned long int mopts, void *mdata)
+do_mount(dav_args *args, void *mdata)
 {
-    uid_t orig = geteuid();
-    seteuid(0);
-    int ret = mount(url, mpoint, kernel_fs,  mopts, mdata);
-    seteuid(orig);
+    gain_privileges(args);
+    int ret = mount(url, mpoint, kernel_fs,  args->mopts, mdata);
+    release_privileges(args);
 
     if (ret) {
         error(0, errno, _("can't mount %s on %s"), url, mpoint);
@@ -896,6 +891,22 @@ do_mount(unsigned long int mopts, void *mdata)
         return -1;
     }
     return 0;
+}
+
+
+/* Gains super user privileges. If an error occurs it prints an error
+   message and calls exit(EXIT_FAILURE). */
+static void
+gain_privileges(const dav_args *args)
+{
+    int ret;
+#ifdef _POSIX_SAVED_IDS
+    ret = seteuid(0);
+#else
+    ret = setreuid(args->uid, 0);
+#endif
+    if (ret)
+        error(EXIT_FAILURE, 0, _("can't change effective user id"));
 }
 
 
@@ -1059,8 +1070,19 @@ parse_config(dav_args *args)
 
     if (!args->dav_user)
         args->dav_user = ne_strdup(DAV_USER);
+    struct passwd *d_pw = getpwnam(args->dav_user);
+    if (!d_pw)
+        error(EXIT_FAILURE, errno, _("user %s does not exist"),
+              args->dav_user);
+    args->dav_uid = d_pw->pw_uid;
+
     if (!args->dav_group)
         args->dav_group = ne_strdup(DAV_GROUP);
+    struct group *grp = getgrnam(args->dav_group);
+    if (!grp)
+        error(EXIT_FAILURE, errno, _("group %s does not exist"),
+              args->dav_group);
+    args->dav_gid = grp->gr_gid;
 
     eval_modes(args);
 
@@ -1072,7 +1094,7 @@ parse_config(dav_args *args)
         free(args->servercert);
         args->servercert = f;
     }
-    if (args->servercert && *args->servercert != '/' && getuid() != 0) {
+    if (args->servercert && *args->servercert != '/' && !args->privileged) {
         char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
                             args->servercert, NULL);
         if (access(f, F_OK) == 0) {
@@ -1109,7 +1131,7 @@ parse_config(dav_args *args)
         free(args->clicert);
         args->clicert = f;
     }
-    if (args->clicert && *args->clicert != '/' && getuid() != 0) {
+    if (args->clicert && *args->clicert != '/' && !args->privileged) {
         char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
                             DAV_CLICERTS_DIR, "/", args->clicert, NULL);
         if (access(f, F_OK) == 0) {
@@ -1117,7 +1139,7 @@ parse_config(dav_args *args)
             args->clicert = f;
         }
     }
-    if (args->clicert && *args->clicert != '/' && getuid() == 0) {
+    if (args->clicert && *args->clicert != '/' && args->privileged) {
         char *f = ne_concat(DAV_SYS_CONF_DIR, "/", DAV_CERTS_DIR, "/",
                             DAV_CLICERTS_DIR, "/", args->clicert, NULL);
         free(args->clicert);
@@ -1125,11 +1147,11 @@ parse_config(dav_args *args)
     }
     if (args->clicert) {
         struct stat st;
-        seteuid(0);
+        gain_privileges(args);
         if (stat(args->clicert, &st) < 0)
             error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
                   args->clicert);
-        seteuid(getuid());
+        release_privileges(args);
         if (st.st_uid != getuid() && st.st_uid != 0)
             error(EXIT_FAILURE, 0,
                   _("client certificate file %s has wrong owner"),
@@ -1142,7 +1164,7 @@ parse_config(dav_args *args)
                   args->clicert);
     }
 
-    if (getuid() == 0 && !args->p_host) {
+    if (args->privileged && !args->p_host) {
         proxy_from_env(args);
         read_no_proxy_list(args);
     }
@@ -1182,9 +1204,9 @@ parse_config(dav_args *args)
 static void
 parse_secrets(dav_args *args)
 {
-    seteuid(0);
+    gain_privileges(args);
     read_secrets(args, DAV_SYS_CONF_DIR "/" DAV_SECRETS);
-    seteuid(getuid());
+    release_privileges(args);
 
     if (args->secrets) {
         read_secrets(args, args->secrets);
@@ -1259,6 +1281,23 @@ parse_secrets(dav_args *args)
 }
 
 
+/* Releases super user privileges and sets the effective uid to the value
+   of args->uid. If an error occurs it prints an error message and
+   calls exit(EXIT_FAILURE). */
+static void
+release_privileges(const dav_args *args)
+{
+    int ret;
+#ifdef _POSIX_SAVED_IDS
+    ret = seteuid(args->uid);
+#else
+    ret = setreuid(0, args->uid);
+#endif
+    if (ret)
+        error(EXIT_FAILURE, 0, _("can't change effective user id"));
+}
+
+
 /* Saves the pid of the mount.davfs daemon in the pid-file. The name of the
    pid-file is taken from the private global variable pidfile. If an error
    occurs during opening of the pid-file, the function returns with -1. */
@@ -1312,7 +1351,7 @@ write_mtab_entry(const dav_args *args)
     mntent. mnt_freq = 0;
     mntent. mnt_passno = 0;
 
-    if (getuid() != 0) {
+    if (!args->privileged) {
         struct passwd *pw = getpwuid(getuid());
         if (!pw) {
             error(0, errno, _("Warning: can't read user data base. Mounting "
@@ -1324,8 +1363,7 @@ write_mtab_entry(const dav_args *args)
         free(opts);
     }
 
-    uid_t orig = geteuid();
-    seteuid(0);
+    gain_privileges(args);
     int ret;
     FILE *mtab = setmntent(_PATH_MOUNTED, "a");
     if (mtab) {
@@ -1335,7 +1373,7 @@ write_mtab_entry(const dav_args *args)
         error(0, 0, _("Warning: can't write entry into mtab, but will mount "
                       "the file system anyway"));
     }
-    seteuid(orig);
+    release_privileges(args);
 
     free(mntent.mnt_opts);
 }
