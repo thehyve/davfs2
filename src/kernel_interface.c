@@ -99,9 +99,6 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
                           char **kernel_fs, size_t *buf_size, const char *url,
                           const char *mpoint, const dav_args *args)
 {
-    uid_t orig = geteuid();
-    seteuid(0);
-
     if (!*kernel_fs)
         *kernel_fs = strdup("fuse");
     if (!*kernel_fs) abort();
@@ -146,9 +143,6 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
 
         error(EXIT_FAILURE, 0, _("unknown kernel file system %s"), *kernel_fs);
     }
-
-    seteuid(orig);
-    return mounted;
 }
 
 

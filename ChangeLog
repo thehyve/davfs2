@@ -8,6 +8,9 @@ ChangeLog for davfs2
       parse_config, defaults.h:
       Set defaults for netdev, mopts, fsuid and fsgid
       in get_options.
+    * mount_davfs.c, kernel_interface.c:
+      Check for _POSIX_SAVED_IDS,
+      add gain_privileges and release_privileges.
 
 2012-01-14 Werner Baumann (werner.baumann@onlinehome.de)
     * src/Makefile.am:
