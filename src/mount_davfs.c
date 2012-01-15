@@ -679,7 +679,6 @@ static void
 check_fstab(const dav_args *args)
 {
     dav_args *n_args = new_args();
-    n_args->mopts = DAV_USER_MOPTS;
 
     FILE *fstab = setmntent(_PATH_MNTTAB, "r");
     if (!fstab)
@@ -1058,7 +1057,10 @@ parse_config(dav_args *args)
         read_config(args, args->conf, 0);
     }
 
-    args->mopts |= DAV_MOPTS;
+    if (!args->dav_user)
+        args->dav_user = ne_strdup(DAV_USER);
+    if (!args->dav_group)
+        args->dav_group = ne_strdup(DAV_GROUP);
 
     eval_modes(args);
 
@@ -1148,22 +1150,26 @@ parse_config(dav_args *args)
     if (!args->p_host)
         args->useproxy = 0;
 
-    if (!args->cache_dir) {
-        if (args->privileged) {
-            args->cache_dir = ne_strdup(args->sys_cache);
-        } else {
+    if (!args->sys_cache)
+        args->sys_cache = ne_strdup(DAV_SYS_CACHE);
+    if (args->privileged) {
+        args->cache_dir = ne_strdup(args->sys_cache);
+    } else {
+        if (!args->cache_dir) {
             args->cache_dir = ne_concat(args->home, "/.", PACKAGE, "/",
                                         DAV_CACHE, NULL);
+        } else if (*args->cache_dir == '~') {
+            int p = 1;
+            if (*(args->cache_dir + p) == '/')
+                p++;
+            char *f = ne_concat(pw->pw_dir, "/", args->cache_dir + p, NULL);
+            free(args->cache_dir);
+            args->cache_dir = f;
         }
     }
-    if (*args->cache_dir == '~') {
-        int p = 1;
-        if (*(args->cache_dir + p) == '/')
-            p++;
-        char *f = ne_concat(pw->pw_dir, "/", args->cache_dir + p, NULL);
-        free(args->cache_dir);
-        args->cache_dir = f;
-    }
+
+    if (!args->backup_dir)
+        args->backup_dir = ne_strdup(DAV_BACKUP_DIR);
 
     if (args->debug & DAV_DBG_CONFIG)
         log_dbg_config(args);
@@ -1618,6 +1624,16 @@ get_options(dav_args *args, char *option)
         [END] = NULL
     };
 
+    args->netdev = DAV_NETDEV;
+    if (args->privileged) {
+        args->mopts = DAV_USER_MOPTS;
+    } else {
+        args->mopts = DAV_MOPTS;
+    }
+    args->fsuid = args->uid;
+    args->fsgid = args->gid;
+    
+
     int so;
     char *argument = NULL;
     struct passwd *pwd;
@@ -1730,6 +1746,7 @@ get_options(dav_args *args, char *option)
             }
         }
     }
+    args->mopts |= DAV_MOPTS;
 }
 
 
@@ -1741,45 +1758,9 @@ new_args(void)
     dav_args *args = (dav_args *) calloc(1, sizeof(dav_args));
     if (!args) abort();
 
-    args->cmdline = NULL;
-    args->relative_mpoint = 0;
-    args->dav_user = ne_strdup(DAV_USER);
-    args->dav_group = ne_strdup(DAV_GROUP);
-
-    args->user = 0;
-    args->users = 0;
-    args->netdev = 1;
-    args->mopts = DAV_MOPTS;
-    args->add_mopts = NULL;
-    args->kernel_fs = NULL;
-    args->buf_size = 0;
-
-    args->fsuid = getuid();
-    args->fsgid = getgid();
-    args->dir_umask = 0;
-    args->file_umask = 0;
-    args->dir_mode = 0;
-    args->file_mode = 0;
-
-    args->scheme = NULL;
-    args->host = NULL;
-    args->port = 0;
-    args->path = NULL;
-    args->servercert = NULL;
-
-    args->username = NULL;
-    args->cl_username = NULL;
-    args->password = NULL;
-    args->clicert = NULL;
-    args->clicert_pw = NULL;
-
-    args->p_host = NULL;
     args->p_port = DAV_DEFAULT_PROXY_PORT;
-    args->p_user = NULL;
-    args->p_passwd = NULL;
     args->useproxy = DAV_USE_PROXY;
 
-    args->lock_owner = NULL;
     args->lock_timeout = DAV_LOCK_TIMEOUT;
     args->lock_refresh = DAV_LOCK_REFRESH;
 
@@ -1796,20 +1777,13 @@ new_args(void)
     args->retry = DAV_RETRY;
     args->max_retry = DAV_MAX_RETRY;
     args->max_upload_attempts = DAV_MAX_UPLOAD_ATTEMPTS;
-    args->s_charset = NULL;
-    args->header = NULL;
 
-    args->sys_cache = ne_strdup(DAV_SYS_CACHE);
-    args->backup_dir = ne_strdup(DAV_BACKUP_DIR);
     args->cache_size = DAV_CACHE_SIZE;
     args->table_size = DAV_TABLE_SIZE;
     args->dir_refresh = DAV_DIR_REFRESH;
     args->file_refresh = DAV_FILE_REFRESH;
     args->delay_upload = DAV_DELAY_UPLOAD;
     args->gui_optimize = DAV_GUI_OPTIMIZE;
-
-    args->debug = 0;
-    args->neon_debug = 0;
 
     return args;
 }

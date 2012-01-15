@@ -36,6 +36,9 @@
    command line and even fstab will be silently ignored. */
 #define DAV_MOPTS (MS_MGC_VAL | MS_NOSUID | MS_NODEV)
 
+/* By default add option "_netdev" to mtab entry. */
+#define DAV_NETDEV 1
+
 /* XML namespace for the cache index file. */
 #define DAV_XML_NS "http://dav.sf.net/"
 
