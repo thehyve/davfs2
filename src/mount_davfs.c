@@ -141,9 +141,6 @@ static void
 check_permissions(dav_args *args);
 
 static void
-check_persona(dav_args *args);
-
-static void
 gain_privileges(const dav_args *args);
 
 static int
@@ -157,6 +154,9 @@ parse_commandline(dav_args *args, int argc, char *argv[]);
 
 static void
 parse_config(dav_args *args);
+
+static void
+parse_persona(dav_args *args);
 
 static void
 parse_secrets(dav_args *args);
@@ -242,7 +242,7 @@ main(int argc, char *argv[])
 
     dav_args *args = new_args();
 
-    check_persona(args);
+    parse_persona(args);
 
     release_privileges(args);
 
@@ -460,7 +460,9 @@ change_persona(dav_args *args)
      permissions; if not it tries to create it and/or set owner and permissions
    - when invoked by non-root user: checks for configuration directory in the
      users homepage and creates missing directories and files
-   - checks wether args->cache_dir is accessible. */
+   - checks wether args->cache_dir is accessible.
+   Requires: privileged, dav_group, sys_cache, cache_dir
+   Provides: sys_cache, cache_dir. */
 static void
 check_dirs(dav_args *args)
 {
@@ -667,14 +669,21 @@ check_double_mounts(dav_args *args)
 }
 
 
-/* Checks fstab whether there is an entry for the mountpoint specified in args
-   and compares the values in args with the values in fstab.
-   If there is no such entry, or this entry does not allow user-mount, or the
-   values differ, an error message is printed and the program terminates. */
+/* Gets the first entry in fstab that matches mpoint and checks for
+   - matching url
+   - matching file system type
+   - option user or users
+   - other options in fstab matching those in args.
+   If there is no such entry or one of the checks fails an error message
+   is printed and the program terminates with EXIT_FAILURE.
+   Requires: uid, gid, conf, user, users, mopts, fsuid, fsgid, dir_mode,
+             file_mode, cl_username*/
 static void
 check_fstab(const dav_args *args)
 {
     dav_args *n_args = new_args();
+    n_args->uid = args->uid;
+    n_args->gid = args->gid;
 
     FILE *fstab = setmntent(_PATH_MNTTAB, "r");
     if (!fstab)
@@ -752,7 +761,8 @@ check_fstab(const dav_args *args)
      - which might be useful in some cases - will not allow to to
      gain access to directories not intended).
    If this condition is not met or an error occurs, an error message is
-   printed and exit(EXIT_FAILURE) is called. */
+   printed and exit(EXIT_FAILURE) is called.
+   Requires: relative_mpoint, privileged. */
 static void
 check_mountpoint(dav_args *args)
 {
@@ -779,7 +789,8 @@ check_mountpoint(dav_args *args)
    - The user must belong to the group specified in option gid (if used).
    - The user must be member of group args->dav_group.
    If this conditions are not met or an error occurs, an error message is
-   printed and exit(EXIT_FAILURE) is called. */
+   printed and exit(EXIT_FAILURE) is called.
+   Requires: privileged, dav_group, fsuid, fsgid */
 static void
 check_permissions(dav_args *args)
 {
@@ -832,41 +843,6 @@ check_permissions(dav_args *args)
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "memeber of group %s", args->dav_group);
-}
-
-
-/* Checks whether the process is setuid 0 and fills persona related members
-   of args (privileged, uid, uid_name, gid, ngroups, groups, home, fsuid, fsgid).
-   If euid != 0 or an error occurs it prints an error message and calls
-   exit(EXIT_FAILURE). */
-static void
-check_persona(dav_args *args)
-{
-    if (geteuid() != 0)
-        error(EXIT_FAILURE, errno, _("program is not setuid root"));
-
-    args->uid = getuid();
-    args->fsuid = args->uid;
-    args->gid = getgid();
-    args->fsgid = args->gid;
-    args->privileged = (args->uid == 0);
-
-    if (!args->privileged) {
-        struct passwd *pw = getpwuid(args->uid);
-        if (!pw || !pw->pw_name || !pw->pw_dir)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
-        args->uid_name = strdup(pw->pw_name);
-        args->home = canonicalize_file_name(pw->pw_dir);
-        if (!args->uid_name || !args->home) abort();
-    }
-
-    args->ngroups = getgroups(0, NULL);
-    if (args->ngroups) {
-        args->groups = (gid_t *) malloc(args->ngroups * sizeof(gid_t));
-        if (!args->groups) abort();
-        if (getgroups(args->ngroups, args->groups) < 0)
-            error(EXIT_FAILURE, 0, _("can't read group data base"));
-    }
 }
 
 
@@ -942,9 +918,10 @@ is_mounted(void)
    it prints an error message and calls exit(EXIT_FAILURE).
    argc    : the number of arguments.
    argv[]  : array of argument strings.
-   return value : args, containig the parsed options and arguments. The args
-                  structure and all strings are newly allocated. The calling
-                  function is responsible to free them. */
+   Requires: uid, gid, mopts
+   Provides: cmdline. relative_mpoint, conf, user, users, netdev, mopts,
+             add_mopts, fsuid, fsgid, dir_mode, file_mode, scheme, host, port,
+             path, cl_username. */
 static dav_args *
 parse_commandline(dav_args *args, int argc, char *argv[])
 {
@@ -1042,7 +1019,17 @@ parse_commandline(dav_args *args, int argc, char *argv[])
 /* Reads and parses the configuration files and stores the values in args.
    The system wide configuration file is parsed first. If args->conf is
    given it will be parsed too and overwrites the values from the system
-   wide configuration file. */
+   wide configuration file.
+   Requires: privileged, conf
+   Provides: dav_user, dav_group, dav_uid, dav_gid kernel_fs, buf_size,
+             servercert, secrets, clicert, p_host, p_port, use_proxy,
+             ask_auth, locks, lock_owner, lock_timeout, lock_refresh,
+             expect100, if_match_bug, drop_weak_etags, allow_cookie,
+             precheck, ignore_dav_header, connect_timeout, read_timeout,
+             retry, max_retry, max_upload_attemps, s_charset, header,
+             sys_cache, cache_dir, backup_dir, cache_size, table_size,
+             dir_refresh, file_refresh, delay_upload, gui_optimize, debug,
+             neon_debug. */
 static void
 parse_config(dav_args *args)
 {
@@ -1198,9 +1185,47 @@ parse_config(dav_args *args)
 }
 
 
+/* Checks whether the process is setuid 0 and fills persona related members
+   of args.
+   If euid != 0 or an error occurs it prints an error message and calls
+   exit(EXIT_FAILURE).
+   Requires: none
+   Provides: privileged, uid, uid_name, gid, ngroups, groups, home. */
+static void
+parse_persona(dav_args *args)
+{
+    if (geteuid() != 0)
+        error(EXIT_FAILURE, errno, _("program is not setuid root"));
+
+    args->uid = getuid();
+    args->gid = getgid();
+    args->privileged = (args->uid == 0);
+
+    if (!args->privileged) {
+        struct passwd *pw = getpwuid(args->uid);
+        if (!pw || !pw->pw_name || !pw->pw_dir)
+            error(EXIT_FAILURE, errno, _("can't read user data base"));
+        args->uid_name = strdup(pw->pw_name);
+        args->home = canonicalize_file_name(pw->pw_dir);
+        if (!args->uid_name || !args->home) abort();
+    }
+
+    args->ngroups = getgroups(0, NULL);
+    if (args->ngroups) {
+        args->groups = (gid_t *) malloc(args->ngroups * sizeof(gid_t));
+        if (!args->groups) abort();
+        if (getgroups(args->ngroups, args->groups) < 0)
+            error(EXIT_FAILURE, 0, _("can't read group data base"));
+    }
+}
+
+
 /* Reads the secrets file and asks the user interactivly for credentials if
    necessary. The user secrets file is parsed after the system wide secrets
-   file, so it will have precedence. */
+   file, so it will have precedence.
+   Requires: scheme, host, port, path, secrets, cl_username, clicert, p_host,
+             p_port, use_proxy, ask_auth
+   Provides: username, password, p_user, p_passwd, clicert_pw.  */
 static void
 parse_secrets(dav_args *args)
 {
@@ -1488,7 +1513,7 @@ decode_octal(const char *s)
 }
 
 
-/* Frees all strings held by args and finally frees args. */
+/* Frees all strings and arrays held by args and finally frees args. */
 static void
 delete_args(dav_args *args)
 {
@@ -1605,7 +1630,10 @@ eval_modes(dav_args *args)
    option : a comma separated list of options (like the options in fstab and
             in the -o option of the mount-programm).
             For known options see the declaration at the beginning of the
-            the function definition. */
+            the function definition.
+   Requires: uid, gid, mopts
+   Provides: conf, user, users, netdev, mopts, add_mopts, fsuid, fsgid,
+             dir_mode, file_mode, cl_username. */
 static void
 get_options(dav_args *args, char *option)
 {
@@ -1662,14 +1690,10 @@ get_options(dav_args *args, char *option)
         [END] = NULL
     };
 
-    args->netdev = DAV_NETDEV;
-    if (args->privileged) {
+    if (args->privileged)
         args->mopts = DAV_USER_MOPTS;
-    } else {
-        args->mopts = DAV_MOPTS;
-    }
-    args->fsuid = getuid();
-    args->fsgid = getgid();
+    args->fsuid = args->uid;
+    args->fsgid = args->gid;
     
 
     int so;
@@ -1788,13 +1812,19 @@ get_options(dav_args *args, char *option)
 }
 
 
-/* Allocates a new dav_args-structure and initializes it.
-   All members are set to reasonable defaults. */
+/* Allocates a new dav_args-structure.
+   Numerical values are initialized to the default values from
+   defaults.h if they are defined there or to 0 otherwise.
+   mopts is set to DAV_USER_MOPTS.
+   String and array pointers are initialized to NULL. */
 static dav_args *
 new_args(void)
 {
     dav_args *args = (dav_args *) calloc(1, sizeof(dav_args));
     if (!args) abort();
+
+    args->netdev = DAV_NETDEV;
+    args->mopts = DAV_USER_MOPTS;
 
     args->p_port = DAV_DEFAULT_PROXY_PORT;
     args->useproxy = DAV_USE_PROXY;
@@ -2115,7 +2145,16 @@ proxy_from_env(dav_args *args)
    filename : name of the configuration file.
    system   : boolean value. 1 means it is the system wide configuration
               file. Some parameters are allowed only in the system wide
-              configuration file, some only in the user configuration file. */
+              configuration file, some only in the user configuration file.
+   Requires: none
+   Provides: dav_user, dav_group, kernel_fs, buf_size, servercert, secrets,
+             clicert, p_host, p_port, use_proxy, ask_auth, locks,
+             lock_owner, lock_timeout, lock_refresh, expect100, if_match_bug,
+             drop_weak_etags, allow_cookie, precheck, ignore_dav_header,
+             connect_timeout, read_timeout, retry, max_retry,
+             max_upload_attemps, s_charset, header, sys_cache, cache_dir,
+             backup_dir, cache_size, table_size, dir_refresh, file_refresh,
+             delay_upload, gui_optimize, debug, neon_debug. */
 static void
 read_config(dav_args *args, const char * filename, int system)
 {
@@ -2336,7 +2375,9 @@ read_no_proxy_list(dav_args *args)
 
 
 /* Searches the file filename for credentials for server url and for the proxy
-   args->p_host and stores them in args. */
+   args->p_host and stores them in args.
+   Requires: scheme, host, port, path, clicert, p_host, p_port
+   Provides: username, password, p_user, p_passwd, clicert_pw.  */
 static void
 read_secrets(dav_args *args, const char *filename)
 {
@@ -2474,7 +2515,7 @@ read_secrets(dav_args *args, const char *filename)
    in square brackets.
    The pointers to the components may be NULL. If they point to a non-NULL
    string, it is freed and then replaced by a newly allocated string.
-   If no scheme is foud the default sheme "http" is returned.
+   If no scheme is found the default sheme "http" is returned.
    If no path is found "/" is returned as path. path will always end with "/".
    There is *no* default value returned for port.
    return value : 0 on success, -1 otherwise. */
