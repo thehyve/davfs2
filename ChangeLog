@@ -5,6 +5,9 @@ ChangeLog for davfs2
     * mount_davfs.c, check_fstab, get_options, parse_persona:
       Rename check_persona into parse_persona.
       Set n_args->uid and n_args->gid in check_fstab.
+    * mount_davfs.c, check_fstab:
+      Remove double check for ft->mnt_dir.
+      Remove unnecessary decode_octal.
 
 2012-01-15 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, parse_config, new_args:
