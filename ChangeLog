@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2012-01-21 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, check_fstab, get_options, parse_persona:
+      Rename check_persona into parse_persona.
+      Set n_args->uid and n_args->gid in check_fstab.
+
 2012-01-15 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, parse_config, new_args:
       Don't set default values of strings in new_args.
