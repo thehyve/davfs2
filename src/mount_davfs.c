@@ -184,9 +184,6 @@ debug_opts(const char *s);
 static int
 debug_opts_neon(const char *s);
 
-static char *
-decode_octal(const char *s);
-
 static void
 delete_args(dav_args *args);
 
@@ -690,7 +687,7 @@ check_fstab(const dav_args *args)
         error(EXIT_FAILURE, errno, _("can't open file %s"), _PATH_MNTTAB);
 
     struct mntent *ft = getmntent(fstab);
-    while (ft && ft->mnt_dir) {
+    while (ft) {
         if (ft->mnt_dir) {
             char *mp = canonicalize_file_name(ft->mnt_dir);
             if (mp) {
@@ -707,12 +704,8 @@ check_fstab(const dav_args *args)
         error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), mpoint,
               _PATH_MNTTAB);
 
-    if (strcmp(url, ft->mnt_fsname) != 0) {
-        char *fstab_url = decode_octal(ft->mnt_fsname);
-        if (strcmp(url, fstab_url) != 0)
-            error(EXIT_FAILURE, 0, _("different URL in %s"), _PATH_MNTTAB);
-        free(fstab_url);
-    }
+    if (strcmp(url, ft->mnt_fsname) != 0)
+        error(EXIT_FAILURE, 0, _("different URL in %s"), _PATH_MNTTAB);
 
     if (!ft->mnt_type || strcmp(DAV_FS_TYPE, ft->mnt_type) != 0)
         error(EXIT_FAILURE, 0, _("different file system type in %s"),
@@ -1477,39 +1470,6 @@ debug_opts_neon(const char *s)
     if (strcmp(s, "most") == 0)
         return NE_DBG_SOCKET | NE_DBG_HTTP;
     return 0;
-}
-
-
-/* Searches string s for octal encoded characters (like \040 for space).
-   It returns a new string where these have been replaced by the
-   respective characters. */
-static char *
-decode_octal(const char *s)
-{
-    const char *old = s;
-    char *decoded = calloc(strlen(s) +1, 1);
-    if (!decoded) abort();
-    while (*old != '\0') {
-        char *pos = strstr(old, "\\0");
-        if (pos) {
-            char *tail;
-            int c = strtol(pos + 1, &tail, 8);
-            if ((tail - pos) == 4 && c != 0 && c >= CHAR_MIN && c <= CHAR_MAX) {
-                strncat(decoded, old, pos - old);
-                *(decoded + strlen(decoded)) = c;
-                old = tail;
-            } else {
-                pos += 2;
-                strncat(decoded, old, pos - old);
-                old = pos;
-            }
-        } else {
-            strcat(decoded, old);
-            old += strlen(old);
-        }
-    }
-    
-    return decoded;
 }
 
 
