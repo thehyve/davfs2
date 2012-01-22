@@ -914,7 +914,7 @@ is_mounted(void)
    it prints an error message and calls exit(EXIT_FAILURE).
    argc    : the number of arguments.
    argv[]  : array of argument strings.
-   Requires: uid, gid, mopts
+   Requires: uid, uid_name, gid, home, mopts
    Provides: cmdline. relative_mpoint, conf, user, users, netdev, mopts,
              add_mopts, fsuid, fsgid, dir_mode, file_mode, scheme, host, port,
              path, cl_username. */
@@ -1008,6 +1008,13 @@ parse_commandline(dav_args *args, int argc, char *argv[])
     if (!args->port)
         args->port = ne_uri_defaultport(args->scheme);
 
+    if (args->conf) {
+        expand_home(&args->conf, args);
+    } else if (!args->privileged) {
+        if (asprintf(&args->conf, "%s/.%s/%s", args->home, PACKAGE,
+                     DAV_CONFIG) < 0) abort();
+    }
+
     return args;       
 }
 
@@ -1031,33 +1038,16 @@ parse_config(dav_args *args)
 {
     read_config(args, DAV_SYS_CONF_DIR "/" DAV_CONFIG, 1);
 
-    if (!args->privileged && !args->conf)
-        args->conf = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CONFIG,
-                               NULL);
-
-    struct passwd *pw = getpwuid(getuid());
-    if (!pw || !pw->pw_dir)
-        error(EXIT_FAILURE, 0, _("can't determine home directory"));
-
-    if (args->conf) {
-        if (*args->conf == '~') {
-            int p = 1;
-            if (*(args->conf + p) == '/')
-                p++;
-            char *f = ne_concat(pw->pw_dir, "/", args->conf + p, NULL);
-            free(args->conf);
-            args->conf = f;
-        }
+    if (args->conf)
         read_config(args, args->conf, 0);
-    }
 
     if (!args->dav_user)
         args->dav_user = ne_strdup(DAV_USER);
-    struct passwd *d_pw = getpwnam(args->dav_user);
-    if (!d_pw)
+    struct passwd *pw = getpwnam(args->dav_user);
+    if (!pw)
         error(EXIT_FAILURE, errno, _("user %s does not exist"),
               args->dav_user);
-    args->dav_uid = d_pw->pw_uid;
+    args->dav_uid = pw->pw_uid;
 
     if (!args->dav_group)
         args->dav_group = ne_strdup(DAV_GROUP);
@@ -1068,6 +1058,10 @@ parse_config(dav_args *args)
     args->dav_gid = grp->gr_gid;
 
     eval_modes(args);
+
+    pw = getpwuid(getuid());
+    if (!pw || !pw->pw_dir)
+        error(EXIT_FAILURE, 0, _("can't determine home directory"));
 
     if (args->servercert && *args->servercert == '~') {
         int p = 1;
@@ -1590,7 +1584,7 @@ eval_modes(dav_args *args)
    absolute filename (starting with '/') in the users home directory.
    user must be the name of the mounting user.
    Otherwise dir is unchanged.
-   Requires: username, home. */
+   Requires: uid_name, home. */
 static void
 expand_home(char **dir, const dav_args *args)
 {
