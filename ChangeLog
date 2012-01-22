@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2012-01-22 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c:
+      Add function expand_home.
+
 2012-01-21 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, check_fstab, get_options, parse_persona:
       Rename check_persona into parse_persona.

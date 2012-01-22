@@ -191,6 +191,9 @@ static void
 eval_modes(dav_args *args);
 
 static void
+expand_home(char **dir, const dav_args *args);
+
+static void
 get_options(dav_args *args, char *option);
 
 static dav_args *
@@ -1582,6 +1585,33 @@ eval_modes(dav_args *args)
     args->file_mode |= S_IFREG;
 }
 
+
+/* If *dir starts with '~/' or '~user/' it is turned into an
+   absolute filename (starting with '/') in the users home directory.
+   user must be the name of the mounting user.
+   Otherwise dir is unchanged.
+   Requires: username, home. */
+static void
+expand_home(char **dir, const dav_args *args)
+{
+    if (!dir || !*dir || **dir != '~')
+        return;
+
+    char *p = *dir + 1;
+    if (*p != '/') {
+        if (strstr(*dir, args->uid_name) != p)
+            return;
+        p += strlen(args->uid_name);
+    }
+    if (*p != '/')
+        return;
+
+    char *new_dir = NULL;
+    if (asprintf(&new_dir, "%s%s", args->home, p) < 0)
+        abort();
+    free(*dir);
+    *dir = new_dir;
+}
 
 /* Parses the string option and stores the values in the appropriate fields of
    args. If an unknown option is found exit(EXIT_FAILURE) is called.
