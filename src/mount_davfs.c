@@ -1023,8 +1023,9 @@ parse_commandline(dav_args *args, int argc, char *argv[])
    The system wide configuration file is parsed first. If args->conf is
    given it will be parsed too and overwrites the values from the system
    wide configuration file.
-   Requires: privileged, conf
-   Provides: dav_user, dav_group, dav_uid, dav_gid kernel_fs, buf_size,
+   Requires: privileged, uid, home, conf, mopts, dir_mode, file_mode
+   Provides: dav_user, dav_group, dav_uid, dav_gid, kernel_fs, buf_size,
+             dir_umask, file_umask, dir_mode, file_mode,
              servercert, secrets, clicert, p_host, p_port, use_proxy,
              ask_auth, locks, lock_owner, lock_timeout, lock_refresh,
              expect100, if_match_bug, drop_weak_etags, allow_cookie,
@@ -1059,21 +1060,11 @@ parse_config(dav_args *args)
 
     eval_modes(args);
 
-    pw = getpwuid(getuid());
-    if (!pw || !pw->pw_dir)
-        error(EXIT_FAILURE, 0, _("can't determine home directory"));
-
-    if (args->servercert && *args->servercert == '~') {
-        int p = 1;
-        if (*(args->servercert + p) == '/')
-            p++;
-        char *f = ne_concat(pw->pw_dir, "/", args->servercert + p, NULL);
-        free(args->servercert);
-        args->servercert = f;
-    }
+    if (args->servercert)
+        expand_home(&args->servercert, args);
     if (args->servercert && *args->servercert != '/' && !args->privileged) {
-        char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
-                            args->servercert, NULL);
+        char *f = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR,
+                            "/", args->servercert, NULL);
         if (access(f, F_OK) == 0) {
             free(args->servercert);
             args->servercert = f;
@@ -1088,28 +1079,17 @@ parse_config(dav_args *args)
         args->servercert = f;
     }
 
+    if (args->secrets)
+        expand_home(&args->secrets, args);
     if (!args->privileged && !args->secrets)
         args->secrets = ne_concat(args->home, "/.", PACKAGE, "/", DAV_SECRETS,
                                   NULL);
-    if (args->secrets && *args->secrets == '~') {
-        int p = 1;
-        if (*(args->secrets + p) == '/')
-            p++;
-        char *f = ne_concat(pw->pw_dir, "/", args->secrets + p, NULL);
-        free(args->secrets);
-        args->secrets = f;
-    }
 
-    if (args->clicert && *args->clicert == '~') {
-        int p = 1;
-        if (*(args->clicert + p) == '/')
-            p++;
-        char *f = ne_concat(pw->pw_dir, "/", args->clicert + p, NULL);
-        free(args->clicert);
-        args->clicert = f;
-    }
+
+    if (args->clicert)
+        expand_home(&args->clicert, args);
     if (args->clicert && *args->clicert != '/' && !args->privileged) {
-        char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
+        char *f = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
                             DAV_CLICERTS_DIR, "/", args->clicert, NULL);
         if (access(f, F_OK) == 0) {
             free(args->clicert);
@@ -1129,7 +1109,7 @@ parse_config(dav_args *args)
             error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
                   args->clicert);
         release_privileges(args);
-        if (st.st_uid != getuid() && st.st_uid != 0)
+        if (st.st_uid != args->uid && st.st_uid != 0)
             error(EXIT_FAILURE, 0,
                   _("client certificate file %s has wrong owner"),
                   args->clicert);
@@ -1154,16 +1134,11 @@ parse_config(dav_args *args)
     if (args->privileged) {
         args->cache_dir = ne_strdup(args->sys_cache);
     } else {
-        if (!args->cache_dir) {
+        if (args->cache_dir) {
+            expand_home(&args->cache_dir, args);
+        } else {
             args->cache_dir = ne_concat(args->home, "/.", PACKAGE, "/",
                                         DAV_CACHE, NULL);
-        } else if (*args->cache_dir == '~') {
-            int p = 1;
-            if (*(args->cache_dir + p) == '/')
-                p++;
-            char *f = ne_concat(pw->pw_dir, "/", args->cache_dir + p, NULL);
-            free(args->cache_dir);
-            args->cache_dir = f;
         }
     }
 
@@ -1544,9 +1519,11 @@ delete_args(dav_args *args)
 }
 
 
-/* Evaluates the umask and thedefault modes for directories and files from
+/* Evaluates the umask and the default modes for directories and files from
    args->mopts, umask(), args->dir_mode and args->file_mode and stores them
-   in args. */
+   in args.
+   Requires: mopts, dir_mode, file_mode
+   Provides: dir_umask, file_umask, dir_mode, file_mode. */
 static void
 eval_modes(dav_args *args)
 {
