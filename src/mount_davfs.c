@@ -762,15 +762,8 @@ check_fstab(const dav_args *args)
 static void
 check_mountpoint(dav_args *args)
 {
-
-    struct passwd *pw;
-
     if (args->relative_mpoint && !args->privileged) {
-        pw = getpwuid(getuid());
-        if (!pw || !pw->pw_dir)
-            error(EXIT_FAILURE, 0,
-                  _("can't get home directory for uid %i"), getuid());
-        if (strstr(mpoint, pw->pw_dir) != mpoint)
+        if (strstr(mpoint, args->home) != mpoint)
             error(EXIT_FAILURE, 0, _("A relative mount point must lie "
                   "within your home directory"));
     }
