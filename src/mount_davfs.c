@@ -135,9 +135,6 @@ static void
 check_fstab(const dav_args *args);
 
 static void
-check_mountpoint(dav_args *args);
-
-static void
 check_permissions(dav_args *args);
 
 static void
@@ -252,8 +249,6 @@ main(int argc, char *argv[])
         check_fstab(args);
 
     parse_config(args);
-
-    check_mountpoint(args);
 
     check_dirs(args);
 
@@ -750,29 +745,6 @@ check_fstab(const dav_args *args)
 }
 
 
-/* Checks whether the mountpoint is valid.
-   For non root users it must meet the additional condition:
-   - if the mount point is given as relative path, it must lie within
-     the mounting users home directory (so a relative path in fstab
-     - which might be useful in some cases - will not allow to to
-     gain access to directories not intended).
-   If this condition is not met or an error occurs, an error message is
-   printed and exit(EXIT_FAILURE) is called.
-   Requires: relative_mpoint, privileged. */
-static void
-check_mountpoint(dav_args *args)
-{
-    if (args->relative_mpoint && !args->privileged) {
-        if (strstr(mpoint, args->home) != mpoint)
-            error(EXIT_FAILURE, 0, _("A relative mount point must lie "
-                  "within your home directory"));
-    }
-
-    if (args->debug & DAV_DBG_CONFIG)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mountpoint: %s", mpoint);
-}
-
-
 /* The mounting user must be either root or meet the following conditions:
    - The  uid must not differ from the option uid, if this option is used.
    - The user must belong to the group specified in option gid (if used).
@@ -908,7 +880,7 @@ is_mounted(void)
    argc    : the number of arguments.
    argv[]  : array of argument strings.
    Requires: uid, uid_name, gid, home, mopts
-   Provides: cmdline. relative_mpoint, conf, user, users, netdev, mopts,
+   Provides: cmdline, conf, user, users, netdev, mopts,
              add_mopts, fsuid, fsgid, dir_mode, file_mode, scheme, host, port,
              path, cl_username. */
 static dav_args *
@@ -982,7 +954,6 @@ parse_commandline(dav_args *args, int argc, char *argv[])
         if (!mpoint)
             error(EXIT_FAILURE, 0,
                   _("can't evaluate path of mount point %s"), mpoint);
-        args->relative_mpoint = (*argv[i] != '/');
         break;
     default:
         error(0, 0, _("too many arguments"));
@@ -990,8 +961,11 @@ parse_commandline(dav_args *args, int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (!mpoint)
-        error(EXIT_FAILURE, 0, _("no mountpoint specified"));
+    if (!args->privileged && *argv[i] != '/') {
+        if (strstr(mpoint, args->home) != mpoint)
+            error(EXIT_FAILURE, 0, _("A relative mount point must lie "
+                  "within your home directory"));
+    }
 
     if (!url)
         error(EXIT_FAILURE, 0, _("no WebDAV-server specified"));
@@ -1822,8 +1796,6 @@ log_dbg_config(dav_args *args)
            "  url: %s", url);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  mount point: %s", mpoint);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  relative_mpoint: %i", args->relative_mpoint);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  dav_user: %s", args->dav_user);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),

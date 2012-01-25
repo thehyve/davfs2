@@ -32,7 +32,6 @@
    daemon mode. The rest will be freed when forking into daemon mode. */
 typedef struct {
     char *cmdline;
-    int relative_mpoint;
     /* Persona */
     int privileged;
     uid_t uid;
