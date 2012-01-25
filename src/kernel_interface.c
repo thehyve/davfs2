@@ -143,6 +143,8 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
 
         error(EXIT_FAILURE, 0, _("unknown kernel file system %s"), *kernel_fs);
     }
+
+    return mounted;
 }
 
 
