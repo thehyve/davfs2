@@ -59,6 +59,8 @@
 #endif
 #include <sys/xattr.h>
 
+#include "xalloc.h"
+
 #include <ne_alloc.h>
 #include <ne_string.h>
 #include <ne_xml.h>
@@ -600,7 +602,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     dir_umask = args->dir_umask;
 
     table_size = args->table_size;
-    table = ne_calloc(sizeof(*table) * table_size);
+    table = xcalloc(table_size, sizeof(*table));
 
     dir_refresh = args->dir_refresh;
     file_refresh = args->file_refresh;
@@ -612,8 +614,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     max_upload_attempts = args->max_upload_attempts;
     lock_refresh = args->lock_refresh;
 
-    fs_stat = (dav_stat *) malloc(sizeof(dav_stat));
-    if (!fs_stat) abort();
+    fs_stat = (dav_stat *) xmalloc(sizeof(dav_stat));
 
     fs_stat->blocks = 0x65B9AA;
     fs_stat->bfree = 0x32DCD5;
@@ -640,13 +641,13 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Reading stored cache data");
     parse_index();
-    root->name = ne_strdup("");
+    root->name = xstrdup("");
     root->path = dav_conv_to_server_enc(args->path);
     root->mode = default_dir_mode;
 
     if (!backup)
         backup = new_node(root, S_IFDIR | S_IRWXU);
-    backup->name = ne_strdup(args->backup_dir);
+    backup->name = xstrdup(args->backup_dir);
     backup->mode = S_IFDIR | S_IRWXU;
 
     clean_cache();
@@ -929,7 +930,7 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
 
     *nodep = new_node(parent, mode | S_IFREG);
     (*nodep)->path = path;
-    (*nodep)->name = ne_strdup(name);
+    (*nodep)->name = xstrdup(name);
     (*nodep)->uid = uid;
     (*nodep)->gid = pw->pw_gid;
     int ret = create_cache_file(*nodep);
@@ -1108,7 +1109,7 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     if (!ret) {
         *nodep = new_node(parent, mode | S_IFDIR);
         (*nodep)->path = path;
-        (*nodep)->name = ne_strdup(name);
+        (*nodep)->name = xstrdup(name);
         (*nodep)->uid = uid;
         (*nodep)->gid = pw->pw_gid;
         (*nodep)->smtime = (*nodep)->mtime;
@@ -1680,9 +1681,7 @@ add_to_changed(dav_node *node)
             return;
         chp = &(*chp)->next;
     }
-    *chp = (dav_node_list_item *) malloc(sizeof(dav_node_list_item));
-    if (!*chp)
-        abort();
+    *chp = (dav_node_list_item *) xmalloc(sizeof(dav_node_list_item));
     (*chp)->node = node;
     (*chp)->next = NULL;
     (*chp)->attempts = 0;
@@ -1702,7 +1701,7 @@ backup_node(dav_node *orig)
     if (!orig->cache_path)
         return;
     dav_node *node = new_node(backup, orig->mode);
-    node->name = ne_strdup(orig->cache_path + strlen(cache_dir) +1);
+    node->name = xstrdup(orig->cache_path + strlen(cache_dir) +1);
     node->cache_path = orig->cache_path;
     orig->cache_path = NULL;
     node->mime_type = orig->mime_type;
@@ -1863,7 +1862,7 @@ move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
         dst_path = ne_concat(dst_parent->path, dst_conv, "/", NULL);
         free(dst_conv);
     } else {
-        dst_path = ne_strdup(dst->path);
+        dst_path = xstrdup(dst->path);
     }
 
     if (dav_move(src->path, dst_path) != 0) {
@@ -1875,7 +1874,7 @@ move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
         remove_node(dst);
 
     free(src->name);
-    src->name = ne_strdup(dst_name);
+    src->name = xstrdup(dst_name);
     update_path(src, src->path, dst_path);
     free(dst_path);
 
@@ -1902,7 +1901,7 @@ move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
         dst_path = ne_concat(dst_parent->path, dst_conv, NULL);
         free(dst_conv);
     } else {
-        dst_path = ne_strdup(dst->path);
+        dst_path = xstrdup(dst->path);
     }
 
     if (dst) {
@@ -1941,7 +1940,7 @@ move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
         dav_set_execute(dst_path, 1);
 
     free(src->name);
-    src->name = ne_strdup(dst_name);
+    src->name = xstrdup(dst_name);
     free(src->path);
     src->path = dst_path;
     if (src->etag) {
@@ -1972,7 +1971,7 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
         dst_path = ne_concat(dst_parent->path, dst_conv, NULL);
         free(dst_conv);
     } else {
-        dst_path = ne_strdup(dst->path);
+        dst_path = xstrdup(dst->path);
     }
 
     if (dav_move(src->path, dst_path) != 0) {
@@ -2002,7 +2001,7 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
     }
 
     free(src->name);
-    src->name = ne_strdup(dst_name);
+    src->name = xstrdup(dst_name);
     free(src->path);
     src->path = dst_path;
     src->utime = time(NULL);
@@ -2022,7 +2021,7 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
 static dav_node *
 new_node(dav_node *parent, mode_t mode)
 {
-    dav_node *node = (dav_node *) ne_malloc(sizeof(dav_node));
+    dav_node *node = (dav_node *) xmalloc(sizeof(dav_node));
 
     node->parent = parent;
     node->childs = NULL;
@@ -2297,7 +2296,7 @@ update_node(dav_node *node, dav_props *props)
 
     if (strcmp(node->name, props->name) != 0) {
         free(node->name);
-        node->name = ne_strdup(props->name);
+        node->name = xstrdup(props->name);
         ret = 1;
         *flush = 1;
     }
@@ -2630,7 +2629,7 @@ open_file(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid)
     *fd = open(node->cache_path, flags, node->mode);
     if (*fd <= 0)
         return EIO;
-    dav_handle *fh = (dav_handle *) ne_malloc(sizeof(dav_handle));
+    dav_handle *fh = (dav_handle *) xmalloc(sizeof(dav_handle));
     fh->fd = *fd;
     fh->flags = O_ACCMODE & flags;
     fh->pid = pid;
@@ -2854,7 +2853,7 @@ clean_cache(void)
                 dav_node *found = new_node(backup, default_file_mode);
                 found->mode &= ~(S_IRWXG | S_IRWXO);
                 found->cache_path = path;
-                found->name = ne_strdup(de->d_name);
+                found->name = xstrdup(de->d_name);
                 attr_from_cache_file(found);
                 backup->mtime = time(NULL);
                 backup->ctime = backup->mtime;
@@ -2884,7 +2883,7 @@ parse_index(void)
         return;
     }
 
-    char *buf = ne_malloc(DAV_XML_BUF_SIZE);
+    char *buf = xmalloc(DAV_XML_BUF_SIZE);
     size_t len = fread(buf, 1, DAV_XML_BUF_SIZE, idx);
     if (len <= 0) {
         free(buf);
@@ -3780,8 +3779,8 @@ test_alignment()
 
     size_t j = 0;
     while (align > 0 && j < trials) {
-        s[j] = (char *) ne_malloc((rand() / (RAND_MAX / 1024)) % (4 *align));
-        n[j] = (dav_node *) ne_malloc(sizeof(dav_node));
+        s[j] = (char *) xmalloc((rand() / (RAND_MAX / 1024)) % (4 *align));
+        n[j] = (dav_node *) xmalloc(sizeof(dav_node));
         while (align > 0 && ((size_t) n[j] % align) > 0)
             align /= 2;
         ++j;

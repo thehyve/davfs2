@@ -54,6 +54,8 @@
 #include <sys/stat.h>
 #endif
 
+#include "xalloc.h"
+
 #include "defaults.h"
 #include "mount_davfs.h"
 #include "cache.h"
@@ -100,8 +102,7 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
                           const char *mpoint, const dav_args *args)
 {
     if (!*kernel_fs)
-        *kernel_fs = strdup("fuse");
-    if (!*kernel_fs) abort();
+        *kernel_fs = xstrdup("fuse");
 
     int mounted = 0;
     if (strcmp(*kernel_fs, "coda") == 0) {
@@ -112,8 +113,7 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
                           args->mopts, args->fsuid, args->fsgid, args->dir_mode)
                                                                         == 0) {
                 free(*kernel_fs);
-                *kernel_fs = strdup("fuse");
-                if (!*kernel_fs) abort();
+                *kernel_fs = xstrdup("fuse");
                 mounted = 1;
                 error(0, 0, _("fuse device opened successfully"));
             } else {
@@ -130,9 +130,7 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
             error(0, 0, _("trying coda kernel file system"));
             if (init_coda(dev, msg_loop, mdata) == 0) {
                 free(*kernel_fs);
-                *kernel_fs = strdup("coda");
-                if (*kernel_fs == NULL)
-                    abort();
+                *kernel_fs = xstrdup("coda");
                 error(0, 0, _("coda device opened successfully"));
             } else {
                 exit(EXIT_FAILURE);
@@ -203,8 +201,7 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
         return -1;
     }
 
-    struct coda_mount_data *md = malloc(sizeof(struct coda_mount_data));
-    if (!md) abort();
+    struct coda_mount_data *md = xmalloc(sizeof(struct coda_mount_data));
     md->version = CODA_MOUNT_VERSION;
     md->fd = *dev;
     *mdata = md;

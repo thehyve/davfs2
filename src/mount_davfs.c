@@ -69,12 +69,14 @@
 #include <sys/types.h>
 #endif
 
+#include "canonicalize.h"
+#include "xalloc.h"
+
 #include <ne_string.h>
 #include <ne_uri.h>
 #include <ne_utils.h>
 
 #include "defaults.h"
-#include "canonicalize.h"
 #include "mount_davfs.h"
 #include "kernel_interface.h"
 #include "cache.h"
@@ -268,7 +270,7 @@ main(int argc, char *argv[])
     dav_run_msgloop_fn run_msgloop = NULL;
     void *mdata = NULL;
     if (args->kernel_fs)
-        kernel_fs = ne_strdup(args->kernel_fs);
+        kernel_fs = xstrdup(args->kernel_fs);
     size_t buf_size = args->buf_size * 1024;
     gain_privileges(args);
     int mounted = dav_init_kernel_interface(&dev, &run_msgloop, &mdata,
@@ -650,7 +652,7 @@ check_double_mounts(dav_args *args)
     char *m = mpoint;
     while (*m == '/')
         m++;
-    char *mp = ne_strdup(m);
+    char *mp = xstrdup(m);
     m = strchr(mp, '/');
     while (m) {
         *m = '-';
@@ -882,8 +884,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
     int i;
     for (i = 0; i < argc; i++)
         len += strlen(argv[i]);
-    args->cmdline = malloc(len);
-    if (!args->cmdline) abort();
+    args->cmdline = xmalloc(len);
     char *p = args->cmdline;
     for (i = 0; i < argc - 1; i++) {
         strcpy(p, argv[i]);
@@ -939,7 +940,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
         if (*argv[i] == '\"' || *argv[i] == '\'') {
             url = ne_strndup(argv[i] + 1, strlen(argv[i]) -2);
         } else {
-            url = ne_strdup(argv[i]);
+            url = xstrdup(argv[i]);
         }
         i++;
         mpoint = canonicalize_file_name(argv[i]);
@@ -1002,7 +1003,7 @@ parse_config(dav_args *args)
         read_config(args, args->conf, 0);
 
     if (!args->dav_user)
-        args->dav_user = ne_strdup(DAV_USER);
+        args->dav_user = xstrdup(DAV_USER);
     struct passwd *pw = getpwnam(args->dav_user);
     if (!pw)
         error(EXIT_FAILURE, errno, _("user %s does not exist"),
@@ -1010,7 +1011,7 @@ parse_config(dav_args *args)
     args->dav_uid = pw->pw_uid;
 
     if (!args->dav_group)
-        args->dav_group = ne_strdup(DAV_GROUP);
+        args->dav_group = xstrdup(DAV_GROUP);
     struct group *grp = getgrnam(args->dav_group);
     if (!grp)
         error(EXIT_FAILURE, errno, _("group %s does not exist"),
@@ -1089,9 +1090,9 @@ parse_config(dav_args *args)
         args->useproxy = 0;
 
     if (!args->sys_cache)
-        args->sys_cache = ne_strdup(DAV_SYS_CACHE);
+        args->sys_cache = xstrdup(DAV_SYS_CACHE);
     if (args->privileged) {
-        args->cache_dir = ne_strdup(args->sys_cache);
+        args->cache_dir = xstrdup(args->sys_cache);
     } else {
         if (args->cache_dir) {
             expand_home(&args->cache_dir, args);
@@ -1102,7 +1103,7 @@ parse_config(dav_args *args)
     }
 
     if (!args->backup_dir)
-        args->backup_dir = ne_strdup(DAV_BACKUP_DIR);
+        args->backup_dir = xstrdup(DAV_BACKUP_DIR);
 
     if (args->debug & DAV_DBG_CONFIG)
         log_dbg_config(args);
@@ -1129,15 +1130,13 @@ parse_persona(dav_args *args)
         struct passwd *pw = getpwuid(args->uid);
         if (!pw || !pw->pw_name || !pw->pw_dir)
             error(EXIT_FAILURE, errno, _("can't read user data base"));
-        args->uid_name = strdup(pw->pw_name);
+        args->uid_name = xstrdup(pw->pw_name);
         args->home = canonicalize_file_name(pw->pw_dir);
-        if (!args->uid_name || !args->home) abort();
     }
 
     args->ngroups = getgroups(0, NULL);
     if (args->ngroups) {
-        args->groups = (gid_t *) malloc(args->ngroups * sizeof(gid_t));
-        if (!args->groups) abort();
+        args->groups = (gid_t *) xmalloc(args->ngroups * sizeof(gid_t));
         if (getgroups(args->ngroups, args->groups) < 0)
             error(EXIT_FAILURE, 0, _("can't read group data base"));
     }
@@ -1625,12 +1624,12 @@ get_options(dav_args *args, char *option)
         case CONF:
             if (args->conf)
                 free(args->conf);
-            args->conf = ne_strdup(argument);
+            args->conf = xstrdup(argument);
             break;
         case USERNAME:
             if (args->cl_username)
                 free(args->cl_username);
-            args->cl_username = ne_strdup(argument);
+            args->cl_username = xstrdup(argument);
             break;
         case UID:
             pwd = getpwnam(argument);
@@ -1734,8 +1733,7 @@ get_options(dav_args *args, char *option)
 static dav_args *
 new_args(void)
 {
-    dav_args *args = (dav_args *) calloc(1, sizeof(dav_args));
-    if (!args) abort();
+    dav_args *args = (dav_args *) xcalloc(1, sizeof(dav_args));
 
     args->netdev = DAV_NETDEV;
     args->mopts = DAV_USER_MOPTS;
@@ -2107,29 +2105,29 @@ read_config(dav_args *args, const char * filename, int system)
             if (system && strcmp(parmv[0], "dav_user") == 0) {
                 if (args->dav_user)
                     free(args->dav_user);
-                args->dav_user = ne_strdup(parmv[1]); 
+                args->dav_user = xstrdup(parmv[1]); 
             } else if (system && strcmp(parmv[0], "dav_group") == 0) {
                 if (args->dav_group)
                     free(args->dav_group);
-                args->dav_group = ne_strdup(parmv[1]); 
+                args->dav_group = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "kernel_fs") == 0) {
                 if (args->kernel_fs)
                     free(args->kernel_fs);
-                args->kernel_fs = ne_strdup(parmv[1]); 
+                args->kernel_fs = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "buf_size") == 0) {
                 args->buf_size = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "servercert") == 0) {
                 if (args->servercert)
                     free(args->servercert);
-                args->servercert = ne_strdup(parmv[1]);
+                args->servercert = xstrdup(parmv[1]);
             } else if (!system && strcmp(parmv[0], "secrets") == 0) {
                 if (args->secrets)
                     free(args->secrets);
-                args->secrets = ne_strdup(parmv[1]); 
+                args->secrets = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "clientcert") == 0) {
                 if (args->clicert)
                     free(args->clicert);
-                args->clicert = ne_strdup(parmv[1]);
+                args->clicert = xstrdup(parmv[1]);
             } else if (system && strcmp(parmv[0], "proxy") == 0) {
                 if (split_uri(NULL, &args->p_host, &args->p_port, NULL,
                               parmv[1]) != 0)
@@ -2144,7 +2142,7 @@ read_config(dav_args *args, const char * filename, int system)
             } else if (strcmp(parmv[0], "lock_owner") == 0) {
                 if (args->lock_owner)
                     free(args->lock_owner);
-                args->lock_owner = ne_strdup(parmv[1]);
+                args->lock_owner = xstrdup(parmv[1]);
             } else if (strcmp(parmv[0], "lock_timeout") == 0) {
                 args->lock_timeout = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "lock_refresh") == 0) {
@@ -2174,19 +2172,19 @@ read_config(dav_args *args, const char * filename, int system)
             } else if (strcmp(parmv[0], "server_charset") == 0) {
                 if (args->s_charset)
                     free(args->s_charset);
-                args->s_charset = ne_strdup(parmv[1]);
+                args->s_charset = xstrdup(parmv[1]);
             } else if (system && strcmp(parmv[0], "cache_dir") == 0) {
                 if (args->sys_cache)
                     free(args->sys_cache);
-                args->sys_cache = ne_strdup(parmv[1]); 
+                args->sys_cache = xstrdup(parmv[1]); 
             } else if (!system && strcmp(parmv[0], "cache_dir") == 0) {
                 if (args->cache_dir != NULL)
                     free(args->cache_dir);
-                args->cache_dir = ne_strdup(parmv[1]); 
+                args->cache_dir = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "backup_dir") == 0) {
                 if (args->backup_dir)
                     free(args->backup_dir);
-                args->backup_dir = ne_strdup(parmv[1]); 
+                args->backup_dir = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "cache_size") == 0) {
                 args->cache_size = arg_to_int(parmv[1], 10, parmv[0]); 
             } else if (strcmp(parmv[0], "table_size") == 0) {
@@ -2254,7 +2252,7 @@ read_no_proxy_list(dav_args *args)
         return;
     }
 
-    char *noproxy_list = ne_strdup(env);
+    char *noproxy_list = xstrdup(env);
     char *np = strtok(noproxy_list, ", ");
     while (np && args->p_host) {
 
@@ -2263,7 +2261,7 @@ read_no_proxy_list(dav_args *args)
             if (asprintf(&host, "%s:%d", args->host, args->port) < 0)
                 abort();
         } else {
-            host = strdup(args->host);
+            host = xstrdup(args->host);
         }
 
         if (*np == '.') {
@@ -2352,9 +2350,9 @@ read_secrets(dav_args *args, const char *filename)
                     memset(args->password, '\0', strlen(args->password));
                     free(args->password);
                 }
-                args->username = ne_strdup(parmv[1]);
+                args->username = xstrdup(parmv[1]);
                 if (count == 3)
-                    args->password = ne_strdup(parmv[2]);
+                    args->password = xstrdup(parmv[2]);
 
             } else if (strcmp(parmv[0], "proxy") == 0
                        || (host && args->p_host
@@ -2369,9 +2367,9 @@ read_secrets(dav_args *args, const char *filename)
                     memset(args->p_passwd, '\0', strlen(args->p_passwd));
                     free(args->p_passwd);
                 }
-                args->p_user = ne_strdup(parmv[1]);
+                args->p_user = xstrdup(parmv[1]);
                 if (count == 3)
-                    args->p_passwd = ne_strdup(parmv[2]);
+                    args->p_passwd = xstrdup(parmv[2]);
 
             } else if (args->clicert
                        && (strcmp(parmv[0], args->clicert) == 0
@@ -2384,7 +2382,7 @@ read_secrets(dav_args *args, const char *filename)
                     memset(args->clicert_pw, '\0', strlen(args->clicert_pw));
                     free(args->clicert_pw);
                 }
-                args->clicert_pw = ne_strdup(parmv[1]);
+                args->clicert_pw = xstrdup(parmv[1]);
             }
 
             if (scheme) free(scheme);
@@ -2467,11 +2465,10 @@ split_uri(char **scheme, char **host, int *port,char **path, const char *uri)
     if (scheme) {
         if (*scheme) free(*scheme);
         if (sch) {
-            *scheme = strdup(sch);
+            *scheme = xstrdup(sch);
         } else {
-            *scheme = strdup("http");
+            *scheme = xstrdup("http");
         }
-        if (!*scheme) abort();
     }
 
     if (port && po)
@@ -2479,8 +2476,7 @@ split_uri(char **scheme, char **host, int *port,char **path, const char *uri)
 
     if (host) {
         if (*host) free(*host);
-        *host = malloc(end - ho + 1);
-        if (!*host) abort();
+        *host = xmalloc(end - ho + 1);
         int i;
         for (i = 0; i < (end - ho); i++) {
             if (*ho == '[') {
@@ -2497,13 +2493,12 @@ split_uri(char **scheme, char **host, int *port,char **path, const char *uri)
     if (path) {
         if (*path) free(*path);
         if (!*pa) {
-            *path = strdup("/");
+            *path = xstrdup("/");
         } else if (*(pa + strlen(pa) - 1) == '/') {
-            *path = strdup(pa);
+            *path = xstrdup(pa);
         } else {
             if (asprintf(path, "%s/", pa) < 1) abort();
         }
-        if (!*path) abort();
     }
 
     return 0;

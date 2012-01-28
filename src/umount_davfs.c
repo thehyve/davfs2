@@ -40,6 +40,8 @@
 #include <unistd.h>
 #endif
 
+#include "xalloc.h"
+
 #include <ne_string.h>
 
 #include "defaults.h"
@@ -132,7 +134,7 @@ main(int argc, char *argv[])
     char *m = mpoint;
     while (*m == '/')
         m++;
-    char *mp = ne_strdup(m);
+    char *mp = xstrdup(m);
     m = strchr(mp, '/');
     while (m) {
         *m = '-';
