@@ -71,6 +71,8 @@
 
 #include "canonicalize.h"
 #include "xalloc.h"
+#include "xvasprintf.h"
+#include "xstrndup.h"
 
 #include <ne_string.h>
 #include <ne_uri.h>
@@ -382,7 +384,7 @@ main(int argc, char *argv[])
     dav_close_cache(got_sigterm);
     dav_close_webdav();
     if (is_mounted()) {
-        char *prog = ne_concat("/bin/umount -il ", mpoint, NULL);
+        char *prog = xasprintf("/bin/umount -il %s", mpoint);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"), mpoint);
         if (system(prog) != 0)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting failed"));
@@ -497,7 +499,7 @@ check_dirs(dav_args *args)
     }
     release_privileges(args);
 
-    fname = ne_concat(DAV_SYS_CONF_DIR "/" DAV_SECRETS, NULL);
+    fname = xasprintf("%s/%s", DAV_SYS_CONF_DIR, DAV_SECRETS);
     if (stat(fname, &st) == 0) {
         if (st.st_uid != 0)
             error(EXIT_FAILURE, 0, _("file %s has wrong owner"), fname);
@@ -510,46 +512,41 @@ check_dirs(dav_args *args)
 
     if (!args->privileged) {
 
-        char *path = ne_concat(args->home, "/.", PACKAGE, NULL);
+        char *path = xasprintf("%s/.%s", args->home, PACKAGE);
         if (stat(path, &st) != 0)
             mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
         if (stat(path, &st) == 0) {
-            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CACHE, NULL);
+            fname = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_CACHE);
             if (stat(fname, &st) != 0)
                 mkdir(fname, S_IRWXU);
             free(fname);
 
-            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR,
-                              NULL);
+            fname = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_CERTS_DIR);
             if (stat(fname, &st) != 0)
                 mkdir(fname, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
             free(fname);
 
-            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR,
-                              "/", DAV_CLICERTS_DIR, NULL);
+            fname = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE,
+                              DAV_CERTS_DIR, DAV_CLICERTS_DIR);
             if (stat(fname, &st) != 0)
                 mkdir(fname, S_IRWXU);
             free(fname);
 
-            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CONFIG, NULL);
+            fname = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_CONFIG);
             if (stat(fname, &st) != 0) {
-                char *template = ne_concat(DAV_DATA_DIR, "/", DAV_CONFIG, NULL);
-                char *command = ne_concat("cp ", template, " ", fname,
-                                          NULL);
+                char *template = xasprintf("%s/%s", DAV_DATA_DIR, DAV_CONFIG);
+                char *command = xasprintf("cp %s %s", template, fname);
                 if (system(command) != 0);
                 free(command);
                 free(template);
             }
             free(fname);
 
-            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_SECRETS,
-                              NULL);
+            fname = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_SECRETS);
             if (stat(fname, &st) != 0) {
-                char *template = ne_concat(DAV_DATA_DIR, "/", DAV_SECRETS,
-                                           NULL);
-                char *command = ne_concat("cp ", template, " ", fname,
-                                          NULL);
+                char *template = xasprintf("%s/%s", DAV_DATA_DIR, DAV_SECRETS);
+                char *command = xasprintf("cp %s %s", template, fname);
                 if (system(command) == 0)
                     chmod(fname, S_IRUSR | S_IWUSR);
                 free(command);
@@ -658,8 +655,7 @@ check_double_mounts(dav_args *args)
         *m = '-';
         m = strchr(mp, '/');
     }
-    char *pidf = NULL;
-    if (asprintf(&pidf, "%s/%s.pid", DAV_SYS_RUN, mp) < 0) abort();
+    char *pidf = xasprintf("%s/%s.pid", DAV_SYS_RUN, mp);
     free(mp);
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "PID file: %s", pidf);
@@ -938,7 +934,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
         exit(EXIT_FAILURE);
     case 2:
         if (*argv[i] == '\"' || *argv[i] == '\'') {
-            url = ne_strndup(argv[i] + 1, strlen(argv[i]) -2);
+            url = xstrndup(argv[i] + 1, strlen(argv[i]) - 2);
         } else {
             url = xstrdup(argv[i]);
         }
@@ -971,8 +967,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
     if (args->conf) {
         expand_home(&args->conf, args);
     } else if (!args->privileged) {
-        if (asprintf(&args->conf, "%s/.%s/%s", args->home, PACKAGE,
-                     DAV_CONFIG) < 0) abort();
+        args->conf = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_CONFIG);
     }
 
     return args;       
@@ -1023,8 +1018,8 @@ parse_config(dav_args *args)
     if (args->servercert)
         expand_home(&args->servercert, args);
     if (args->servercert && *args->servercert != '/' && !args->privileged) {
-        char *f = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR,
-                            "/", args->servercert, NULL);
+        char *f = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE, DAV_CERTS_DIR,
+                            args->servercert);
         if (access(f, F_OK) == 0) {
             free(args->servercert);
             args->servercert = f;
@@ -1033,8 +1028,8 @@ parse_config(dav_args *args)
         }
     }
     if (args->servercert && *args->servercert != '/') {
-        char *f = ne_concat(DAV_SYS_CONF_DIR, "/", DAV_CERTS_DIR, "/",
-                            args->servercert, NULL);
+        char *f = xasprintf("%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
+                            args->servercert);
         free(args->servercert);
         args->servercert = f;
     }
@@ -1042,23 +1037,22 @@ parse_config(dav_args *args)
     if (args->secrets)
         expand_home(&args->secrets, args);
     if (!args->privileged && !args->secrets)
-        args->secrets = ne_concat(args->home, "/.", PACKAGE, "/", DAV_SECRETS,
-                                  NULL);
-
+        args->secrets = xasprintf("%s/.%s/%s", args->home, PACKAGE,
+                                  DAV_SECRETS);
 
     if (args->clicert)
         expand_home(&args->clicert, args);
     if (args->clicert && *args->clicert != '/' && !args->privileged) {
-        char *f = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
-                            DAV_CLICERTS_DIR, "/", args->clicert, NULL);
+        char *f = xasprintf("%s/.%s/%s/%s/%s", args->home, PACKAGE,
+                            DAV_CERTS_DIR, DAV_CLICERTS_DIR, args->clicert);
         if (access(f, F_OK) == 0) {
             free(args->clicert);
             args->clicert = f;
         }
     }
     if (args->clicert && *args->clicert != '/' && args->privileged) {
-        char *f = ne_concat(DAV_SYS_CONF_DIR, "/", DAV_CERTS_DIR, "/",
-                            DAV_CLICERTS_DIR, "/", args->clicert, NULL);
+        char *f = xasprintf("%s/%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
+                            DAV_CLICERTS_DIR, args->clicert);
         free(args->clicert);
         args->clicert = f;
     }
@@ -1097,8 +1091,8 @@ parse_config(dav_args *args)
         if (args->cache_dir) {
             expand_home(&args->cache_dir, args);
         } else {
-            args->cache_dir = ne_concat(args->home, "/.", PACKAGE, "/",
-                                        DAV_CACHE, NULL);
+            args->cache_dir = xasprintf("%s/.%s/%s", args->home, PACKAGE,
+                                        DAV_CACHE);
         }
     }
 
@@ -1287,21 +1281,19 @@ write_mtab_entry(const dav_args *args)
     mntent.mnt_fsname = url;
     mntent.mnt_dir = mpoint;
     mntent.mnt_type = DAV_FS_TYPE;
-    mntent.mnt_opts = NULL;
-    if (asprintf(&mntent.mnt_opts, "%s%s%s%s%s%s",
-                 (args->mopts & MS_RDONLY) ? "ro" : "rw",
-                 (args->mopts & MS_NOSUID) ? ",nosuid" : "",
-                 (args->mopts & MS_NOEXEC) ? ",noexec" : "",
-                 (args->mopts & MS_NODEV) ? ",nodev" : "",
-                 (args->netdev) ? ",_netdev" : "",
-                 (args->add_mopts != NULL) ? args->add_mopts : "") < 0)
-        abort();
+    mntent.mnt_opts = xasprintf("%s%s%s%s%s%s",
+                            (args->mopts & MS_RDONLY) ? "ro" : "rw",
+                            (args->mopts & MS_NOSUID) ? ",nosuid" : "",
+                            (args->mopts & MS_NOEXEC) ? ",noexec" : "",
+                            (args->mopts & MS_NODEV) ? ",nodev" : "",
+                            (args->netdev) ? ",_netdev" : "",
+                            (args->add_mopts != NULL) ? args->add_mopts : "");
     mntent. mnt_freq = 0;
     mntent. mnt_passno = 0;
 
     if (!args->privileged) {
         char *opts = mntent.mnt_opts;
-        mntent.mnt_opts = ne_concat(opts, ",user=", args->uid_name, NULL);
+        mntent.mnt_opts = xasprintf("%s,user=%s", opts, args->uid_name);
         free(opts);
     }
 
@@ -1529,9 +1521,7 @@ expand_home(char **dir, const dav_args *args)
     if (*p != '/')
         return;
 
-    char *new_dir = NULL;
-    if (asprintf(&new_dir, "%s%s", args->home, p) < 0)
-        abort();
+    char *new_dir = xasprintf("%s%s", args->home, p);
     free(*dir);
     *dir = new_dir;
 }
@@ -1638,10 +1628,8 @@ get_options(dav_args *args, char *option)
             } else {
                 args->fsuid = pwd->pw_uid;
             }
-            if (asprintf(&add_mopts, "%s,uid=%i",
-                         (args->add_mopts) ? args->add_mopts : "",
-                         args->fsuid) < 0)
-                abort();
+            add_mopts = xasprintf("%s,uid=%i",
+                        (args->add_mopts) ? args->add_mopts : "", args->fsuid);
             if (args->add_mopts)
                 free(args->add_mopts);
             args->add_mopts = add_mopts;
@@ -1654,10 +1642,8 @@ get_options(dav_args *args, char *option)
             } else {
                 args->fsgid = grp->gr_gid;
             }
-            if (asprintf(&add_mopts, "%s,gid=%i",
-                         (args->add_mopts) ? args->add_mopts : "",
-                         args->fsgid) < 0)
-                abort();
+            add_mopts = xasprintf("%s,gid=%i",
+                        (args->add_mopts) ? args->add_mopts : "", args->fsgid);
             if (args->add_mopts)
                 free(args->add_mopts);
             args->add_mopts = add_mopts;
@@ -2208,11 +2194,14 @@ read_config(dav_args *args, const char * filename, int system)
         } else if (applies && count == 3) {
 
             if (strcmp(parmv[0], "add_header") == 0) {
-                char *tmp = args->header;
-                args->header = ne_concat(parmv[1], ": ", parmv[2], "\r\n", tmp,
-                                         NULL);
-                if (tmp)
-                    free(tmp);
+                if (args->header) {
+                    char *tmp = args->header;
+                    args->header = xasprintf("%s: %s\r\n%s", parmv[1],
+                                             parmv[2], tmp);
+                    if (tmp) free(tmp);
+                } else {
+                    args->header = xasprintf("%s: %s\r\n", parmv[1], parmv[2]);
+                }
             } else {
                 error_at_line(EXIT_FAILURE, 0, filename, lineno,
                               _("unknown option"));
@@ -2258,8 +2247,7 @@ read_no_proxy_list(dav_args *args)
 
         char *host = NULL;
         if (strchr(np, ':')) {
-            if (asprintf(&host, "%s:%d", args->host, args->port) < 0)
-                abort();
+            host = xasprintf("%s:%d", args->host, args->port);
         } else {
             host = xstrdup(args->host);
         }
@@ -2497,7 +2485,7 @@ split_uri(char **scheme, char **host, int *port,char **path, const char *uri)
         } else if (*(pa + strlen(pa) - 1) == '/') {
             *path = xstrdup(pa);
         } else {
-            if (asprintf(path, "%s/", pa) < 1) abort();
+            *path = xasprintf("%s/", pa);
         }
     }
 

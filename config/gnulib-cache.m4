@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=config --po-base=glpo --doc-base=doc --tests-base=tests --aux-dir=config --no-libtool --macro-prefix=gl --po-domain=davfs2 canonicalize iconv_open rpmatch xalloc
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=config --po-base=glpo --doc-base=doc --tests-base=tests --aux-dir=config --no-libtool --macro-prefix=gl --po-domain=davfs2 canonicalize iconv_open rpmatch xalloc xstrndup xvasprintf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
@@ -24,6 +24,8 @@ gl_MODULES([
   iconv_open
   rpmatch
   xalloc
+  xstrndup
+  xvasprintf
 ])
 gl_AVOID([])
 gl_SOURCE_BASE([gl])

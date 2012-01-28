@@ -12,6 +12,7 @@ ChangeLog for davfs2
       Check secrets file in check_dirs.
     * all:
       Add Gnulib module xalloc.
+      Add Gnulib modules xstrndup and xvasprintf.
 
 2012-01-25 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h:
