@@ -456,13 +456,14 @@ change_persona(dav_args *args)
    - when invoked by non-root user: checks for configuration directory in the
      users homepage and creates missing directories and files
    - checks wether args->cache_dir is accessible.
-   Requires: privileged, uid, ngroups, groups, home, dav_gid, sys_cache,
-             cache_dir
+   Requires: privileged, uid, ngroups, groups, home, dav_gid, secrets,
+             sys_cache, cache_dir
    Provides: sys_cache, cache_dir. */
 static void
 check_dirs(dav_args *args)
 {
     struct stat st;
+    char *fname;
 
     if (stat(DAV_MOUNTS, &st) == 0) {
         mounts = DAV_MOUNTS;
@@ -495,6 +496,17 @@ check_dirs(dav_args *args)
     }
     release_privileges(args);
 
+    fname = ne_concat(DAV_SYS_CONF_DIR "/" DAV_SECRETS, NULL);
+    if (stat(fname, &st) == 0) {
+        if (st.st_uid != 0)
+            error(EXIT_FAILURE, 0, _("file %s has wrong owner"), fname);
+        if ((st.st_mode &
+                (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
+                != 0)
+            error(EXIT_FAILURE, 0, _("file %s has wrong permissions"), fname);
+    }
+    free(fname);
+
     if (!args->privileged) {
 
         char *path = ne_concat(args->home, "/.", PACKAGE, NULL);
@@ -502,47 +514,60 @@ check_dirs(dav_args *args)
             mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
         if (stat(path, &st) == 0) {
-            char *dir = ne_concat(path, "/", DAV_CACHE, NULL);
-            if (stat(dir, &st) != 0)
-                mkdir(dir, S_IRWXU);
-            free(dir);
+            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CACHE, NULL);
+            if (stat(fname, &st) != 0)
+                mkdir(fname, S_IRWXU);
+            free(fname);
 
-            dir = ne_concat(path, "/", DAV_CERTS_DIR, NULL);
-            if (stat(dir, &st) != 0)
-                mkdir(dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-            free(dir);
+            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR,
+                              NULL);
+            if (stat(fname, &st) != 0)
+                mkdir(fname, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+            free(fname);
 
-            dir = ne_concat(path, "/", DAV_CERTS_DIR, "/", DAV_CLICERTS_DIR,
-                            NULL);
-            if (stat(dir, &st) != 0)
-                mkdir(dir, S_IRWXU);
-            free(dir);
+            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CERTS_DIR,
+                              "/", DAV_CLICERTS_DIR, NULL);
+            if (stat(fname, &st) != 0)
+                mkdir(fname, S_IRWXU);
+            free(fname);
 
-            char *file_name = ne_concat(path, "/", DAV_CONFIG, NULL);
-            if (stat(file_name, &st) != 0) {
+            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_CONFIG, NULL);
+            if (stat(fname, &st) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_CONFIG, NULL);
-                char *command = ne_concat("cp ", template, " ", file_name,
+                char *command = ne_concat("cp ", template, " ", fname,
                                           NULL);
                 if (system(command) != 0);
                 free(command);
                 free(template);
             }
-            free(file_name);
+            free(fname);
 
-            file_name = ne_concat(path, "/", DAV_SECRETS, NULL);
-            if (stat(file_name, &st) != 0) {
+            fname = ne_concat(args->home, "/.", PACKAGE, "/", DAV_SECRETS,
+                              NULL);
+            if (stat(fname, &st) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_SECRETS,
                                            NULL);
-                char *command = ne_concat("cp ", template, " ", file_name,
+                char *command = ne_concat("cp ", template, " ", fname,
                                           NULL);
                 if (system(command) == 0)
-                    chmod(file_name, S_IRUSR | S_IWUSR);
+                    chmod(fname, S_IRUSR | S_IWUSR);
                 free(command);
                 free(template);
             }
-            free(file_name);
+            free(fname);
         }
         free(path);
+
+        if (stat(args->secrets, &st) == 0) {
+            if (st.st_uid != args->uid)
+                error(EXIT_FAILURE, 0, _("file %s has wrong owner"),
+                      args->secrets);
+            if ((st.st_mode &
+                (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
+                    != 0)
+                error(EXIT_FAILURE, 0, _("file %s has wrong permissions"),
+                      args->secrets);
+        }
     }
 
     if (strcmp(args->cache_dir, args->sys_cache) == 0) {
@@ -2275,18 +2300,6 @@ read_no_proxy_list(dav_args *args)
 static void
 read_secrets(dav_args *args, const char *filename)
 {
-    struct stat st;
-    if (stat(filename, &st) < 0) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
-               _("opening %s failed"), filename);
-        return;
-    }
-    if (st.st_uid != geteuid())
-        error(EXIT_FAILURE, 0, _("file %s has wrong owner"), filename);
-    if ((st.st_mode &
-          (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)) != 0)
-        error(EXIT_FAILURE, 0, _("file %s has wrong permissions"), filename);
-
     FILE *file = fopen(filename, "r");
     if (!file) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
