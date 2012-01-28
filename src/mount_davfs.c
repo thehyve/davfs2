@@ -463,7 +463,7 @@ check_dirs(dav_args *args)
 {
     struct stat st;
 
-    if (access(DAV_MOUNTS, R_OK) == 0) {
+    if (stat(DAV_MOUNTS, &st) == 0) {
         mounts = DAV_MOUNTS;
     } else {
         mounts = _PATH_MOUNTED;
@@ -472,7 +472,7 @@ check_dirs(dav_args *args)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mounts in: %s", mounts);
 
     gain_privileges(args);
-    if (access(DAV_SYS_RUN, F_OK) != 0) {
+    if (stat(DAV_SYS_RUN, &st) != 0) {
         if (mkdir(DAV_SYS_RUN, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_ISVTX)
                 != 0)
             error(EXIT_FAILURE, errno, _("can't create directory %s"),
@@ -487,12 +487,8 @@ check_dirs(dav_args *args)
             error(EXIT_FAILURE, errno,
                   _("can't change mode of directory %s"), DAV_SYS_RUN);
     }
-    struct group *grp = getgrnam(args->dav_group);
-    if (!grp)
-        error(EXIT_FAILURE, errno, _("group %s does not exist"),
-              args->dav_group);
-    if (st.st_gid != grp->gr_gid) {
-        if (chown(DAV_SYS_RUN, 0, grp->gr_gid) != 0)
+    if (st.st_gid != args->dav_gid) {
+        if (chown(DAV_SYS_RUN, 0, args->dav_gid) != 0)
             error(EXIT_FAILURE, errno,
                   _("can't change group of directory %s"), DAV_SYS_RUN);
     }
@@ -500,32 +496,29 @@ check_dirs(dav_args *args)
 
     if (!args->privileged) {
 
-        char *path = NULL;
-        struct passwd *pw = getpwuid(getuid());
-        if (pw && pw->pw_dir)
-            path = ne_concat(pw->pw_dir, "/.", PACKAGE, NULL);
-        if (path && access(path, F_OK) != 0)
+        char *path = ne_concat(args->home, "/.", PACKAGE, NULL);
+        if (stat(path, &st) != 0)
             mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
-        if (path && access(path, F_OK) == 0) {
+        if (stat(path, &st) == 0) {
             char *dir = ne_concat(path, "/", DAV_CACHE, NULL);
-            if (access(dir, F_OK) != 0)
+            if (stat(dir, &st) != 0)
                 mkdir(dir, S_IRWXU);
             free(dir);
 
             dir = ne_concat(path, "/", DAV_CERTS_DIR, NULL);
-            if (access(dir, F_OK) != 0)
+            if (stat(dir, &st) != 0)
                 mkdir(dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
             free(dir);
 
             dir = ne_concat(path, "/", DAV_CERTS_DIR, "/", DAV_CLICERTS_DIR,
                             NULL);
-            if (access(dir, F_OK) != 0)
+            if (stat(dir, &st) != 0)
                 mkdir(dir, S_IRWXU);
             free(dir);
 
             char *file_name = ne_concat(path, "/", DAV_CONFIG, NULL);
-            if (access(file_name, F_OK) != 0) {
+            if (stat(file_name, &st) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_CONFIG, NULL);
                 char *command = ne_concat("cp ", template, " ", file_name,
                                           NULL);
@@ -536,7 +529,7 @@ check_dirs(dav_args *args)
             free(file_name);
 
             file_name = ne_concat(path, "/", DAV_SECRETS, NULL);
-            if (access(file_name, F_OK) != 0) {
+            if (stat(file_name, &st) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_SECRETS,
                                            NULL);
                 char *command = ne_concat("cp ", template, " ", file_name,
@@ -554,7 +547,7 @@ check_dirs(dav_args *args)
     if (strcmp(args->cache_dir, args->sys_cache) == 0) {
 
         gain_privileges(args);
-        if (access(args->sys_cache, F_OK) != 0) {
+        if (stat(args->sys_cache, &st) != 0) {
             if (mkdir(args->sys_cache, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
                 error(EXIT_FAILURE, errno, _("can't create directory %s"),
@@ -570,12 +563,8 @@ check_dirs(dav_args *args)
                       _("can't change mode of directory %s"),
                       args->sys_cache);
         }
-        struct group *grp = getgrnam(args->dav_group);
-        if (!grp)
-            error(EXIT_FAILURE, errno, _("group %s does not exist"),
-                  args->dav_group);
-        if (st.st_gid != grp->gr_gid) {
-            if (chown(args->sys_cache, 0, grp->gr_gid) != 0)
+        if (st.st_gid != args->dav_gid) {
+            if (chown(args->sys_cache, 0, args->dav_gid) != 0)
                 error(EXIT_FAILURE, errno,
                       _("can't change group of directory %s"),
                       args->sys_cache);
@@ -584,12 +573,7 @@ check_dirs(dav_args *args)
 
     } else {
 
-        struct passwd *pw = getpwuid(getuid());
-        if (!pw)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
-        if (!pw->pw_name)
-            error(EXIT_FAILURE, 0, _("can't read user data base"));
-        if (access(args->cache_dir, F_OK) != 0) {
+        if (stat(args->cache_dir, &st) != 0) {
             if (mkdir(args->cache_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
                 error(EXIT_FAILURE, errno, _("can't create directory %s"),
@@ -598,18 +582,17 @@ check_dirs(dav_args *args)
         if (stat(args->cache_dir, &st) != 0)
             error(EXIT_FAILURE, errno, _("can't access directory %s"),
                   args->cache_dir);
-        if ((st.st_uid != getuid() || (st.st_mode & S_IRWXU) != S_IRWXU)
+        if ((st.st_uid != args->uid || (st.st_mode & S_IRWXU) != S_IRWXU)
                 &&  (st.st_mode & S_IRWXO) != S_IRWXO) {
             if ((st.st_mode & S_IRWXG) != S_IRWXG)
                 error(EXIT_FAILURE, errno, _("can't access directory %s"),
                       args->cache_dir);
-            struct group *grp = getgrgid(st.st_gid);
-            if (!grp)
-                error(EXIT_FAILURE, errno, _("can't read group data base"));
-            char **members = grp->gr_mem;
-            while (*members && strcmp(*members, pw->pw_name) != 0)
-                members++;
-            if (!*members)
+            int i;
+            for (i = 0; i < args->ngroups; i++) {
+                if (st.st_gid == args->groups[i])
+                    break;
+            }
+            if (i == args->ngroups)
                 error(EXIT_FAILURE, 0, _("can't access directory %s"),
                 args->cache_dir);
         }
