@@ -456,7 +456,8 @@ change_persona(dav_args *args)
    - when invoked by non-root user: checks for configuration directory in the
      users homepage and creates missing directories and files
    - checks wether args->cache_dir is accessible.
-   Requires: privileged, dav_group, sys_cache, cache_dir
+   Requires: privileged, uid, ngroups, groups, home, dav_gid, sys_cache,
+             cache_dir
    Provides: sys_cache, cache_dir. */
 static void
 check_dirs(dav_args *args)
@@ -734,56 +735,40 @@ check_fstab(const dav_args *args)
    - The user must be member of group args->dav_group.
    If this conditions are not met or an error occurs, an error message is
    printed and exit(EXIT_FAILURE) is called.
-   Requires: privileged, dav_group, fsuid, fsgid */
+   Requires: privileged, uid, uid_name, gid, dav_group, dav_gid, fsuid, fsgid */
 static void
 check_permissions(dav_args *args)
 {
     if (args->privileged)
         return;
 
-    if (args->fsuid != getuid())
+    if (args->fsuid != args->uid)
         error(EXIT_FAILURE, 0,
               _("you can't set file owner different from your uid"));
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "uid ok");
 
-    if (getgid() != args->fsgid) {
-        struct passwd *pw = getpwuid(getuid());
-        if (!pw)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
-        if (!pw->pw_name)
-            error(EXIT_FAILURE, 0, _("can't read user data base"));
-        struct group *grp = getgrgid(args->fsgid);
-        if (!grp)
-            error(EXIT_FAILURE, 0, _("can't read group data base"));
-        char **members = grp->gr_mem;
-        while (*members && strcmp(*members, pw->pw_name) != 0)
-            members++;
-        if (!*members)
+    if (args->gid != args->fsgid) {
+        int i;
+        for (i = 0; i < args->ngroups; i++) {
+            if (args->fsgid == args->groups[i])
+                break;
+        }
+        if (i == args->ngroups)
             error(EXIT_FAILURE, 0,
                   _("you must be member of the group of the file system"));
     }
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "gid ok");
 
-    struct passwd *pw;
-    pw = getpwuid(getuid());
-    if (!pw)
-        error(EXIT_FAILURE, errno, _("can't read user data base"));
-    if (!pw->pw_name)
-        error(EXIT_FAILURE, 0, _("can't read user data base"));
-    struct group *grp = getgrnam(args->dav_group);
-    if (!grp)
-        error(EXIT_FAILURE, errno, _("group %s does not exist"),
-              args->dav_group);
-    if (pw->pw_gid != grp->gr_gid) {
-        char **members = grp->gr_mem;
-        while (*members && strcmp(*members, pw->pw_name) != 0)
-            members++;
-        if (!*members)
-            error(EXIT_FAILURE, 0, _("user %s must be member of group %s"),
-                  pw->pw_name, grp->gr_name);
+    int i;
+    for (i = 0; i < args->ngroups; i++) {
+        if (args->dav_gid == args->groups[i])
+            break;
     }
+    if (i == args->ngroups)
+        error(EXIT_FAILURE, 0, _("user %s must be member of group %s"),
+              args->uid_name, args->dav_group);
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "memeber of group %s", args->dav_group);
