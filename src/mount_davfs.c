@@ -327,9 +327,8 @@ main(int argc, char *argv[])
 
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Releasing root privileges");
-    uid_t daemon_id = geteuid();
     gain_privileges(args);
-    ret = setuid(daemon_id);
+    ret = setuid(args->uid);
     if (ret) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                _("can't release root privileges"));
@@ -1302,14 +1301,8 @@ write_mtab_entry(const dav_args *args)
     mntent. mnt_passno = 0;
 
     if (!args->privileged) {
-        struct passwd *pw = getpwuid(getuid());
-        if (!pw) {
-            error(0, errno, _("Warning: can't read user data base. Mounting "
-                              "anyway, but there is no entry in mtab."));
-            return;
-        }
         char *opts = mntent.mnt_opts;
-        mntent.mnt_opts = ne_concat(opts, ",user=", pw->pw_name, NULL);
+        mntent.mnt_opts = ne_concat(opts, ",user=", args->uid_name, NULL);
         free(opts);
     }
 
