@@ -57,6 +57,8 @@
 #endif
 
 #include "xalloc.h"
+#include "xstrndup.h"
+#include "xvasprintf.h"
 
 #include <ne_alloc.h>
 #include <ne_auth.h>
@@ -377,7 +379,7 @@ dav_init_webdav(const dav_args *args)
     ne_set_connect_timeout(session, args->connect_timeout);
 #endif /* NE_VERSION_MINOR > 26 */
 
-    char *useragent = ne_concat(PACKAGE_TARNAME, "/", PACKAGE_VERSION, NULL);
+    char *useragent = xasprintf("%s/%s", PACKAGE_TARNAME, PACKAGE_VERSION);
     ne_set_useragent(session, useragent);
     free(useragent);
 
@@ -1278,7 +1280,7 @@ convert(char **s, iconv_t conv)
             && insize == 0 && outsize >= MB_LEN_MAX) {
         memset(out, 0, MB_LEN_MAX);
         free(*s);
-        *s = ne_strndup(buf, out - buf + MB_LEN_MAX);
+        *s = xstrndup(buf, out - buf + MB_LEN_MAX);
     }
 
     free(buf);
@@ -1551,11 +1553,11 @@ replace_slashes(char **name)
         char *nn;
         *slash = '\0';
         if (slash == *name) {
-            nn = ne_concat("slash-", slash + 1, NULL);
+            nn = xasprintf("slash-%s", slash + 1);
         } else if (slash == end) {
-            nn = ne_concat(*name, "-slash", NULL);
+            nn = xasprintf("%s-slash", *name);
         } else {
-            nn = ne_concat(*name, "-slash-", slash + 1, NULL);
+            nn = xasprintf("%s-slash-%s", *name, slash + 1);
         }
         free(*name);
         *name = nn;
@@ -1776,7 +1778,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
             *(result->path + strlen(result->path) - 1) = '\0';
     } else {
         if (result->is_dir) {
-            char *tmp = ne_concat(result->path, "/", NULL);
+            char *tmp = xasprintf("%s/", result->path);
             free(result->path);
             result->path = tmp;
         }
@@ -2056,7 +2058,7 @@ update_cookie(ne_request *req, void *userdata, const ne_status *status)
     }
 
     char *value = ne_strndup(cookie_hdr, sep - cookie_hdr + 1);
-    cookie = ne_concat("Cookie: $Version=1;", value, "\r\n", NULL);
+    cookie = xasprintf("Cookie: $Version=1;%s\r\n", value);
     free(value);
 
     ne_hook_pre_send(session, add_header, cookie);

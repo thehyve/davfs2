@@ -41,6 +41,7 @@
 #endif
 
 #include "xalloc.h"
+#include "xvasprintf.h"
 
 #include <ne_string.h>
 
@@ -140,14 +141,14 @@ main(int argc, char *argv[])
         *m = '-';
         m = strchr(mp, '/');
     }
-    char *pidfile = ne_concat(DAV_SYS_RUN, "/", mp, ".pid", NULL);
+    char *pidfile = xasprintf("%s/%s.pid", DAV_SYS_RUN, mp);
     free(mp);
 
-    char *umount_command = ne_concat("umount -i '", mpoint, "'", NULL);
+    char *umount_command = xasprintf("umount -i '%s'", mpoint);
 
-    char *pid = NULL;
+    char pid[32];
     FILE *file = fopen(pidfile, "r");
-    if (!file || fscanf(file, "%a[0-9]", &pid) != 1 || !pid) {
+    if (!file || fscanf(file, "%30[0-9]", pid) != 1 || !pid) {
         error(0, 0,
               _("\n"
                 "  can't read PID from file %s;\n"
@@ -157,7 +158,7 @@ main(int argc, char *argv[])
     }
     fclose(file);
 
-    char *ps_command = ne_concat("ps -p ", pid, NULL);
+    char *ps_command = xasprintf("ps -p %s", pid);
     FILE *ps_in = popen(ps_command, "r");
     if (!ps_in) {
         error(0, 0,

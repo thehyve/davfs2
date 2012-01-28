@@ -55,6 +55,7 @@
 #endif
 
 #include "xalloc.h"
+#include "xvasprintf.h"
 
 #include "defaults.h"
 #include "mount_davfs.h"
@@ -155,9 +156,7 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
     *dev = 0;
     int minor = 0;
     while (*dev <= 0 && minor < MAX_CODADEVS) {
-        char *path;
-        if (asprintf(&path, "%s/%s%i", DAV_DEV_DIR, CODA_DEV_NAME, minor) < 0)
-            abort();
+        char *path = xasprintf("%s/%s%i", DAV_DEV_DIR, CODA_DEV_NAME, minor);
         *dev = open(path, O_RDWR | O_NONBLOCK);
         free(path);
         ++minor;
@@ -166,10 +165,8 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
     if (*dev <= 0 && system("/sbin/modprobe coda &>/dev/null") == 0) {
         minor = 0;
         while (*dev <= 0 && minor < MAX_CODADEVS) {
-            char *path;
-            if (asprintf(&path, "%s/%s%i",
-                         DAV_DEV_DIR, CODA_DEV_NAME, minor) < 0)
-                abort();
+            char *path = xasprintf("%s/%s%i", DAV_DEV_DIR, CODA_DEV_NAME,
+                                   minor);
             *dev = open(path, O_RDWR | O_NONBLOCK);
             if (*dev <= 0) {
                 if (mknod(path, S_IFCHR, makedev(CODA_MAJOR, minor)) == 0) {
@@ -215,9 +212,7 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
           size_t *buf_size, const char *url, const char *mpoint,
           unsigned long int mopts, uid_t owner, gid_t group, mode_t mode)
 {
-    char *path;
-    if (asprintf(&path, "%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME) < 0)
-            abort();
+    char *path = xasprintf("%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME);
 
     *dev = open(path, O_RDWR | O_NONBLOCK);
     if (*dev <= 0 && system("/sbin/modprobe fuse &>/dev/null") == 0) {
@@ -244,15 +239,13 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
     }
 
 #if SIZEOF_VOID_P == 8
-    if (asprintf((char **) mdata, "fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
-                 "allow_other,max_read=%lu", *dev, mode, owner, group,
-                 *buf_size - 4096) < 0)
-        abort();
+    *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
+                       "allow_other,max_read=%lu", *dev, mode, owner, group,
+                       *buf_size - 4096);
 #else
-    if (asprintf((char **) mdata, "fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
-                 "allow_other,max_read=%u", *dev, mode, owner, group,
-                 *buf_size - 4096) < 0)
-        abort();
+    *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
+                       "allow_other,max_read=%u", *dev, mode, owner, group,
+                       *buf_size - 4096);
 #endif
     if (mount(url, mpoint, "fuse", mopts, *mdata) == 0) {
         *msg_loop = dav_fuse_loop;

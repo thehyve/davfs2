@@ -60,6 +60,8 @@
 #include <sys/xattr.h>
 
 #include "xalloc.h"
+#include "xstrndup.h"
+#include "xvasprintf.h"
 
 #include <ne_alloc.h>
 #include <ne_string.h>
@@ -688,7 +690,7 @@ dav_close_cache(int got_sigterm)
 
     clean_tree(root, !got_sigterm);
 
-    char *new_index = ne_concat(cache_dir, "/", DAV_INDEX, ".new", NULL);
+    char *new_index = xasprintf("%s/%s.new",cache_dir, DAV_INDEX);
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Creating index %s.",
                new_index);
@@ -706,7 +708,7 @@ dav_close_cache(int got_sigterm)
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                        "Replacing old index");
-            char *old_index = ne_concat(cache_dir, "/", DAV_INDEX, NULL);
+            char *old_index = xasprintf("%s/%s", cache_dir, DAV_INDEX);
             if (rename(new_index, old_index) != 0)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                        _("can't replace %s with %s"), old_index, new_index);
@@ -925,7 +927,7 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
         return EINVAL;
 
     char *name_conv = dav_conv_to_server_enc(name);
-    char *path = ne_concat(parent->path, name_conv, NULL);
+    char *path = xasprintf("%s%s", parent->path, name_conv);
     free(name_conv);
 
     *nodep = new_node(parent, mode | S_IFREG);
@@ -1102,7 +1104,7 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
         return EINVAL;
 
     char *name_conv = dav_conv_to_server_enc(name);
-    char *path = ne_concat(parent->path, name_conv, "/", NULL);
+    char *path = xasprintf("%s%s/", parent->path, name_conv);
     free(name_conv);
     int ret = dav_make_collection(path);
 
@@ -1859,7 +1861,7 @@ move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
     char *dst_path;
     if (!dst) {
         char *dst_conv = dav_conv_to_server_enc(dst_name);
-        dst_path = ne_concat(dst_parent->path, dst_conv, "/", NULL);
+        dst_path = xasprintf("%s%s/", dst_parent->path, dst_conv);
         free(dst_conv);
     } else {
         dst_path = xstrdup(dst->path);
@@ -1898,7 +1900,7 @@ move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
     char *dst_path;
     if (!dst) {
         char *dst_conv = dav_conv_to_server_enc(dst_name);
-        dst_path = ne_concat(dst_parent->path, dst_conv, NULL);
+        dst_path = xasprintf("%s%s", dst_parent->path, dst_conv);
         free(dst_conv);
     } else {
         dst_path = xstrdup(dst->path);
@@ -1968,7 +1970,7 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
     char *dst_path;
     if (!dst) {
         char *dst_conv = dav_conv_to_server_enc(dst_name);
-        dst_path = ne_concat(dst_parent->path, dst_conv, NULL);
+        dst_path = xasprintf("%s%s", dst_parent->path, dst_conv);
         free(dst_conv);
     } else {
         dst_path = xstrdup(dst->path);
@@ -2399,7 +2401,7 @@ update_path(dav_node *node, const char *src_path, const char *dst_path)
         return;
     }
 
-    char *path = ne_concat(dst_path, node->path + strlen(src_path), NULL);
+    char *path = xasprintf("%s%s", dst_path, node->path + strlen(src_path));
     free(node->path);
     node->path = path;
 }
@@ -2556,7 +2558,7 @@ create_cache_file(dav_node *node)
         }
     }
 
-    node->cache_path = ne_concat(cache_dir, "/", node->name, "-XXXXXX", NULL);
+    node->cache_path = xasprintf("%s/%s-XXXXXX", cache_dir, node->name);
 
     int fd = mkstemp(node->cache_path);
     if (fd <= 0) {
@@ -2590,8 +2592,7 @@ create_dir_cache_file(dav_node *dir)
         }
     }
 
-    dir->cache_path = ne_concat(cache_dir, "/dir-", dir->name, "-XXXXXX",
-                                 NULL);
+    dir->cache_path = xasprintf("%s/dir-%s-XXXXXX", cache_dir, dir->name);
     int fd = mkstemp(dir->cache_path);
     if (fd <= 0) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
@@ -2779,7 +2780,8 @@ check_cache_dir(const char *dir, const char *host, const char *path,
     struct passwd *pw = getpwuid(default_uid);
     if (!pw || !pw->pw_name)
         error(EXIT_FAILURE, 0, _("can't read user data base"));
-    char *dir_name = ne_concat(host, path, mpoint + 1, "+", pw->pw_name, NULL);
+    char *dir_name = xasprintf("%s%s%s+%s", host, path, mpoint + 1,
+                               pw->pw_name);
     *(dir_name + strlen(host) + strlen(path) - 1) = '+';
     char *pos = strchr(dir_name, '/');
     while (pos) {
@@ -2794,7 +2796,7 @@ check_cache_dir(const char *dir, const char *host, const char *path,
     struct dirent *de = readdir(tl_dir);
     while (de && !cache_dir) {
         if (strcmp(de->d_name, dir_name) == 0) {
-            cache_dir = ne_concat(dir, "/", de->d_name, NULL);
+            cache_dir = xasprintf("%s/%s", dir, de->d_name);
         }
         de = readdir(tl_dir);
     }
@@ -2802,7 +2804,7 @@ check_cache_dir(const char *dir, const char *host, const char *path,
     closedir(tl_dir);
 
     if (!cache_dir) {
-        cache_dir = ne_concat(dir, "/", dir_name, NULL);
+        cache_dir = xasprintf("%s/%s", dir, dir_name);
         if (mkdir(cache_dir, S_IRWXU) != 0)
             error(EXIT_FAILURE, 0, _("can't create cache directory %s"),
             cache_dir);
@@ -2835,7 +2837,7 @@ clean_cache(void)
 
         if (strcmp(de->d_name, ".") != 0 && strcmp(de->d_name, "..") != 0
                 && strcmp(de->d_name, DAV_INDEX) != 0) {
-            char *path = ne_concat(cache_dir, "/", de->d_name, NULL);
+            char *path = xasprintf("%s/%s", cache_dir, de->d_name);
             int i = 0;
             dav_node *node = NULL;
             while (!node && i < table_size) {
@@ -2876,7 +2878,7 @@ clean_cache(void)
 static void
 parse_index(void)
 {
-    char *index = ne_concat(cache_dir, "/", DAV_INDEX, NULL);
+    char *index = xasprintf("%s/%s", cache_dir, DAV_INDEX);
     FILE *idx = fopen(index, "r");
     if (!idx) {
         free(index);
@@ -3019,7 +3021,7 @@ write_node(dav_node *node, FILE *file, const char *indent)
             return -1;
     }
 
-    char *ind = ne_concat(indent, "  ", NULL);
+    char *ind = xasprintf("%s  ", indent);
 
     if (node != root && !is_backup(node)) {
         if (fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind, type[PATH], node->path,
@@ -3156,10 +3158,10 @@ static int
 xml_cdata(void *userdata, int state, const char *cdata, size_t len)
 {
     if (!xml_data) {
-        xml_data = ne_strndup(cdata, len);
+        xml_data = xstrndup(cdata, len);
     } else {
-        char *add = ne_strndup(cdata, len);
-        char *new = ne_concat(xml_data, add, NULL);
+        char *add = xstrndup(cdata, len);
+        char *new = xasprintf("%s%s", xml_data, add);
         free(add);
         free(xml_data);
         xml_data = new;
