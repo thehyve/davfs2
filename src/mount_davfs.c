@@ -74,7 +74,7 @@
 #include "xvasprintf.h"
 #include "xstrndup.h"
 
-#include <ne_string.h>
+#include <ne_ssl.h>
 #include <ne_uri.h>
 #include <ne_utils.h>
 
@@ -981,7 +981,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
    Requires: privileged, uid, home, conf, mopts, dir_mode, file_mode
    Provides: dav_user, dav_group, dav_uid, dav_gid, kernel_fs, buf_size,
              dir_umask, file_umask, dir_mode, file_mode,
-             servercert, secrets, clicert, p_host, p_port, use_proxy,
+             trust_ca_cert, secrets, clicert, p_host, p_port, use_proxy,
              ask_auth, locks, lock_owner, lock_timeout, lock_refresh,
              expect100, if_match_bug, drop_weak_etags, allow_cookie,
              precheck, ignore_dav_header, connect_timeout, read_timeout,
@@ -1015,23 +1015,31 @@ parse_config(dav_args *args)
 
     eval_modes(args);
 
-    if (args->servercert)
-        expand_home(&args->servercert, args);
-    if (args->servercert && *args->servercert != '/' && !args->privileged) {
-        char *f = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE, DAV_CERTS_DIR,
-                            args->servercert);
-        if (access(f, F_OK) == 0) {
-            free(args->servercert);
-            args->servercert = f;
+    if (args->trust_ca_cert) {
+        char *f = NULL;
+        expand_home(&args->trust_ca_cert, args);
+        if (*args->trust_ca_cert == '/') {
+            args->ca_cert = ne_ssl_cert_read(args->trust_ca_cert);
         } else {
-            free(f);
+            if (!args->privileged) {
+                f = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE,
+                              DAV_CERTS_DIR, args->trust_ca_cert);
+                args->ca_cert = ne_ssl_cert_read(f);
+            }
+            if (!args->ca_cert) {
+                if (f) free(f);
+                f = xasprintf("%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
+                              args->trust_ca_cert);
+                args->ca_cert = ne_ssl_cert_read(f);
+            }
+            if (args->ca_cert) {
+                free(args->trust_ca_cert);
+                args->trust_ca_cert = f;
+            }
         }
-    }
-    if (args->servercert && *args->servercert != '/') {
-        char *f = xasprintf("%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
-                            args->servercert);
-        free(args->servercert);
-        args->servercert = f;
+        if (!args->ca_cert)
+            error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
+                  args->trust_ca_cert);
     }
 
     if (args->secrets)
@@ -1417,8 +1425,10 @@ delete_args(dav_args *args)
         free(args->host);
     if (args->path)
         free(args->path);
-    if (args->servercert)
-        free(args->servercert);
+    if (args->trust_ca_cert)
+        free(args->trust_ca_cert);
+    if (args->ca_cert)
+        free(args->ca_cert);
     if (args->secrets)
         free(args->secrets);
     if (args->username) {
@@ -1594,7 +1604,7 @@ get_options(dav_args *args, char *option)
     };
 
     if (args->privileged)
-        args->mopts = DAV_USER_MOPTS;
+        args->mopts = DAV_MOPTS;
     args->fsuid = args->uid;
     args->fsgid = args->gid;
     
@@ -1805,7 +1815,7 @@ log_dbg_config(dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  path: %s", args->path);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  servercert: %s", args->servercert);
+           "  trust_ca_cert: %s", args->trust_ca_cert);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  secrets: %s", args->secrets);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2043,7 +2053,7 @@ proxy_from_env(dav_args *args)
               file. Some parameters are allowed only in the system wide
               configuration file, some only in the user configuration file.
    Requires: none
-   Provides: dav_user, dav_group, kernel_fs, buf_size, servercert, secrets,
+   Provides: dav_user, dav_group, kernel_fs, buf_size, trust_ca_cert, secrets,
              clicert, p_host, p_port, use_proxy, ask_auth, locks,
              lock_owner, lock_timeout, lock_refresh, expect100, if_match_bug,
              drop_weak_etags, allow_cookie, precheck, ignore_dav_header,
@@ -2102,10 +2112,11 @@ read_config(dav_args *args, const char * filename, int system)
                 args->kernel_fs = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "buf_size") == 0) {
                 args->buf_size = arg_to_int(parmv[1], 10, parmv[0]);
-            } else if (strcmp(parmv[0], "servercert") == 0) {
-                if (args->servercert)
-                    free(args->servercert);
-                args->servercert = xstrdup(parmv[1]);
+            } else if (strcmp(parmv[0], "trust_ca_cert") == 0
+                       || strcmp(parmv[0], "servercert") == 0) {
+                if (args->trust_ca_cert)
+                    free(args->trust_ca_cert);
+                args->trust_ca_cert = xstrdup(parmv[1]);
             } else if (!system && strcmp(parmv[0], "secrets") == 0) {
                 if (args->secrets)
                     free(args->secrets);

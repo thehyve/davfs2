@@ -65,7 +65,8 @@ typedef struct {
     char *host;               /* Command line */
     int port;                 /* Command line */
     char *path;               /* Command line */
-    char *servercert;         /* User config file, system config file */
+    char *trust_ca_cert;      /* User config file, system config file */
+    ne_ssl_certificate *ca_cert;
     char *secrets;            /* User config file */
     char *username;           /* User secrets file, system secrets file */
     char *cl_username;        /* Command line */
