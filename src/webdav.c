@@ -60,7 +60,6 @@
 #include "xstrndup.h"
 #include "xvasprintf.h"
 
-#include <ne_alloc.h>
 #include <ne_auth.h>
 #include <ne_basic.h>
 #include <ne_dates.h>
@@ -412,15 +411,8 @@ dav_init_webdav(const dav_args *args)
         ne_ssl_set_verify(session, ssl_verify, NULL);
         ne_ssl_trust_default_ca(session);
 
-        if (args->servercert) {
-            ne_ssl_certificate *server_cert
-                    = ne_ssl_cert_read(args->servercert);
-            if (!server_cert)
-                error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
-                      args->servercert);
-            ne_ssl_trust_cert(session, server_cert);
-            ne_ssl_cert_free(server_cert);
-        }
+        if (args->ca_cert)
+            ne_ssl_trust_cert(session, args->ca_cert);
 
         if (args->clicert) {
             uid_t orig = geteuid();
@@ -1796,7 +1788,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
             dav_delete_props(result);
             return;
         }
-        result->name = ne_strndup(result->path + strlen(ctx->path),
+        result->name = xstrndup(result->path + strlen(ctx->path),
                                   strlen(result->path) - strlen(ctx->path)
                                   - result->is_dir);
         replace_slashes(&result->name);
@@ -2057,7 +2049,7 @@ update_cookie(ne_request *req, void *userdata, const ne_status *status)
         cookie = NULL;
     }
 
-    char *value = ne_strndup(cookie_hdr, sep - cookie_hdr + 1);
+    char *value = xstrndup(cookie_hdr, sep - cookie_hdr + 1);
     cookie = xasprintf("Cookie: $Version=1;%s\r\n", value);
     free(value);
 
