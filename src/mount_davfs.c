@@ -964,12 +964,6 @@ parse_commandline(dav_args *args, int argc, char *argv[])
     if (!args->port)
         args->port = ne_uri_defaultport(args->scheme);
 
-    if (args->conf) {
-        expand_home(&args->conf, args);
-    } else if (!args->privileged) {
-        args->conf = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_CONFIG);
-    }
-
     return args;       
 }
 
@@ -993,6 +987,12 @@ static void
 parse_config(dav_args *args)
 {
     read_config(args, DAV_SYS_CONF_DIR "/" DAV_CONFIG, 1);
+
+    if (args->conf) {
+        expand_home(&args->conf, args);
+    } else if (!args->privileged) {
+        args->conf = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_CONFIG);
+    }
 
     if (args->conf)
         read_config(args, args->conf, 0);
