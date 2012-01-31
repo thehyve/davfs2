@@ -685,6 +685,7 @@ check_fstab(const dav_args *args)
     dav_args *n_args = new_args();
     n_args->uid = args->uid;
     n_args->gid = args->gid;
+    n_args->mopts = DAV_USER_MOPTS;
 
     FILE *fstab = setmntent(_PATH_MNTTAB, "r");
     if (!fstab)
@@ -1603,8 +1604,6 @@ get_options(dav_args *args, char *option)
         [END] = NULL
     };
 
-    if (args->privileged)
-        args->mopts = DAV_MOPTS;
     args->fsuid = args->uid;
     args->fsgid = args->gid;
     
@@ -1732,7 +1731,7 @@ new_args(void)
     dav_args *args = (dav_args *) xcalloc(1, sizeof(dav_args));
 
     args->netdev = DAV_NETDEV;
-    args->mopts = DAV_USER_MOPTS;
+    args->mopts = DAV_MOPTS;
 
     args->p_port = DAV_DEFAULT_PROXY_PORT;
     args->useproxy = DAV_USE_PROXY;

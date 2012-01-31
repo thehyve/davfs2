@@ -57,6 +57,8 @@
 #include "xalloc.h"
 #include "xvasprintf.h"
 
+#include <ne_ssl.h>
+
 #include "defaults.h"
 #include "mount_davfs.h"
 #include "cache.h"

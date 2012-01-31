@@ -61,6 +61,8 @@
 #include <sys/types.h>
 #endif
 
+#include <ne_ssl.h>
+
 #include "defaults.h"
 #include "mount_davfs.h"
 #include "cache.h"
