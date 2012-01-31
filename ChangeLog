@@ -1,6 +1,16 @@
 ChangeLog for davfs2
 --------------------
 
+2012-01-31 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, mount_davfs.h, webdav.c:
+      Read ca_cert in mount_davfs.c.
+    * mount_davfs.c, parse_commandline, parse_config:
+      Redo: Canonicalize conf in parse_cmdline.
+    * mount_davfs.c, get_options, new_args, check_fstab:
+      Fix defaults for mopts.
+    * umount_davfs.c:
+      Don't use a-flag in fscanf.
+
 2012-01-28 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, check_dirs:
       Use stat instead of access.

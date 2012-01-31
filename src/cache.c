@@ -63,8 +63,7 @@
 #include "xstrndup.h"
 #include "xvasprintf.h"
 
-#include <ne_alloc.h>
-#include <ne_string.h>
+#include <ne_ssl.h>
 #include <ne_xml.h>
 
 #include "defaults.h"

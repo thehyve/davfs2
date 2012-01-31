@@ -43,8 +43,6 @@
 #include "xalloc.h"
 #include "xvasprintf.h"
 
-#include <ne_string.h>
-
 #include "defaults.h"
 #include "canonicalize.h"
 
@@ -148,7 +146,7 @@ main(int argc, char *argv[])
 
     char pid[32];
     FILE *file = fopen(pidfile, "r");
-    if (!file || fscanf(file, "%30[0-9]", pid) != 1 || !pid) {
+    if (!file || fscanf(file, "%30[0-9]", pid) < 1) {
         error(0, 0,
               _("\n"
                 "  can't read PID from file %s;\n"
