@@ -1043,6 +1043,33 @@ parse_config(dav_args *args)
                   args->trust_ca_cert);
     }
 
+    if (args->trust_server_cert) {
+        char *f = NULL;
+        expand_home(&args->trust_server_cert, args);
+        if (*args->trust_server_cert == '/') {
+            args->server_cert = ne_ssl_cert_read(args->trust_server_cert);
+        } else {
+            if (!args->privileged) {
+                f = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE,
+                              DAV_CERTS_DIR, args->trust_server_cert);
+                args->server_cert = ne_ssl_cert_read(f);
+            }
+            if (!args->server_cert) {
+                if (f) free(f);
+                f = xasprintf("%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
+                              args->trust_server_cert);
+                args->server_cert = ne_ssl_cert_read(f);
+            }
+            if (args->server_cert) {
+                free(args->trust_server_cert);
+                args->trust_server_cert = f;
+            }
+        }
+        if (!args->server_cert)
+            error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
+                  args->trust_server_cert);
+    }
+
     if (args->secrets)
         expand_home(&args->secrets, args);
     if (!args->privileged && !args->secrets)
@@ -1430,6 +1457,10 @@ delete_args(dav_args *args)
         free(args->trust_ca_cert);
     if (args->ca_cert)
         free(args->ca_cert);
+    if (args->trust_server_cert)
+        free(args->trust_server_cert);
+    if (args->server_cert)
+        free(args->server_cert);
     if (args->secrets)
         free(args->secrets);
     if (args->username) {
@@ -2116,6 +2147,10 @@ read_config(dav_args *args, const char * filename, int system)
                 if (args->trust_ca_cert)
                     free(args->trust_ca_cert);
                 args->trust_ca_cert = xstrdup(parmv[1]);
+            } else if (strcmp(parmv[0], "trust_server_cert") == 0) {
+                if (args->trust_server_cert)
+                    free(args->trust_server_cert);
+                args->trust_server_cert = xstrdup(parmv[1]);
             } else if (!system && strcmp(parmv[0], "secrets") == 0) {
                 if (args->secrets)
                     free(args->secrets);

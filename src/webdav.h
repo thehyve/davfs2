@@ -55,7 +55,7 @@ struct dav_props {
    If an error occurs, the program is terminated.
    paramters: if not self explaining, please see mount_davfs.h, struct args. */
 void
-dav_init_webdav(const dav_args* args);
+dav_init_webdav(dav_args* args);
 
 
 /* Does an OPTIONS request to check the server capabilities. In case of
