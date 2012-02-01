@@ -179,6 +179,9 @@ static char *password;
 static char *p_username;
 static char *p_password;
 
+/* If this is not NULL the server must present exactly this certificate. */
+static ne_ssl_certificate *server_cert;
+
 /* Whether to send expect 100-continue header in PUT requests. */
 static int use_expect100;
 
@@ -321,7 +324,7 @@ update_cookie(ne_request *req, void *userdata, const ne_status *status);
 /*==================*/
 
 void
-dav_init_webdav(const dav_args *args)
+dav_init_webdav(dav_args *args)
 {
     if (args->neon_debug & ~NE_DBG_HTTPPLAIN)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Initializing webdav");
@@ -408,11 +411,16 @@ dav_init_webdav(const dav_args *args)
     if (strcmp(args->scheme, "https") == 0) {
         if (!ne_has_support(NE_FEATURE_SSL))
             error(EXIT_FAILURE, 0, _("neon library does not support TLS/SSL"));
-        ne_ssl_set_verify(session, ssl_verify, NULL);
-        ne_ssl_trust_default_ca(session);
 
-        if (args->ca_cert)
-            ne_ssl_trust_cert(session, args->ca_cert);
+        ne_ssl_set_verify(session, ssl_verify, NULL);
+        if (args->server_cert) {
+            server_cert = args->server_cert;
+            args->server_cert = NULL;
+        } else {
+            ne_ssl_trust_default_ca(session);
+            if (args->ca_cert)
+                ne_ssl_trust_cert(session, args->ca_cert);
+        }
 
         if (args->clicert) {
             uid_t orig = geteuid();
@@ -1937,6 +1945,14 @@ quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 static int
 ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
 {
+    if (server_cert) {
+        if (ne_ssl_cert_cmp(cert, server_cert) == 0)
+            return 0;
+        if (have_terminal)
+            error(0, 0, _("the server certificate is not trusted"));
+        return -1;
+    }
+
     char *issuer = ne_ssl_readable_dname(ne_ssl_cert_issuer(cert));
     char *subject = ne_ssl_readable_dname(ne_ssl_cert_subject(cert));
     char *digest = xcalloc(1, NE_SSL_DIGESTLEN);

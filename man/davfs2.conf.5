@@ -1,4 +1,4 @@
-.TH @CONFIGFILE@ 5 2011\-04\-03 @PACKAGE_STRING@
+.TH @CONFIGFILE@ 5 2012\-02\-01 @PACKAGE_STRING@
 
 
 .SH NAME
@@ -143,32 +143,46 @@ must be appended, seperated by a colon. Examples: \fIfoo.bar:1704\fP or
 \fBOnly allowed in the system wide configuration file.\fR
 
 .TP
-.B servercert
+.B trust_ca_cert
 Name of a certificate file in PEM format. The name of the file may be
 given as absolute path or as file name only. In the latter case the
 directories \fI~/.@PACKAGE@/@CERTS_DIR@\fP and
 \fI@SYS_CONF_DIR@/@CERTS_DIR@\fP will be searched.
 .br
-This option is intended for self-signed server certificates. Self-signed
-means issuer and subject are the same. Common name (CN) must be the
-domain name of the server.
+This option is useful when the certificate presented by the server
+cannot be verified using the system's data base of trusted certificate
+authorities (CA). The certificate file must contain the self-signed
+certificate of the top level CA in the chain of trust. It may be a
+self-signed server certificate (but see also \fBtrust_server_cert\fR).
 .br
-In case the server certificate is not self-singed, this file must contain
-the certificate of the certificate authority (CA) that signed the server
-certificate, not the the server certificate itself. If an hirarchy of
-CA's is involved (the CA that signed the server certificate is not the
-root CA), the file must contain all the certificates from the chain of
-CAs involved, beginning with the CA that signed the server certificate,
-up to the self-signed certificate of the root CA. (The option name
-\fBservercert\fR is a misnomer in this case. Sorry.) You can create the
-file by concatenating all the CA-certificates involved.
+\fBNote:\fR Even if the server's certificate is trusted that does not mean
+it is accepted. Additionally the certificate's date must be valid and
+either the CommonName or the SubjectAltName must match the host name
+of the server.
+
+.TP
+.B servercert
+Same as \fBtrust_ca_cert\fR but badly named.
 .br
-\fBNote:\fR Even if the certificate is trusted, that does not mean it
-is accepted. There is the additional constraint, that the certificate
-presented by the server must belong to the server. The CN in the
-server certificate must be the domain name of the server. There is
-currently no way to automatically accept certificates that don't
-belong to the server.
+\fBDeprecated\fR
+
+.TP
+.B trust_server_cert
+Name of a certificate file in PEM format. The name of the file may be
+given as absolute path or as file name only. In the latter case the
+directories \fI~/.@PACKAGE@/@CERTS_DIR@\fP and
+\fI@SYS_CONF_DIR@/@CERTS_DIR@\fP will be searched.
+.br
+Usefull when the server's certificate can't be verified or is even invalid,
+but \fByou know\fR that you can trust this certificate.
+When the server presents a certificate that is exactly equal to this one
+and when the server is able to authenticate against the public key contained
+in this certificate the connection will be established.
+.br
+This is the preferred option for self signed server certificates.
+.br
+No other ways to verify the certificate will be tried and the certificate
+will not be checked for validity.
 
 .TP
 .B clientcert

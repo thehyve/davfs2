@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2012-02-01 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, mount_davfs.h, webdav.c:
+      Add option trust_server_cert.
+
 2012-01-31 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h, webdav.c:
       Read ca_cert in mount_davfs.c.
