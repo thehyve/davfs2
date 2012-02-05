@@ -216,7 +216,7 @@ static void
 read_no_proxy_list(dav_args *args);
 
 static void
-read_secrets(dav_args *args, const char *filename);
+read_secrets(dav_args *args, const char *filename, int system);
 
 static int
 split_uri(char **scheme, char **host, int *port,char **path, const char *uri);
@@ -499,6 +499,24 @@ check_dirs(dav_args *args)
     }
     release_privileges(args);
 
+    if (args->sys_clicert) {
+        gain_privileges(args);
+        if (stat(args->clicert, &st) < 0)
+            error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
+                  args->clicert);
+        release_privileges(args);
+        if (st.st_uid != 0)
+            error(EXIT_FAILURE, 0,
+                  _("client certificate file %s has wrong owner"),
+                  args->sys_clicert);
+        if ((st.st_mode &
+                (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
+                != 0)
+            error(EXIT_FAILURE, 0,
+                  _("client certificate file %s has wrong permissions"),
+                  args->sys_clicert);
+    }
+
     fname = xasprintf("%s/%s", DAV_SYS_CONF_DIR, DAV_SECRETS);
     if (stat(fname, &st) == 0) {
         if (st.st_uid != 0)
@@ -555,6 +573,22 @@ check_dirs(dav_args *args)
             free(fname);
         }
         free(path);
+
+        if (args->clicert) {
+            if (stat(args->clicert, &st) < 0)
+                error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
+                      args->clicert);
+            if (st.st_uid != args->uid)
+                error(EXIT_FAILURE, 0,
+                      _("client certificate file %s has wrong owner"),
+                      args->clicert);
+            if ((st.st_mode &
+                    (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
+                    != 0)
+                error(EXIT_FAILURE, 0,
+                      _("client certificate file %s has wrong permissions"),
+                      args->clicert);
+        }
 
         if (stat(args->secrets, &st) == 0) {
             if (st.st_uid != args->uid)
@@ -1039,7 +1073,7 @@ parse_config(dav_args *args)
             }
         }
         if (!args->ca_cert)
-            error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
+            error(EXIT_FAILURE, 0, _("can't read CA certificate %s"),
                   args->trust_ca_cert);
     }
 
@@ -1076,38 +1110,31 @@ parse_config(dav_args *args)
         args->secrets = xasprintf("%s/.%s/%s", args->home, PACKAGE,
                                   DAV_SECRETS);
 
-    if (args->clicert)
+    if (args->clicert) {
         expand_home(&args->clicert, args);
-    if (args->clicert && *args->clicert != '/' && !args->privileged) {
-        char *f = xasprintf("%s/.%s/%s/%s/%s", args->home, PACKAGE,
-                            DAV_CERTS_DIR, DAV_CLICERTS_DIR, args->clicert);
-        if (access(f, F_OK) == 0) {
+        if (*args->clicert != '/') {
+            char *f = xasprintf("%s/.%s/%s/%s/%s", args->home, PACKAGE,
+                                DAV_CERTS_DIR, DAV_CLICERTS_DIR, args->clicert);
             free(args->clicert);
             args->clicert = f;
         }
-    }
-    if (args->clicert && *args->clicert != '/' && args->privileged) {
-        char *f = xasprintf("%s/%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
-                            DAV_CLICERTS_DIR, args->clicert);
-        free(args->clicert);
-        args->clicert = f;
-    }
-    if (args->clicert) {
-        struct stat st;
-        gain_privileges(args);
-        if (stat(args->clicert, &st) < 0)
+        args->client_cert = ne_ssl_clicert_read(args->clicert);
+        if (!args->client_cert)
             error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
                   args->clicert);
+    } else if (args->sys_clicert) {
+        if (*args->sys_clicert != '/') {
+            char *f = xasprintf("%s/.%s/%s/%s/%s", args->home, PACKAGE,
+                                DAV_CERTS_DIR, DAV_CLICERTS_DIR,
+                                args->sys_clicert);
+            free(args->clicert);
+            args->clicert = f;
+        }
+        gain_privileges(args);
+        args->client_cert = ne_ssl_clicert_read(args->sys_clicert);
         release_privileges(args);
-        if (st.st_uid != args->uid && st.st_uid != 0)
-            error(EXIT_FAILURE, 0,
-                  _("client certificate file %s has wrong owner"),
-                  args->clicert);
-        if ((st.st_mode &
-                (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
-                != 0)
-            error(EXIT_FAILURE, 0,
-                  _("client certificate file %s has wrong permissions"),
+        if (!args->client_cert)
+            error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
                   args->clicert);
     }
 
@@ -1183,11 +1210,11 @@ static void
 parse_secrets(dav_args *args)
 {
     gain_privileges(args);
-    read_secrets(args, DAV_SYS_CONF_DIR "/" DAV_SECRETS);
+    read_secrets(args, DAV_SYS_CONF_DIR "/" DAV_SECRETS, 1);
     release_privileges(args);
 
     if (args->secrets) {
-        read_secrets(args, args->secrets);
+        read_secrets(args, args->secrets, 0);
     }
 
     if (args->cl_username) {
@@ -1239,6 +1266,19 @@ parse_secrets(dav_args *args)
             free(args->password);
             args->password = NULL;
         }
+    }
+
+    if (args->client_cert && ne_ssl_clicert_encrypted(args->client_cert)) {
+        if (!args->clicert_pw && args->askauth) {
+            printf(_("Please enter the password to decrypt client\n"
+                     "certificate %s.\n"), args->clicert);
+            args->clicert_pw = dav_user_input_hidden(_("Password: "));
+        }
+        if (!args->clicert_pw
+                || ne_ssl_clicert_decrypt(args->client_cert,
+                                          args->clicert_pw) != 0)
+            error(EXIT_FAILURE, 0, _("can't decrypt client certificate %s"),
+                  args->clicert);
     }
 
     if (args->debug & DAV_DBG_SECRETS) {
@@ -1456,11 +1496,11 @@ delete_args(dav_args *args)
     if (args->trust_ca_cert)
         free(args->trust_ca_cert);
     if (args->ca_cert)
-        free(args->ca_cert);
+        ne_ssl_cert_free(args->ca_cert);
     if (args->trust_server_cert)
         free(args->trust_server_cert);
     if (args->server_cert)
-        free(args->server_cert);
+        ne_ssl_cert_free(args->server_cert);
     if (args->secrets)
         free(args->secrets);
     if (args->username) {
@@ -1475,6 +1515,10 @@ delete_args(dav_args *args)
     }
     if (args->clicert)
         free(args->clicert);
+    if (args->sys_clicert)
+        free(args->sys_clicert);
+    if (args->client_cert)
+        ne_ssl_clicert_free(args->client_cert);
     if (args->clicert_pw) {
         memset(args->clicert_pw, '\0', strlen(args->clicert_pw));
         free(args->clicert_pw);
@@ -1847,9 +1891,13 @@ log_dbg_config(dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  trust_ca_cert: %s", args->trust_ca_cert);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  trust_server_cert: %s", args->trust_server_cert);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  secrets: %s", args->secrets);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  clicert: %s", args->clicert);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  sys_clicert: %s", args->sys_clicert);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  p_host: %s", args->p_host);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2155,10 +2203,14 @@ read_config(dav_args *args, const char * filename, int system)
                 if (args->secrets)
                     free(args->secrets);
                 args->secrets = xstrdup(parmv[1]); 
-            } else if (strcmp(parmv[0], "clientcert") == 0) {
+            } else if (!system && strcmp(parmv[0], "clientcert") == 0) {
                 if (args->clicert)
                     free(args->clicert);
                 args->clicert = xstrdup(parmv[1]);
+            } else if (system && strcmp(parmv[0], "clientcert") == 0) {
+                if (args->sys_clicert)
+                    free(args->sys_clicert);
+                args->sys_clicert = xstrdup(parmv[1]);
             } else if (system && strcmp(parmv[0], "proxy") == 0) {
                 if (split_uri(NULL, &args->p_host, &args->p_port, NULL,
                               parmv[1]) != 0)
@@ -2322,7 +2374,7 @@ read_no_proxy_list(dav_args *args)
    Requires: scheme, host, port, path, clicert, p_host, p_port
    Provides: username, password, p_user, p_passwd, clicert_pw.  */
 static void
-read_secrets(dav_args *args, const char *filename)
+read_secrets(dav_args *args, const char *filename, int system)
 {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -2330,6 +2382,17 @@ read_secrets(dav_args *args, const char *filename)
                _("opening %s failed"), filename);
         return;
     }
+
+    char *ccert = NULL;
+    if (!system && args->clicert) {
+        ccert = strrchr(args->clicert, '/');
+    } else if (system && args->sys_clicert) {
+        ccert = strrchr(args->sys_clicert, '/');
+    }
+    if (ccert && *(ccert + 1) == '\0')
+        ccert = NULL;
+    if (ccert)
+        ccert++;
 
     size_t n = 0;
     char *line = NULL;
@@ -2357,15 +2420,6 @@ read_secrets(dav_args *args, const char *filename)
                 port = ne_uri_defaultport(scheme);
 
             char *mp = canonicalize_file_name(parmv[0]);
-
-            char *ccert = NULL;
-            if (args->clicert) {
-                ccert = strrchr(args->clicert, '/');
-                if (ccert && *(ccert + 1) == '\0')
-                    ccert = NULL;
-                if (ccert)
-                    ccert++;
-            }
 
             if ((mp && strcmp(mp, mpoint) == 0)
                     || (scheme && args->scheme
@@ -2404,8 +2458,21 @@ read_secrets(dav_args *args, const char *filename)
                 if (count == 3)
                     args->p_passwd = xstrdup(parmv[2]);
 
-            } else if (args->clicert
+            } else if (!system && args->clicert
                        && (strcmp(parmv[0], args->clicert) == 0
+                           || strcmp(parmv[0], ccert) == 0)) {
+
+                if (count != 2)
+                    error_at_line(EXIT_FAILURE, 0, filename, lineno,
+                                  _("malformed line"));
+                if (args->clicert_pw) {
+                    memset(args->clicert_pw, '\0', strlen(args->clicert_pw));
+                    free(args->clicert_pw);
+                }
+                args->clicert_pw = xstrdup(parmv[1]);
+
+            } else if (system && args->sys_clicert
+                       && (strcmp(parmv[0], args->sys_clicert) == 0
                            || strcmp(parmv[0], ccert) == 0)) {
 
                 if (count != 2)

@@ -422,38 +422,8 @@ dav_init_webdav(dav_args *args)
                 ne_ssl_trust_cert(session, args->ca_cert);
         }
 
-        if (args->clicert) {
-            uid_t orig = geteuid();
-            seteuid(0);
-            ne_ssl_client_cert *client_cert
-                    = ne_ssl_clicert_read(args->clicert);
-            seteuid(orig);
-            if (!client_cert)
-                error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
-                      args->clicert);
-            if (client_cert && ne_ssl_clicert_encrypted(client_cert)) {
-                char *pw = NULL;
-                if (!args->clicert_pw && args->askauth) {
-                    printf(_("Please enter the password to decrypt client\n"
-                             "certificate %s.\n"), args->clicert);
-                    pw = dav_user_input_hidden(_("Password: "));
-                } else {
-                    pw = xstrdup(args->clicert_pw);
-                }
-                int ret = 1;
-                if (pw) {
-                    ret = ne_ssl_clicert_decrypt(client_cert, pw);
-                    memset(pw, '\0', strlen(pw));
-                    free(pw);
-                }
-                if (ret)
-                    error(EXIT_FAILURE, 0,
-                          _("can't decrypt client certificate %s"),
-                          args->clicert);
-            }
-            ne_ssl_set_clicert(session, client_cert);
-            ne_ssl_clicert_free(client_cert);
-        }
+        if (args->client_cert)
+            ne_ssl_set_clicert(session, args->client_cert);
     }
 
     have_terminal = args->askauth;
