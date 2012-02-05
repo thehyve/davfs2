@@ -3,7 +3,7 @@ ChangeLog for davfs2
 
 2012-02-05 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h, webdav.c:
-      Better handling of client certificates.
+      Read client certificates in mount_davfs.c.
 
 2012-02-01 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h, webdav.c:
