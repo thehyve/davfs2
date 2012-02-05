@@ -73,7 +73,9 @@ typedef struct {
     char *username;           /* User secrets file, system secrets file */
     char *cl_username;        /* Command line */
     char *password;           /* User secrets file, system secrets file */
-    char *clicert;            /* User config file, system config file */
+    char *clicert;            /* User config file */
+    char *sys_clicert;        /* System config file */
+    ne_ssl_client_cert *client_cert;
     char *clicert_pw;         /* User secrets file, system secrets file */
     char *p_host;             /* User config file, sys conf f., environment */
     int p_port;               /* User config file, sys conf f., environment */
