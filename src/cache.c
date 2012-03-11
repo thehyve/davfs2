@@ -202,10 +202,10 @@ static char *cache_dir;
 
 /* Maximum cache size. If open files require more space, this will
    be ignored. */
-unsigned long long max_cache_size;
+static unsigned long long max_cache_size;
 
 /* Actual cache size. */
-unsigned long long cache_size;
+static unsigned long long cache_size;
 
 /* Alignment boundary of dav_node in byte.
    Used to compute a hash value and file numbers from node pointers. */
@@ -633,7 +633,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
 
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Checking cache directory");
-    max_cache_size = args->cache_size * 0x100000;
+    max_cache_size = (unsigned long long) args->cache_size * 0x100000;
     check_cache_dir(args->cache_dir, args->host, args->path, mpoint);
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  %s", cache_dir);
