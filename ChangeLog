@@ -5,6 +5,8 @@ ChangeLog for davfs2
     * webdav.c, get_ne_error:
       Translate HTTP 405 into ENOENT.
       (http://savannah.nongnu.org/support/?107869)
+    * mount.davfs.8, de/mount.davfs.8.po:
+      Fixed typos. (Debian Bug#660866)
 
 2012-03-01 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_init_cache:
