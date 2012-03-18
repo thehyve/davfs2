@@ -1336,6 +1336,7 @@ get_ne_error(const char *method)
         case 301:           /* Moved Permanently */
         case 303:           /* See Other */
         case 404:           /* Not Found */
+        case 405:           /* Method Not Allowed */
         case 410:           /* Gone */
             return ENOENT;
         case 408:           /* Request Timeout */
@@ -1345,7 +1346,6 @@ get_ne_error(const char *method)
             return EACCES;
         case 400:           /* Bad Request */
         case 403:           /* Forbidden */
-        case 405:           /* Method Not Allowed */
         case 409:           /* Conflict */
         case 411:           /* Length Required */
         case 412:           /* Precondition Failed */
