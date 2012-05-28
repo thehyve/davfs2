@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2012-05-28 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c:
+      Added functions read_cert and read_client_cert.
+
 2012-03-18 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, get_ne_error:
       Translate HTTP 405 into ENOENT.
@@ -10,7 +14,7 @@ ChangeLog for davfs2
 
 2012-03-01 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, dav_init_cache:
-      Fix integer overrun.
+      Fix integer overflow.
 
 2012-02-05 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h, webdav.c:

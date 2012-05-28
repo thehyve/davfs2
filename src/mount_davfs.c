@@ -209,6 +209,12 @@ parse_line(char *line, int parmc, char *parmv[]);
 static void
 proxy_from_env(dav_args *args);
 
+static ne_ssl_certificate *
+read_cert(char **filename, dav_args *args);
+
+static ne_ssl_client_cert *
+read_client_cert(char **filename, dav_args *args, int system);
+
 static void
 read_config(dav_args *args, const char * filename, int system);
 
@@ -458,10 +464,7 @@ change_persona(dav_args *args)
      permissions; if not it tries to create it and/or set owner and permissions
    - when invoked by non-root user: checks for configuration directory in the
      users homepage and creates missing directories and files
-   - checks wether args->cache_dir is accessible.
-   Requires: privileged, uid, ngroups, groups, home, dav_gid, secrets,
-             sys_cache, cache_dir
-   Provides: sys_cache, cache_dir. */
+   - checks wether args->cache_dir is accessible. */
 static void
 check_dirs(dav_args *args)
 {
@@ -498,24 +501,6 @@ check_dirs(dav_args *args)
                   _("can't change group of directory %s"), DAV_SYS_RUN);
     }
     release_privileges(args);
-
-    if (args->sys_clicert) {
-        gain_privileges(args);
-        if (stat(args->clicert, &st) < 0)
-            error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
-                  args->clicert);
-        release_privileges(args);
-        if (st.st_uid != 0)
-            error(EXIT_FAILURE, 0,
-                  _("client certificate file %s has wrong owner"),
-                  args->sys_clicert);
-        if ((st.st_mode &
-                (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
-                != 0)
-            error(EXIT_FAILURE, 0,
-                  _("client certificate file %s has wrong permissions"),
-                  args->sys_clicert);
-    }
 
     fname = xasprintf("%s/%s", DAV_SYS_CONF_DIR, DAV_SECRETS);
     if (stat(fname, &st) == 0) {
@@ -573,22 +558,6 @@ check_dirs(dav_args *args)
             free(fname);
         }
         free(path);
-
-        if (args->clicert) {
-            if (stat(args->clicert, &st) < 0)
-                error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
-                      args->clicert);
-            if (st.st_uid != args->uid)
-                error(EXIT_FAILURE, 0,
-                      _("client certificate file %s has wrong owner"),
-                      args->clicert);
-            if ((st.st_mode &
-                    (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
-                    != 0)
-                error(EXIT_FAILURE, 0,
-                      _("client certificate file %s has wrong permissions"),
-                      args->clicert);
-        }
 
         if (stat(args->secrets, &st) == 0) {
             if (st.st_uid != args->uid)
@@ -710,9 +679,7 @@ check_double_mounts(dav_args *args)
    - option user or users
    - other options in fstab matching those in args.
    If there is no such entry or one of the checks fails an error message
-   is printed and the program terminates with EXIT_FAILURE.
-   Requires: uid, gid, conf, user, users, mopts, fsuid, fsgid, dir_mode,
-             file_mode, cl_username*/
+   is printed and the program terminates with EXIT_FAILURE. */
 static void
 check_fstab(const dav_args *args)
 {
@@ -791,8 +758,7 @@ check_fstab(const dav_args *args)
    - The user must belong to the group specified in option gid (if used).
    - The user must be member of group args->dav_group.
    If this conditions are not met or an error occurs, an error message is
-   printed and exit(EXIT_FAILURE) is called.
-   Requires: privileged, uid, uid_name, gid, dav_group, dav_gid, fsuid, fsgid */
+   printed and exit(EXIT_FAILURE) is called. */
 static void
 check_permissions(dav_args *args)
 {
@@ -903,11 +869,7 @@ is_mounted(void)
    If it does not find exactly two non-option-arguments (url and mointpoint)
    it prints an error message and calls exit(EXIT_FAILURE).
    argc    : the number of arguments.
-   argv[]  : array of argument strings.
-   Requires: uid, uid_name, gid, home, mopts
-   Provides: cmdline, conf, user, users, netdev, mopts,
-             add_mopts, fsuid, fsgid, dir_mode, file_mode, scheme, host, port,
-             path, cl_username. */
+   argv[]  : array of argument strings. */
 static dav_args *
 parse_commandline(dav_args *args, int argc, char *argv[])
 {
@@ -1006,18 +968,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
 /* Reads and parses the configuration files and stores the values in args.
    The system wide configuration file is parsed first. If args->conf is
    given it will be parsed too and overwrites the values from the system
-   wide configuration file.
-   Requires: privileged, uid, home, conf, mopts, dir_mode, file_mode
-   Provides: dav_user, dav_group, dav_uid, dav_gid, kernel_fs, buf_size,
-             dir_umask, file_umask, dir_mode, file_mode,
-             trust_ca_cert, secrets, clicert, p_host, p_port, use_proxy,
-             ask_auth, locks, lock_owner, lock_timeout, lock_refresh,
-             expect100, if_match_bug, drop_weak_etags, allow_cookie,
-             precheck, ignore_dav_header, connect_timeout, read_timeout,
-             retry, max_retry, max_upload_attemps, s_charset, header,
-             sys_cache, cache_dir, backup_dir, cache_size, table_size,
-             dir_refresh, file_refresh, delay_upload, gui_optimize, debug,
-             neon_debug. */
+   wide configuration file. */
 static void
 parse_config(dav_args *args)
 {
@@ -1050,59 +1001,11 @@ parse_config(dav_args *args)
 
     eval_modes(args);
 
-    if (args->trust_ca_cert) {
-        char *f = NULL;
-        expand_home(&args->trust_ca_cert, args);
-        if (*args->trust_ca_cert == '/') {
-            args->ca_cert = ne_ssl_cert_read(args->trust_ca_cert);
-        } else {
-            if (!args->privileged) {
-                f = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE,
-                              DAV_CERTS_DIR, args->trust_ca_cert);
-                args->ca_cert = ne_ssl_cert_read(f);
-            }
-            if (!args->ca_cert) {
-                if (f) free(f);
-                f = xasprintf("%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
-                              args->trust_ca_cert);
-                args->ca_cert = ne_ssl_cert_read(f);
-            }
-            if (args->ca_cert) {
-                free(args->trust_ca_cert);
-                args->trust_ca_cert = f;
-            }
-        }
-        if (!args->ca_cert)
-            error(EXIT_FAILURE, 0, _("can't read CA certificate %s"),
-                  args->trust_ca_cert);
-    }
+    if (args->trust_ca_cert)
+        args->ca_cert = read_cert(&args->trust_ca_cert, args);
 
-    if (args->trust_server_cert) {
-        char *f = NULL;
-        expand_home(&args->trust_server_cert, args);
-        if (*args->trust_server_cert == '/') {
-            args->server_cert = ne_ssl_cert_read(args->trust_server_cert);
-        } else {
-            if (!args->privileged) {
-                f = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE,
-                              DAV_CERTS_DIR, args->trust_server_cert);
-                args->server_cert = ne_ssl_cert_read(f);
-            }
-            if (!args->server_cert) {
-                if (f) free(f);
-                f = xasprintf("%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
-                              args->trust_server_cert);
-                args->server_cert = ne_ssl_cert_read(f);
-            }
-            if (args->server_cert) {
-                free(args->trust_server_cert);
-                args->trust_server_cert = f;
-            }
-        }
-        if (!args->server_cert)
-            error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
-                  args->trust_server_cert);
-    }
+    if (args->trust_server_cert)
+        args->ca_cert = read_cert(&args->trust_server_cert, args);
 
     if (args->secrets)
         expand_home(&args->secrets, args);
@@ -1111,31 +1014,10 @@ parse_config(dav_args *args)
                                   DAV_SECRETS);
 
     if (args->clicert) {
-        expand_home(&args->clicert, args);
-        if (*args->clicert != '/') {
-            char *f = xasprintf("%s/.%s/%s/%s/%s", args->home, PACKAGE,
-                                DAV_CERTS_DIR, DAV_CLICERTS_DIR, args->clicert);
-            free(args->clicert);
-            args->clicert = f;
-        }
-        args->client_cert = ne_ssl_clicert_read(args->clicert);
-        if (!args->client_cert)
-            error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
-                  args->clicert);
+        args->client_cert = read_client_cert(&args->clicert, args, 0);
+        if (args->sys_clicert) free(args->sys_clicert);
     } else if (args->sys_clicert) {
-        if (*args->sys_clicert != '/') {
-            char *f = xasprintf("%s/.%s/%s/%s/%s", args->home, PACKAGE,
-                                DAV_CERTS_DIR, DAV_CLICERTS_DIR,
-                                args->sys_clicert);
-            free(args->clicert);
-            args->clicert = f;
-        }
-        gain_privileges(args);
-        args->client_cert = ne_ssl_clicert_read(args->sys_clicert);
-        release_privileges(args);
-        if (!args->client_cert)
-            error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
-                  args->clicert);
+        args->client_cert = read_client_cert(&args->sys_clicert, args, 0);
     }
 
     if (args->privileged && !args->p_host) {
@@ -1170,9 +1052,7 @@ parse_config(dav_args *args)
 /* Checks whether the process is setuid 0 and fills persona related members
    of args.
    If euid != 0 or an error occurs it prints an error message and calls
-   exit(EXIT_FAILURE).
-   Requires: none
-   Provides: privileged, uid, uid_name, gid, ngroups, groups, home. */
+   exit(EXIT_FAILURE). */
 static void
 parse_persona(dav_args *args)
 {
@@ -1202,10 +1082,7 @@ parse_persona(dav_args *args)
 
 /* Reads the secrets file and asks the user interactivly for credentials if
    necessary. The user secrets file is parsed after the system wide secrets
-   file, so it will have precedence.
-   Requires: scheme, host, port, path, secrets, cl_username, clicert, p_host,
-             p_port, use_proxy, ask_auth
-   Provides: username, password, p_user, p_passwd, clicert_pw.  */
+   file, so it will have precedence.  */
 static void
 parse_secrets(dav_args *args)
 {
@@ -1270,8 +1147,11 @@ parse_secrets(dav_args *args)
 
     if (args->client_cert && ne_ssl_clicert_encrypted(args->client_cert)) {
         if (!args->clicert_pw && args->askauth) {
+            char *certfile = args->clicert;
+            if (!certfile)
+                certfile = args->sys_clicert;
             printf(_("Please enter the password to decrypt client\n"
-                     "certificate %s.\n"), args->clicert);
+                     "certificate %s.\n"), certfile);
             args->clicert_pw = dav_user_input_hidden(_("Password: "));
         }
         if (!args->clicert_pw
@@ -1588,10 +1468,9 @@ eval_modes(dav_args *args)
 
 
 /* If *dir starts with '~/' or '~user/' it is turned into an
-   absolute filename (starting with '/') in the users home directory.
+   absolute filename (starting with '/') in the user's home directory.
    user must be the name of the mounting user.
-   Otherwise dir is unchanged.
-   Requires: uid_name, home. */
+   Otherwise dir is unchanged. */
 static void
 expand_home(char **dir, const dav_args *args)
 {
@@ -1619,10 +1498,7 @@ expand_home(char **dir, const dav_args *args)
    option : a comma separated list of options (like the options in fstab and
             in the -o option of the mount-programm).
             For known options see the declaration at the beginning of the
-            the function definition.
-   Requires: uid, gid, mopts
-   Provides: conf, user, users, netdev, mopts, add_mopts, fsuid, fsgid,
-             dir_mode, file_mode, cl_username. */
+            the function definition. */
 static void
 get_options(dav_args *args, char *option)
 {
@@ -2125,20 +2001,95 @@ proxy_from_env(dav_args *args)
 }
 
 
+/* Reads a certificate in PEM-format from file *filename.
+   If *filename is not absulute it is expanded relative to the user's
+   home directory or certificate directory. If it is not found in the
+   user's home directory the system wide configuration directory is
+   searched instead. */
+static ne_ssl_certificate *
+read_cert(char **filename, dav_args *args)
+{
+        ne_ssl_certificate *cert = NULL;
+        expand_home(filename, args);
+        if (**filename == '/') {
+            return ne_ssl_cert_read(*filename);
+        } else {
+            char *f = NULL;
+            if (!args->privileged) {
+                f = xasprintf("%s/.%s/%s/%s", args->home, PACKAGE,
+                              DAV_CERTS_DIR, *filename);
+                cert = ne_ssl_cert_read(f);
+            }
+            if (!cert) {
+                if (f) free(f);
+                f = xasprintf("%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
+                              *filename);
+                cert = ne_ssl_cert_read(f);
+            }
+            if (cert) {
+                free(*filename);
+                *filename = f;
+            } else {
+                if (f) free(f);
+            }
+        }
+        if (cert)
+            error(EXIT_FAILURE, 0, _("can't read certificate %s"),
+                  *filename);
+        return cert;
+}
+
+
+/* Reads a client certificate in PKCS#12 format from file *filename.
+   If *filename is not absolute it is expanded with regard to the
+   users's home directory or the system wide configuration directory
+   depending on the value of system. */
+static ne_ssl_client_cert *
+read_client_cert(char **filename, dav_args *args, int system)
+{
+    if (!system)
+        expand_home(filename, args);
+    if (**filename != '/') {
+        char *f = NULL;
+        if (!system) {
+            f = xasprintf("%s/.%s/%s/%s/%s", args->home, PACKAGE,
+                          DAV_CERTS_DIR, DAV_CLICERTS_DIR, *filename);
+        } else {
+            f = xasprintf("%s/%s/%s/%s", DAV_SYS_CONF_DIR, DAV_CERTS_DIR,
+                          DAV_CLICERTS_DIR, *filename);
+        }
+        free(*filename);
+        *filename = f;
+    }
+
+    struct stat st;
+    if (system)
+        gain_privileges(args);
+    if (stat(*filename, &st) < 0)
+        error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
+              *filename);
+    if ((system && st.st_uid != 0) || (!system && st.st_uid != args->uid))
+        error(EXIT_FAILURE, 0,
+              _("client certificate file %s has wrong owner"), *filename);
+    if ((st.st_mode &
+            (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)) != 0)
+        error(EXIT_FAILURE, 0,
+              _("client certificate file %s has wrong permissions"), *filename);
+    ne_ssl_client_cert *cert = ne_ssl_clicert_read(*filename);
+    if (system)
+        release_privileges(args);
+    if (!args->client_cert)
+        error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
+              *filename);
+    return cert;
+}
+
+
 /* Reads the configuration file filename and stores the values in args.
    filename : name of the configuration file.
    system   : boolean value. 1 means it is the system wide configuration
               file. Some parameters are allowed only in the system wide
-              configuration file, some only in the user configuration file.
-   Requires: none
-   Provides: dav_user, dav_group, kernel_fs, buf_size, trust_ca_cert, secrets,
-             clicert, p_host, p_port, use_proxy, ask_auth, locks,
-             lock_owner, lock_timeout, lock_refresh, expect100, if_match_bug,
-             drop_weak_etags, allow_cookie, precheck, ignore_dav_header,
-             connect_timeout, read_timeout, retry, max_retry,
-             max_upload_attemps, s_charset, header, sys_cache, cache_dir,
-             backup_dir, cache_size, table_size, dir_refresh, file_refresh,
-             delay_upload, gui_optimize, debug, neon_debug. */
+              configuration file, some only in the user configuration file. */
 static void
 read_config(dav_args *args, const char * filename, int system)
 {
@@ -2370,9 +2321,7 @@ read_no_proxy_list(dav_args *args)
 
 
 /* Searches the file filename for credentials for server url and for the proxy
-   args->p_host and stores them in args.
-   Requires: scheme, host, port, path, clicert, p_host, p_port
-   Provides: username, password, p_user, p_passwd, clicert_pw.  */
+   args->p_host and stores them in args.  */
 static void
 read_secrets(dav_args *args, const char *filename, int system)
 {
