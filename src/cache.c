@@ -2480,7 +2480,7 @@ has_permission(const dav_node *node, uid_t uid, int how)
         if (!grp)
             return 0;
         char **members = grp->gr_mem;
-        while (*members && strcmp(*members, pw->pw_name) == 0)
+        while (*members && strcmp(*members, pw->pw_name) != 0)
             members++;
         if (!*members)
             return 0;
