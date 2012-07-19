@@ -25,9 +25,7 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#ifdef HAVE_ICONV_H
 #include <iconv.h>
-#endif
 #ifdef HAVE_LANGINFO_H
 #include <langinfo.h>
 #endif
@@ -41,9 +39,7 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
@@ -56,10 +52,7 @@
 #include <sys/stat.h>
 #endif
 
-#include "xalloc.h"
-#include "xstrndup.h"
-#include "xvasprintf.h"
-
+#include <ne_alloc.h>
 #include <ne_auth.h>
 #include <ne_basic.h>
 #include <ne_dates.h>
@@ -157,7 +150,7 @@ static const ne_propname quota_names[] = {
 
 static size_t log_bufsize = 512;
 
-static char *none_match_header = "If-None-Match: *\r\n";
+static char *none_match_header = "If-None-Match: *\n";
 
 
 /* Private global variables */
@@ -178,9 +171,6 @@ static char *username;
 static char *password;
 static char *p_username;
 static char *p_password;
-
-/* If this is not NULL the server must present exactly this certificate. */
-static ne_ssl_certificate *server_cert;
 
 /* Whether to send expect 100-continue header in PUT requests. */
 static int use_expect100;
@@ -209,7 +199,6 @@ static int initialized;
    Needed by  ssl_verify() which may be called at any time. */
 static int have_terminal;
 
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
 /* Handle to convert character encoding from utf-8 to LC_CTYPE.
    If NULL no conversion is done. */
 static iconv_t from_utf_8;
@@ -225,7 +214,6 @@ static iconv_t from_server_enc;
 /* Handle to convert from LC_CTYPE to character encoding of path names.
    If NULL no conversion is done. */
 static iconv_t to_server_enc;
-#endif /* DAV_USE_ICONV && HAVE_ICONV_H */
 
 /* A GNU custom stream, used to redirect neon debug messages to syslog. */
 static FILE *log_stream;
@@ -242,10 +230,8 @@ static char *cookie;
 /* Private function prototypes and inline functions */
 /*==================================================*/
 
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
 static void
 convert(char **s, iconv_t conv);
-#endif
 
 static int
 get_error(int ret, const char *method);
@@ -324,12 +310,11 @@ update_cookie(ne_request *req, void *userdata, const ne_status *status);
 /*==================*/
 
 void
-dav_init_webdav(dav_args *args)
+dav_init_webdav(const dav_args *args)
 {
     if (args->neon_debug & ~NE_DBG_HTTPPLAIN)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Initializing webdav");
 
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
     char *lc_charset = nl_langinfo(CODESET);
     if (lc_charset && strcasecmp(lc_charset, "UTF-8") != 0) {
         from_utf_8 = iconv_open(lc_charset, "UTF-8");
@@ -354,14 +339,14 @@ dav_init_webdav(dav_args *args)
                 to_server_enc = 0;
         }
     }
-#endif /* DAV_USE_ICONV && HAVE_ICONV_H */
 
     if (ne_sock_init() != 0)
         error(EXIT_FAILURE, errno, _("socket library initialization failed"));
 
     if (args->neon_debug & ~NE_DBG_HTTPPLAIN) {
-        char *buf = xmalloc(log_bufsize);
-        cookie_io_functions_t *log_func = xmalloc(sizeof(cookie_io_functions_t));
+        char *buf = malloc(log_bufsize);
+        cookie_io_functions_t *log_func = malloc(sizeof(cookie_io_functions_t));
+        if (!log_func) abort();
         log_func->read = NULL;
         log_func->write = log_writer;
         log_func->seek = NULL;
@@ -381,14 +366,14 @@ dav_init_webdav(dav_args *args)
     ne_set_connect_timeout(session, args->connect_timeout);
 #endif /* NE_VERSION_MINOR > 26 */
 
-    char *useragent = xasprintf("%s/%s", PACKAGE_TARNAME, PACKAGE_VERSION);
+    char *useragent = ne_concat(PACKAGE_TARNAME, "/", PACKAGE_VERSION, NULL);
     ne_set_useragent(session, useragent);
     free(useragent);
 
     if (args->username)
-        username = xstrdup(args->username);
+        username = ne_strdup(args->username);
     if (args->password)
-        password = xstrdup(args->password);
+        password = ne_strdup(args->password);
 #if NE_VERSION_MINOR < 26
     ne_set_server_auth(session, auth, "server");
 #else /* NE_VERSION_MINOR >= 26 */
@@ -398,9 +383,9 @@ dav_init_webdav(dav_args *args)
     if (args->useproxy && args->p_host) {
         ne_session_proxy(session, args->p_host, args->p_port);
         if (args->p_user)
-            p_username = xstrdup(args->p_user);
+            p_username = ne_strdup(args->p_user);
         if (args->p_passwd)
-            p_password = xstrdup(args->p_passwd);
+            p_password = ne_strdup(args->p_passwd);
 #if NE_VERSION_MINOR < 26
         ne_set_proxy_auth(session, auth, "proxy");
 #else /* NE_VERSION_MINOR >= 26 */
@@ -411,19 +396,51 @@ dav_init_webdav(dav_args *args)
     if (strcmp(args->scheme, "https") == 0) {
         if (!ne_has_support(NE_FEATURE_SSL))
             error(EXIT_FAILURE, 0, _("neon library does not support TLS/SSL"));
-
         ne_ssl_set_verify(session, ssl_verify, NULL);
-        if (args->server_cert) {
-            server_cert = args->server_cert;
-            args->server_cert = NULL;
-        } else {
-            ne_ssl_trust_default_ca(session);
-            if (args->ca_cert)
-                ne_ssl_trust_cert(session, args->ca_cert);
+        ne_ssl_trust_default_ca(session);
+
+        if (args->servercert) {
+            ne_ssl_certificate *server_cert
+                    = ne_ssl_cert_read(args->servercert);
+            if (!server_cert)
+                error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
+                      args->servercert);
+            ne_ssl_trust_cert(session, server_cert);
+            ne_ssl_cert_free(server_cert);
         }
 
-        if (args->client_cert)
-            ne_ssl_set_clicert(session, args->client_cert);
+        if (args->clicert) {
+            uid_t orig = geteuid();
+            seteuid(0);
+            ne_ssl_client_cert *client_cert
+                    = ne_ssl_clicert_read(args->clicert);
+            seteuid(orig);
+            if (!client_cert)
+                error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
+                      args->clicert);
+            if (client_cert && ne_ssl_clicert_encrypted(client_cert)) {
+                char *pw = NULL;
+                if (!args->clicert_pw && args->askauth) {
+                    printf(_("Please enter the password to decrypt client\n"
+                             "certificate %s.\n"), args->clicert);
+                    pw = dav_user_input_hidden(_("Password: "));
+                } else {
+                    pw = ne_strdup(args->clicert_pw);
+                }
+                int ret = 1;
+                if (pw) {
+                    ret = ne_ssl_clicert_decrypt(client_cert, pw);
+                    memset(pw, '\0', strlen(pw));
+                    free(pw);
+                }
+                if (ret)
+                    error(EXIT_FAILURE, 0,
+                          _("can't decrypt client certificate %s"),
+                          args->clicert);
+            }
+            ne_ssl_set_clicert(session, client_cert);
+            ne_ssl_clicert_free(client_cert);
+        }
     }
 
     have_terminal = args->askauth;
@@ -432,18 +449,18 @@ dav_init_webdav(dav_args *args)
         locks = ne_lockstore_create();
         if (!args->lock_owner) {
             if (!args->username) {
-                owner = xstrdup(PACKAGE_STRING);
+                owner = ne_strdup(PACKAGE_STRING);
             } else {
-                owner = xstrdup(args->username);
+                owner = ne_strdup(args->username);
             }
         } else {
-            owner = xstrdup(args->lock_owner);
+            owner = ne_strdup(args->lock_owner);
         }
         lock_timeout = args->lock_timeout;
     }
 
     if (args->header) {
-        custom_header = xstrdup(args->header);
+        custom_header = ne_strdup(args->header);
         ne_hook_pre_send(session, add_header, custom_header);
     }
 
@@ -523,11 +540,9 @@ dav_close_webdav(void)
 char *
 dav_conv_from_utf_8(const char *s)
 {
-    char *new = xstrdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
+    char *new = ne_strdup(s);
     if (from_utf_8)
         convert(&new, from_utf_8);
-#endif
     return new;
 }
 
@@ -535,11 +550,9 @@ dav_conv_from_utf_8(const char *s)
 char *
 dav_conv_to_utf_8(const char *s)
 {
-    char *new = xstrdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
+    char *new = ne_strdup(s);
     if (to_utf_8)
         convert(&new, to_utf_8);
-#endif
     return new;
 }
 
@@ -547,11 +560,9 @@ dav_conv_to_utf_8(const char *s)
 char *
 dav_conv_from_server_enc(const char *s)
 {
-    char *new = xstrdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
+    char *new = ne_strdup(s);
     if (from_server_enc)
         convert(&new, from_server_enc);
-#endif
     return new;
 }
 
@@ -559,11 +570,9 @@ dav_conv_from_server_enc(const char *s)
 char *
 dav_conv_to_server_enc(const char *s)
 {
-    char *new = xstrdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
+    char *new = ne_strdup(s);
     if (to_server_enc)
         convert(&new, to_server_enc);
-#endif
     return new;
 }
 
@@ -738,7 +747,7 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
         if (mime && value) {
             if (*mime)
                 free(*mime);
-            *mime = xstrdup(value);
+            *mime = ne_strdup(value);
         }
     }
 
@@ -788,7 +797,7 @@ dav_head(const char *path, char **etag, time_t *mtime, off_t *length,
     if (!ret && mime && value) {
         if (*mime)
             free(*mime);
-        *mime = xstrdup(value);
+        *mime = ne_strdup(value);
     }
 
     ne_request_destroy(req);
@@ -834,7 +843,7 @@ dav_lock(const char *path, time_t *expire, int *exists)
     lock = ne_lock_create();
     ne_fill_server_uri(session, &lock->uri);
     lock->uri.path = spath;
-    lock->owner = xstrdup(owner);
+    lock->owner = ne_strdup(owner);
     lock->timeout = lock_timeout;
 
 #if NE_VERSION_MINOR > 25
@@ -1077,7 +1086,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
             if (value) {
                 if (*mime)
                     free(*mime);
-                *mime = xstrdup(value);
+                *mime = ne_strdup(value);
             }
         }
     }
@@ -1108,9 +1117,6 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
 
     static int use_rfc = 1;
     static int use_userinfo = 1;
-
-    if (!use_rfc && !use_userinfo)
-        return EIO;
 
     quota_context ctx;
     ctx.error = 0;
@@ -1144,7 +1150,7 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
         if (!ret) {
             if (ctx.error)
                 ret = EIO;
-        } else if (ret != EAGAIN) {
+        } else if (ret == EINVAL) {
             use_userinfo = 0;
         }
     }
@@ -1235,14 +1241,14 @@ dav_unlock(const char *path, time_t *expire)
 /* Private functions */
 /*===================*/
 
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
 static void
 convert(char **s, iconv_t conv)
 {
     size_t insize = strlen(*s);
     char *in = *s;
     size_t outsize = MB_LEN_MAX * (insize + 1);
-    char *buf = xcalloc(outsize, 1);
+    char *buf = calloc(outsize, 1);
+    if (!buf) abort();
     char *out = buf;
 
     iconv(conv, NULL, NULL, &out, &outsize);
@@ -1250,12 +1256,11 @@ convert(char **s, iconv_t conv)
             && insize == 0 && outsize >= MB_LEN_MAX) {
         memset(out, 0, MB_LEN_MAX);
         free(*s);
-        *s = xstrndup(buf, out - buf + MB_LEN_MAX);
+        *s = ne_strndup(buf, out - buf + MB_LEN_MAX);
     }
 
     free(buf);
 }
-#endif /* DAV_USE_ICONV && HAVE_ICONV_H */
 
 
 /* Returns a file error code according to ret from the last WebDAV
@@ -1336,7 +1341,6 @@ get_ne_error(const char *method)
         case 301:           /* Moved Permanently */
         case 303:           /* See Other */
         case 404:           /* Not Found */
-        case 405:           /* Method Not Allowed */
         case 410:           /* Gone */
             return ENOENT;
         case 408:           /* Request Timeout */
@@ -1346,6 +1350,7 @@ get_ne_error(const char *method)
             return EACCES;
         case 400:           /* Bad Request */
         case 403:           /* Forbidden */
+        case 405:           /* Method Not Allowed */
         case 409:           /* Conflict */
         case 411:           /* Length Required */
         case 412:           /* Precondition Failed */
@@ -1523,11 +1528,11 @@ replace_slashes(char **name)
         char *nn;
         *slash = '\0';
         if (slash == *name) {
-            nn = xasprintf("slash-%s", slash + 1);
+            nn = ne_concat("slash-", slash + 1, NULL);
         } else if (slash == end) {
-            nn = xasprintf("%s-slash", *name);
+            nn = ne_concat(*name, "-slash", NULL);
         } else {
-            nn = xasprintf("%s-slash-%s", *name, slash + 1);
+            nn = ne_concat(*name, "-slash-", slash + 1, NULL);
         }
         free(*name);
         *name = nn;
@@ -1697,7 +1702,7 @@ prop_result(void *userdata, const char *href, const ne_prop_result_set *set)
         return;
     }
 
-    char *tmp_path = (char *) xmalloc(strlen(uri.path) + 1);
+    char *tmp_path = (char *) ne_malloc(strlen(uri.path) + 1);
     const char *from = uri.path;
 
 #else /* NE_VERSION_MINOR >= 26 */
@@ -1709,7 +1714,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     if (!ctx || !uri || !uri->path || !set)
         return;
 
-    char *tmp_path = (char *) xmalloc(strlen(uri->path) + 1);
+    char *tmp_path = (char *) ne_malloc(strlen(uri->path) + 1);
     const char *from = uri->path;
 
 #endif /* NE_VERSION_MINOR >= 26 */
@@ -1721,7 +1726,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
         *to++ = *from++;
     }
     *to = 0;
-    dav_props *result = xcalloc(1, sizeof(dav_props));
+    dav_props *result = ne_calloc(sizeof(dav_props));
     result->path = ne_path_unescape(tmp_path);
     free (tmp_path);
 
@@ -1748,7 +1753,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
             *(result->path + strlen(result->path) - 1) = '\0';
     } else {
         if (result->is_dir) {
-            char *tmp = xasprintf("%s/", result->path);
+            char *tmp = ne_concat(result->path, "/", NULL);
             free(result->path);
             result->path = tmp;
         }
@@ -1760,20 +1765,18 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     }
 
     if (strcmp(result->path, ctx->path) == 0) {
-        result->name = xstrdup("");
+        result->name = ne_strdup("");
     } else {
         if (strlen(result->path) < (strlen(ctx->path) + result->is_dir + 1)) {
             dav_delete_props(result);
             return;
         }
-        result->name = xstrndup(result->path + strlen(ctx->path),
+        result->name = ne_strndup(result->path + strlen(ctx->path),
                                   strlen(result->path) - strlen(ctx->path)
                                   - result->is_dir);
         replace_slashes(&result->name);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
         if (from_server_enc)
             convert(&result->name, from_server_enc);
-#endif
     }
 
     data = ne_propset_value(set, &prop_names[ETAG]);
@@ -1915,17 +1918,9 @@ quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 static int
 ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
 {
-    if (server_cert) {
-        if (ne_ssl_cert_cmp(cert, server_cert) == 0)
-            return 0;
-        if (have_terminal)
-            error(0, 0, _("the server certificate is not trusted"));
-        return -1;
-    }
-
     char *issuer = ne_ssl_readable_dname(ne_ssl_cert_issuer(cert));
     char *subject = ne_ssl_readable_dname(ne_ssl_cert_subject(cert));
-    char *digest = xcalloc(1, NE_SSL_DIGESTLEN);
+    char *digest = ne_calloc(NE_SSL_DIGESTLEN);
     if (!issuer || !subject || ne_ssl_cert_digest(cert, digest) != 0) {
         if (have_terminal) {
             error(0, 0, _("error processing server certificate"));
@@ -2035,8 +2030,8 @@ update_cookie(ne_request *req, void *userdata, const ne_status *status)
         cookie = NULL;
     }
 
-    char *value = xstrndup(cookie_hdr, sep - cookie_hdr + 1);
-    cookie = xasprintf("Cookie: $Version=1;%s\r\n", value);
+    char *value = ne_strndup(cookie_hdr, sep - cookie_hdr + 1);
+    cookie = ne_concat("Cookie: $Version=1;", value, "\r\n", NULL);
     free(value);
 
     ne_hook_pre_send(session, add_header, cookie);
