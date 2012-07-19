@@ -410,11 +410,14 @@ dav_init_webdav(const dav_args *args)
         }
 
         if (args->clicert) {
-            uid_t orig = geteuid();
-            seteuid(0);
             ne_ssl_client_cert *client_cert
                     = ne_ssl_clicert_read(args->clicert);
-            seteuid(orig);
+            if (!client_cert) {
+                uid_t orig = geteuid();
+                seteuid(0);
+                client_cert = ne_ssl_clicert_read(args->clicert);
+                seteuid(orig);
+            }
             if (!client_cert)
                 error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
                       args->clicert);
