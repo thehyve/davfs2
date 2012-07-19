@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, has_permission:
+      Change strcmp() == 0 into strcmp() != 0 (bug #33644).
+
+2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, get_ne_error:
       Translate HTTP 405 into ENOENT.
       (http://savannah.nongnu.org/support/?107869)
