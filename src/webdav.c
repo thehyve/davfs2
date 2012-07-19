@@ -1150,7 +1150,7 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
         if (!ret) {
             if (ctx.error)
                 ret = EIO;
-        } else if (ret == EINVAL) {
+        } else if (ret != EAGAIN) {
             use_userinfo = 0;
         }
     }
