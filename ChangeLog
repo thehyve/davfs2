@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_init_cache:
+      Fix integer overflow.
+
+2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
     * dav_coda.c, dav_fuse.c:
       Add missing #includes.
 
