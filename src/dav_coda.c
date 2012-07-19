@@ -37,12 +37,8 @@
 #include <stdint.h>
 #endif
 #include <stdio.h>
-#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
-#endif
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
@@ -60,8 +56,6 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
-
-#include <ne_ssl.h>
 
 #include "defaults.h"
 #include "mount_davfs.h"
@@ -696,7 +690,7 @@ coda_statfs(void)
 
     dav_stat *st = dav_statfs();
     if (!st) {
-        oh->result = ENOSYS;
+        oh->result = EIO;
         return sizeof(struct coda_out_hdr);
     }
 
