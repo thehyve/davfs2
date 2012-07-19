@@ -2,6 +2,11 @@ ChangeLog for davfs2
 --------------------
 
 2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, parse_line, read_config, read_secrets:
+      Remove fixed length buffer, parse config line in place
+      (bug #33412).
+
+2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, kernel_interface.c:
       Check return values of system calls.
 
