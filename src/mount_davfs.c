@@ -1835,7 +1835,7 @@ log_dbg_cmdline(char *argv[])
     char *cmdline;
     if (argz_create(argv, &cmdline, &len) == 0) {
         argz_stringify(cmdline, len, ' ');
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), cmdline);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "%s", cmdline);
         free(cmdline);
     }
 }
