@@ -33,12 +33,9 @@
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
-#ifdef HAVE_STDLIB_H
+#include <stdio.h>
 #include <stdlib.h>
-#endif
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
@@ -50,8 +47,6 @@
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
-
-#include <ne_ssl.h>
 
 #include "defaults.h"
 #include "mount_davfs.h"
@@ -985,7 +980,7 @@ fuse_stat(void)
 
     dav_stat *st = dav_statfs();
     if (!st) {
-        oh->error = -ENOSYS;
+        oh->error = -EIO;
         return sizeof(struct fuse_out_header);
     }
 
