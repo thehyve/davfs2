@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c:
+      Added missing '\r' in constant none_match_header
+
+2012-07-19 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, mount_davfs.h:
       Remove check for someone elses home directory
       (sr #107641).
