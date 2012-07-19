@@ -31,31 +31,20 @@
    Some data will be copied into global or local variables to be available in
    daemon mode. The rest will be freed when forking into daemon mode. */
 typedef struct {
-    char *cmdline;
-    /* Persona */
-    int privileged;
-    uid_t uid;
-    char *uid_name;
-    gid_t gid;
-    int ngroups;
-    gid_t *groups;
-    char *home;
     char *dav_user;           /* System config file */
     char *dav_group;          /* System config file */
-    uid_t dav_uid;
-    gid_t dav_gid;
     char *conf;               /* Command line */
     /* Mount options */
     int user;                 /* Command line */
-    int users;                /* Command line */
+    int users;                 /* Command line */
     int netdev;               /* Command line */
     unsigned long int mopts;  /* Command line */
     char *add_mopts;
     char *kernel_fs;          /* User config file, system config file */
     size_t buf_size;          /* User config file, system config file */
     /* File mode */
-    uid_t fsuid;              /* Command line */
-    gid_t fsgid;              /* Command line */
+    uid_t uid;                /* Command line */
+    gid_t gid;                /* Command line */
     mode_t dir_umask;
     mode_t file_umask;
     mode_t dir_mode;          /* Command line */
@@ -65,17 +54,12 @@ typedef struct {
     char *host;               /* Command line */
     int port;                 /* Command line */
     char *path;               /* Command line */
-    char *trust_ca_cert;      /* User config file, system config file */
-    ne_ssl_certificate *ca_cert;
-    char *trust_server_cert;  /* User config file, system config file */
-    ne_ssl_certificate *server_cert;
+    char *servercert;         /* User config file, system config file */
     char *secrets;            /* User config file */
     char *username;           /* User secrets file, system secrets file */
     char *cl_username;        /* Command line */
     char *password;           /* User secrets file, system secrets file */
-    char *clicert;            /* User config file */
-    char *sys_clicert;        /* System config file */
-    ne_ssl_client_cert *client_cert;
+    char *clicert;            /* User config file, system config file */
     char *clicert_pw;         /* User secrets file, system secrets file */
     char *p_host;             /* User config file, sys conf f., environment */
     int p_port;               /* User config file, sys conf f., environment */

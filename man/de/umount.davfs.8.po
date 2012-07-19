@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2011-04-03 10:20+0300\n"
+"POT-Creation-Date: 2012-07-19 12:35+0300\n"
 "PO-Revision-Date: 2009-04-27 18:49+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
