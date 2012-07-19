@@ -834,10 +834,23 @@ check_permissions(dav_args *args)
         error(EXIT_FAILURE, errno, _("group %s does not exist"),
               args->dav_group);
     if (pw->pw_gid != grp->gr_gid) {
-        char **members = grp->gr_mem;
-        while (*members && strcmp(*members, pw->pw_name) != 0)
-            members++;
-        if (!*members)
+        int ngroups = getgroups(0, NULL);
+        gid_t *groups = NULL;
+        if (ngroups > 0) {
+            groups = (gid_t *) malloc(ngroups * sizeof(gid_t));
+            if (!groups) abort();
+            if (getgroups(ngroups, groups) < 0)
+                error(EXIT_FAILURE, 0, _("can't read group data base"));
+        } else {
+            error(EXIT_FAILURE, 0, _("can't read group data base"));
+        }
+        int i;
+        for (i = 0; i < ngroups; i++) {
+            if (grp->gr_gid == groups[i])
+                break;
+        }
+        free(groups);
+        if (i == ngroups)
             error(EXIT_FAILURE, 0, _("user %s must be member of group %s"),
                   pw->pw_name, grp->gr_name);
     }
