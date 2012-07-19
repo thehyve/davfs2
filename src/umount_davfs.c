@@ -33,18 +33,14 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#include "xalloc.h"
-#include "xvasprintf.h"
+#include <ne_string.h>
 
 #include "defaults.h"
-#include "canonicalize.h"
 
 #ifdef ENABLE_NLS
 #define _(String) gettext(String)
@@ -133,20 +129,20 @@ main(int argc, char *argv[])
     char *m = mpoint;
     while (*m == '/')
         m++;
-    char *mp = xstrdup(m);
+    char *mp = ne_strdup(m);
     m = strchr(mp, '/');
     while (m) {
         *m = '-';
         m = strchr(mp, '/');
     }
-    char *pidfile = xasprintf("%s/%s.pid", DAV_SYS_RUN, mp);
+    char *pidfile = ne_concat(DAV_SYS_RUN, "/", mp, ".pid", NULL);
     free(mp);
 
-    char *umount_command = xasprintf("umount -i '%s'", mpoint);
+    char *umount_command = ne_concat("umount -i '", mpoint, "'", NULL);
 
-    char pid[32];
+    char *pid = NULL;
     FILE *file = fopen(pidfile, "r");
-    if (!file || fscanf(file, "%30[0-9]", pid) < 1) {
+    if (!file || fscanf(file, "%a[0-9]", &pid) != 1 || !pid) {
         error(0, 0,
               _("\n"
                 "  can't read PID from file %s;\n"
@@ -156,7 +152,7 @@ main(int argc, char *argv[])
     }
     fclose(file);
 
-    char *ps_command = xasprintf("ps -p %s", pid);
+    char *ps_command = ne_concat("ps -p ", pid, NULL);
     FILE *ps_in = popen(ps_command, "r");
     if (!ps_in) {
         error(0, 0,
