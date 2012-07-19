@@ -6,14 +6,20 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2012-03-18 12:02+0100\n"
-"PO-Revision-Date: 2012-03-18 12:03+0100\n"
+"POT-Creation-Date: 2012-07-19 12:35+0300\n"
+"PO-Revision-Date: 2009-07-19 12:40+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#. type: TH
+#: davfs2.conf.5:1 mount.davfs.8:1
+#, no-wrap
+msgid "2012-07-19"
+msgstr "2012-07-19"
 
 # type: TH
 #. type: TH
@@ -38,27 +44,27 @@ msgstr "BESCHREIBUNG"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:518 mount.davfs.8:533 umount.davfs.8:79
+#: davfs2.conf.5:504 mount.davfs.8:533 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:524 mount.davfs.8:550 umount.davfs.8:84
+#: davfs2.conf.5:510 mount.davfs.8:550 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
 #. type: Plain text
-#: davfs2.conf.5:527 mount.davfs.8:553 umount.davfs.8:87
+#: davfs2.conf.5:513 mount.davfs.8:553 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:529 mount.davfs.8:555 umount.davfs.8:89
+#: davfs2.conf.5:515 mount.davfs.8:555 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
@@ -69,12 +75,6 @@ msgstr "SIEHE AUCH"
 #, no-wrap
 msgid "@PROGRAM_NAME@"
 msgstr "@PROGRAM_NAME@"
-
-#. type: TH
-#: mount.davfs.8:1
-#, no-wrap
-msgid "2012-03-18"
-msgstr "2012-03-18"
 
 # type: Plain text
 #. type: Plain text
@@ -651,7 +651,7 @@ msgstr ""
 "es ist ein Sicherheitsrisiko, einen Hintergrundprozess, der mit dem Internet "
 "verbunden ist, mit root-Rechten laufen zu lassen. Deshalb ändert "
 "B<@PROGRAM_NAME@> seine Benutzer- und Gruppenkennung, wenn es in den "
-"Hintergrund wechselt."
+"Hinterdrund wechselt."
 
 # type: Plain text
 #. type: Plain text
@@ -716,8 +716,8 @@ msgid ""
 "system is mounted by an unprivileged user, the mount point must lie within "
 "the home directory of the mounting user."
 msgstr ""
-"Wenn in I<fstab> ein relativer Dateiname als Einhängepunkt angegeben ist und "
-"ein normaler Benutzer ein Dateisystem einhängt, muss der Einhängepunkt "
+"Wenn in \fIfstab\fP ein relativer Dateiname als Einhängepunkt angegeben ist "
+"und ein normaler Benutzer ein Dateisystem einhängt, muss der Einhängepunkt "
 "innerhalb des Home-Verzeichnisses dieses Benutzers liegen."
 
 # type: Plain text
@@ -811,7 +811,7 @@ msgstr "CACHE"
 #. type: Plain text
 #: mount.davfs.8:275
 msgid ""
-"B<@PROGRAM_NAME@> tries to reduce HTTP-traffic by caching and reusing data.  "
+"B<@PROGRAM_NAME@> tries to reduce HTTP-trafic by caching and reusing data.  "
 "Information about directories and files are held in memory, while downloaded "
 "files are cached on disk."
 msgstr ""
