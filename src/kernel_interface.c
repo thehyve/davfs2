@@ -37,9 +37,7 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
@@ -53,11 +51,6 @@
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
-
-#include "xalloc.h"
-#include "xvasprintf.h"
-
-#include <ne_ssl.h>
 
 #include "defaults.h"
 #include "mount_davfs.h"
@@ -104,8 +97,12 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
                           char **kernel_fs, size_t *buf_size, const char *url,
                           const char *mpoint, const dav_args *args)
 {
+    uid_t orig = geteuid();
+    seteuid(0);
+
     if (!*kernel_fs)
-        *kernel_fs = xstrdup("fuse");
+        *kernel_fs = strdup("fuse");
+    if (!*kernel_fs) abort();
 
     int mounted = 0;
     if (strcmp(*kernel_fs, "coda") == 0) {
@@ -113,10 +110,11 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
         if (init_coda(dev, msg_loop, mdata) != 0) {
             error(0, 0, _("trying fuse kernel file system"));
             if (init_fuse(dev, msg_loop, mdata, buf_size, url, mpoint,
-                          args->mopts, args->fsuid, args->fsgid, args->dir_mode)
+                          args->mopts, args->uid, args->gid, args->dir_mode)
                                                                         == 0) {
                 free(*kernel_fs);
-                *kernel_fs = xstrdup("fuse");
+                *kernel_fs = strdup("fuse");
+                if (!*kernel_fs) abort();
                 mounted = 1;
                 error(0, 0, _("fuse device opened successfully"));
             } else {
@@ -127,13 +125,15 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
     } else if (strcmp(*kernel_fs, "fuse") == 0) {
 
         if (init_fuse(dev, msg_loop, mdata, buf_size, url, mpoint, args->mopts,
-                      args->fsuid, args->fsgid, args->dir_mode) == 0) {
+                      args->uid, args->gid, args->dir_mode) == 0) {
             mounted = 1;
         } else {
             error(0, 0, _("trying coda kernel file system"));
             if (init_coda(dev, msg_loop, mdata) == 0) {
                 free(*kernel_fs);
-                *kernel_fs = xstrdup("coda");
+                *kernel_fs = strdup("coda");
+                if (*kernel_fs == NULL)
+                    abort();
                 error(0, 0, _("coda device opened successfully"));
             } else {
                 exit(EXIT_FAILURE);
@@ -145,6 +145,7 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
         error(EXIT_FAILURE, 0, _("unknown kernel file system %s"), *kernel_fs);
     }
 
+    seteuid(orig);
     return mounted;
 }
 
@@ -158,26 +159,28 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
     *dev = 0;
     int minor = 0;
     while (*dev <= 0 && minor < MAX_CODADEVS) {
-        char *path = xasprintf("%s/%s%i", DAV_DEV_DIR, CODA_DEV_NAME, minor);
+        char *path;
+        if (asprintf(&path, "%s/%s%i", DAV_DEV_DIR, CODA_DEV_NAME, minor) < 0)
+            abort();
         *dev = open(path, O_RDWR | O_NONBLOCK);
         free(path);
         ++minor;
     }
 
-    if (*dev <= 0 && system("/sbin/modprobe coda &>/dev/null") == 0) {
+    if (*dev <= 0) {
+        system("/sbin/modprobe coda &>/dev/null");
         minor = 0;
         while (*dev <= 0 && minor < MAX_CODADEVS) {
-            char *path = xasprintf("%s/%s%i", DAV_DEV_DIR, CODA_DEV_NAME,
-                                   minor);
+            char *path;
+            if (asprintf(&path, "%s/%s%i",
+                         DAV_DEV_DIR, CODA_DEV_NAME, minor) < 0)
+                abort();
             *dev = open(path, O_RDWR | O_NONBLOCK);
             if (*dev <= 0) {
                 if (mknod(path, S_IFCHR, makedev(CODA_MAJOR, minor)) == 0) {
-                    if (chown(path, 0, 0) == 0
-                            && chmod(path, S_IRUSR | S_IWUSR) == 0) {
-                        *dev = open(path, O_RDWR | O_NONBLOCK);
-                    } else {
-                        remove(path);
-                    }
+                    chown(path, 0, 0);
+                    chmod(path, S_IRUSR | S_IWUSR);
+                    *dev = open(path, O_RDWR | O_NONBLOCK);
                 }
             }
             free(path);
@@ -200,7 +203,8 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
         return -1;
     }
 
-    struct coda_mount_data *md = xmalloc(sizeof(struct coda_mount_data));
+    struct coda_mount_data *md = malloc(sizeof(struct coda_mount_data));
+    if (!md) abort();
     md->version = CODA_MOUNT_VERSION;
     md->fd = *dev;
     *mdata = md;
@@ -214,19 +218,20 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
           size_t *buf_size, const char *url, const char *mpoint,
           unsigned long int mopts, uid_t owner, gid_t group, mode_t mode)
 {
-    char *path = xasprintf("%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME);
+    char *path;
+    if (asprintf(&path, "%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME) < 0)
+            abort();
 
     *dev = open(path, O_RDWR | O_NONBLOCK);
-    if (*dev <= 0 && system("/sbin/modprobe fuse &>/dev/null") == 0) {
+    if (*dev <= 0) {
+        system("/sbin/modprobe fuse &>/dev/null");
         *dev = open(path, O_RDWR | O_NONBLOCK);
     }
     if (*dev <= 0) {
         if (mknod(path, S_IFCHR, makedev(FUSE_MAJOR, FUSE_MINOR)) == 0) {
-            if (chown(path, 0, 0) == 0 && chmod(path, S_IRUSR | S_IWUSR) == 0) {
-                *dev = open(path, O_RDWR | O_NONBLOCK);
-            } else {
-                remove(path);
-            }
+            chown(path, 0, 0);
+            chmod(path, S_IRUSR | S_IWUSR);
+            *dev = open(path, O_RDWR | O_NONBLOCK);
         }
     }
 
@@ -241,13 +246,15 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
     }
 
 #if SIZEOF_VOID_P == 8
-    *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
-                       "allow_other,max_read=%lu", *dev, mode, owner, group,
-                       *buf_size - 4096);
+    if (asprintf((char **) mdata, "fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
+                 "allow_other,max_read=%lu", *dev, mode, owner, group,
+                 (unsigned long int) (*buf_size - 4096)) < 0)
+        abort();
 #else
-    *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
-                       "allow_other,max_read=%u", *dev, mode, owner, group,
-                       *buf_size - 4096);
+    if (asprintf((char **) mdata, "fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
+                 "allow_other,max_read=%u", *dev, mode, owner, group,
+                 (unsigned int) (*buf_size - 4096)) < 0)
+        abort();
 #endif
     if (mount(url, mpoint, "fuse", mopts, *mdata) == 0) {
         *msg_loop = dav_fuse_loop;
