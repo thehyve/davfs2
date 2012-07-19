@@ -629,7 +629,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
 
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Checking cache directory");
-    max_cache_size = args->cache_size * 0x100000;
+    max_cache_size = (unsigned long long) args->cache_size * 0x100000;
     check_cache_dir(args->cache_dir, args->host, args->path, mpoint);
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  %s", cache_dir);
