@@ -592,7 +592,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     alignment = test_alignment();
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Alignment of dav_node: %i",
-               alignment);
+               (int) alignment);
 
     default_uid = args->fsuid;
     default_gid = args->fsgid;
@@ -746,9 +746,10 @@ dav_tidy_cache(void)
 {
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-               "tidy: %i of %llu nodes changed", nchanged, fs_stat->files);
+               "tidy: %i of %lli nodes changed", nchanged,
+               (long long int) fs_stat->files);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "cache-size: %llu MiBytes.",
-               (cache_size + 0x80000) / 0x100000);
+               (unsigned long long int) (cache_size + 0x80000) / 0x100000);
     }
 
     if (cache_size > max_cache_size)
@@ -1216,7 +1217,8 @@ dav_read(ssize_t *len, dav_node * node, int fd, char *buf, size_t size,
 
     *len = pread(fd, buf, size, offset);
     if (debug)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "read %i", *len);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "read %lli",
+               (long long int) *len);
     if (*len < 0)
         return errno;
 
@@ -1609,7 +1611,8 @@ dav_write(size_t *written, dav_node * node, int fd, char *buf, size_t size,
     }
 
     if (debug)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  written %i", *written);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  written %llui",
+               (unsinged long long int) *written);
     return 0;
 }
 
@@ -3059,13 +3062,8 @@ write_node(dav_node *node, FILE *file, const char *indent)
     }
 
     if (is_reg(node)) {
-#if _FILE_OFFSET_BITS == 64
-        if (fprintf(file, "%s<d:%s>%lli</d:%s>\n", ind, type[SIZE], node->size,
-                    type[SIZE]) < 0)
-#else
-        if (fprintf(file, "%s<d:%s>%li</d:%s>\n", ind, type[SIZE], node->size,
-                    type[SIZE]) < 0)
-#endif
+        if (fprintf(file, "%s<d:%s>%lli</d:%s>\n", ind, type[SIZE],
+                    (long long int) node->size, type[SIZE]) < 0)
             return -1;
     }
 

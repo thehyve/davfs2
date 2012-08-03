@@ -243,11 +243,11 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
 #if SIZEOF_VOID_P == 8
     *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
                        "allow_other,max_read=%lu", *dev, mode, owner, group,
-                       *buf_size - 4096);
+                       (unsigned long int) (*buf_size - 4096));
 #else
     *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
                        "allow_other,max_read=%u", *dev, mode, owner, group,
-                       *buf_size - 4096);
+                       (unsigned int) (*buf_size - 4096));
 #endif
     if (mount(url, mpoint, "fuse", mopts, *mdata) == 0) {
         *msg_loop = dav_fuse_loop;
