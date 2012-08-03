@@ -1,21 +1,15 @@
-# Copyright (C) 2006, 2007, 2008, 2009, 2010 Werner Baumann
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012 Werner Baumann
 
 # Copying and distribution of this file, with or without modification, are
 # permitted in any medium without royalty.
 
 
-What is new in davfs2 1.????
+What is new in davfs2 1.4.7
 ===========================
 
-davfs2 now uses Gnulib to solve portability issues. At the moment it
-make use of modules canonicalize and rpmatch. If you build davfs2 on
-some other system than standard GNU/Linux and encouter problems please
-file an support request. Many of these problem should be sovable by
-importing additional Gnulib modules.
-
-No longer check for somone elses home directory.
-
-TODO
+Mostly bug-fixes (see ChangeLog).
+The check for somebody elses home directory is gone. So you should
+be able tomount in /media/foo even if / is the home of some daemon.
 
 
 What is new in davfs2 1.4.6
