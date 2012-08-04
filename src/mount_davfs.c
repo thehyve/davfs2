@@ -1743,7 +1743,7 @@ log_dbg_config(dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  kernel_fs: %s", args->kernel_fs);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  buf_size: %i KiB", args->buf_size);
+           "  buf_size: %llu KiB", (unsigned long long) args->buf_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  fsuid: %i", args->fsuid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -1821,9 +1821,9 @@ log_dbg_config(dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  backup_dir: %s", args->backup_dir);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  cache_size: %i MiB", args->cache_size);
+           "  cache_size: %llu MiB", (unsigned long long) args->cache_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  table_size: %i", args->table_size);
+           "  table_size: %llu", (unsigned long long) args->table_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  dir_refresh: %li s", args->dir_refresh);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),

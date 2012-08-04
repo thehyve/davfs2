@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2012-08-04 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c:
+      Fix integer format warnings.
+
 2012-08-03 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, kernel_interface.c:
       Fix integer format warnings.
