@@ -1612,7 +1612,7 @@ dav_write(size_t *written, dav_node * node, int fd, char *buf, size_t size,
 
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  written %llui",
-               (unsinged long long int) *written);
+               (unsigned long long int) *written);
     return 0;
 }
 
