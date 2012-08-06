@@ -265,7 +265,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
             if (debug) {
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_UNLINK:");
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-                       ih->nodeid,
+                       (unsigned long long) ih->nodeid,
                        (char *) (buf + sizeof(struct fuse_in_header)));
             }
             oh->error = dav_remove((dav_node *) ((size_t) ih->nodeid),
@@ -279,7 +279,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
             if (debug) {
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RMDIR:");
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-                       ih->nodeid,
+                       (unsigned long long) ih->nodeid,
                        (char *) (buf + sizeof(struct fuse_in_header)));
             }
             oh->error = dav_rmdir((dav_node *) ((size_t) ih->nodeid),
@@ -318,7 +318,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
             if (debug) {
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_FSYNC:");
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx",
-                ih->nodeid);
+                (unsigned long long) ih->nodeid);
             }
             oh->error = dav_sync((dav_node *) ((size_t) ih->nodeid));
             if (oh->error)
@@ -427,7 +427,7 @@ fuse_access(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_ACCESS:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               ih->nodeid, in->mask);
+               (unsigned long long) ih->nodeid, in->mask);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  uid %i", ih->uid);
     }
 
@@ -455,7 +455,7 @@ fuse_create(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_CREATE:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               ih->nodeid, in->flags);
+               (unsigned long long) ih->nodeid, in->flags);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i, mode 0%o",
                ih->pid, in->mode);
     }
@@ -528,7 +528,8 @@ fuse_getattr(void)
                                 (buf + sizeof(struct fuse_out_header));
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETATTR:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx", ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx",
+               (unsigned long long) ih->nodeid);
     }
 
     oh->error = dav_getattr((dav_node *) ((size_t) ih->nodeid), ih->uid);
@@ -562,7 +563,7 @@ fuse_getxattr(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETXATTR:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, %s, %i",
-               ih->nodeid, name, in->size);
+               (unsigned long long) ih->nodeid, name, in->size);
     }
 
     size_t size = in->size;
@@ -642,7 +643,7 @@ fuse_listxattr(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LISTXATTR:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, %i",
-               ih->nodeid, in->size);
+               (unsigned long long) ih->nodeid, in->size);
     }
 
     size_t size = in->size;
@@ -682,7 +683,7 @@ fuse_lookup(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LOOKUP:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-               ih->nodeid, name);
+               (unsigned long long) ih->nodeid, name);
     }
 
     dav_node *node = NULL;
@@ -722,7 +723,7 @@ fuse_mkdir(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_MKDIR:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-               ih->nodeid, name);
+               (unsigned long long) ih->nodeid, name);
     }
 
     dav_node *node = NULL;
@@ -762,7 +763,7 @@ fuse_mknod(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_MKNOD:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, m 0%o",
-               ih->nodeid, in->mode);
+               (unsigned long long) ih->nodeid, in->mode);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  %s", name);
     }
 
@@ -810,7 +811,7 @@ fuse_open(void)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_OPEN:");
         }
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               ih->nodeid, in->flags);
+               (unsigned long long) ih->nodeid, in->flags);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i, mode 0%o",
                ih->pid, in->mode);
     }
@@ -850,10 +851,10 @@ fuse_read(void)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_READ:");
         }
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, fd %llu",
-               ih->nodeid, in->fh);
+               (unsigned long long) ih->nodeid, (unsigned long long) in->fh);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i", ih->pid);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  size %u, off %llu",
-               in->size, in->offset);
+               in->size, (unsigned long long) in->offset);
     }
 
     if (in->size > (buf_size - sizeof(struct fuse_out_header))) {
@@ -887,9 +888,9 @@ fuse_release(void)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RELEASE:");
         }
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               ih->nodeid, in->flags);
+               (unsigned long long) ih->nodeid, in->flags);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i, fd %llu",
-               ih->pid, in->fh);
+               ih->pid, (unsigned long long) in->fh);
     }
 
     oh->error = dav_close((dav_node *) ((size_t) ih->nodeid), in->fh,
@@ -915,9 +916,9 @@ fuse_rename(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RENAME:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  sp 0x%llx, %s",
-               ih->nodeid, old);
+               (unsigned long long) ih->nodeid, old);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  dp 0x%llx, %s",
-               in->newdir, new);
+               (unsigned long long) in->newdir, new);
     }
 
     if (in->newdir == 1)
@@ -944,12 +945,13 @@ fuse_setattr(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_SETATTR:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, m 0%o",
-               ih->nodeid, in->mode);
+               (unsigned long long) ih->nodeid, in->mode);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  uid %i, gid %i",
                in->uid, in->gid);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  sz %llu, at %llu,",
-               in->size, in->atime);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  mt %llu", in->mtime);
+               (unsigned long long) in->size, (unsigned long long) in->atime);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  mt %llu",
+               (unsigned long long) in->mtime);
     }
 
     oh->error = dav_setattr((dav_node *) ((size_t) ih->nodeid), ih->uid,
@@ -1028,11 +1030,11 @@ fuse_write(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_WRITE:");
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, fd %llu",
-               ih->nodeid, in->fh);
+               (unsigned long long) ih->nodeid, (unsigned long long) in->fh);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i, flags 0%o",
                ih->pid, in->write_flags);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  size %u, off %llu",
-               in->size, in->offset);
+               in->size, (unsigned long long) in->offset);
     }
 
     if (in->size > (buf_size - sizeof(struct fuse_in_header)
