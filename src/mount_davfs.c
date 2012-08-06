@@ -1254,10 +1254,9 @@ write_mtab_entry(const dav_args *args)
     }
 
     gain_privileges(args);
-    int ret;
     FILE *mtab = setmntent(_PATH_MOUNTED, "a");
     if (mtab) {
-        ret = addmntent(mtab, &mntent);
+        addmntent(mtab, &mntent);
         endmntent(mtab);
     } else {
         error(0, 0, _("Warning: can't write entry into mtab, but will mount "
