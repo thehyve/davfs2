@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2012-08-20 Werner Baumann (werner.baumann@onlinehome.de)
+    * src/Makefile.am:
+      Fix DESTDIR bug (sr #108104).
+
 2012-08-06 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, write_mtab_entry:
       Remove unnecessary variable ret.

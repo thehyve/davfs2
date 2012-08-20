@@ -56,8 +56,8 @@ install-exec-hook:
 	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \
 	if test "$(sbindir)" != "$(ssbindir)"; then \
 	  $(mkinstalldirs) $(DESTDIR)$(ssbindir); \
-	  $(LN_S) -f $(DESTDIR)$(sbindir)/mount.davfs $(DESTDIR)$(ssbindir)/mount.davfs; \
-	  $(LN_S) -f $(DESTDIR)$(sbindir)/umount.davfs $(DESTDIR)$(ssbindir)/umount.davfs; \
+	  $(LN_S) -f $(sbindir)/mount.davfs $(DESTDIR)$(ssbindir)/mount.davfs; \
+	  $(LN_S) -f $(sbindir)/umount.davfs $(DESTDIR)$(ssbindir)/umount.davfs; \
 	fi
 
 uninstall-hook:
