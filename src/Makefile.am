@@ -32,7 +32,6 @@ mount_davfs_SOURCES = cache.c dav_coda.c \
         kernel_interface.h mount_davfs.h webdav.h
 umount_davfs_SOURCES = umount_davfs.c defaults.h
 
-AM_CPPFLAGS = -I$(top_builddir)/gl -I$(top_srcdir)/gl
 AM_CFLAGS = -Wall
 DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_SYS_CONF_DIR=\"$(pkgsysconfdir)\" \
@@ -47,15 +46,13 @@ DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_USER=\"$(dav_user)\" \
        -DDAV_GROUP=\"$(dav_group)\" @DEFS@
 LIBS = $(NEON_LIBS) @LIBS@
-mount_davfs_LDADD = $(LIBINTL) $(LIBICONV) ../gl/libgnu.a
-umount_davfs_LDADD = $(LIBINTL) ../gl/libgnu.a
 
 install-exec-hook:
 	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \
 	if test "$(sbindir)" != "$(ssbindir)"; then \
 	  $(mkinstalldirs) $(DESTDIR)$(ssbindir); \
-	  $(LN_S) -f $(DESTDIR)$(sbindir)/mount.davfs $(DESTDIR)$(ssbindir)/mount.davfs; \
-	  $(LN_S) -f $(DESTDIR)$(sbindir)/umount.davfs $(DESTDIR)$(ssbindir)/umount.davfs; \
+	  $(LN_S) -f $(sbindir)/mount.davfs $(DESTDIR)$(ssbindir)/mount.davfs; \
+	  $(LN_S) -f $(sbindir)/umount.davfs $(DESTDIR)$(ssbindir)/umount.davfs; \
 	fi
 
 uninstall-hook:
