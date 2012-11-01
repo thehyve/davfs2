@@ -22,7 +22,6 @@
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 pkglocalstatedir = $(dav_localstatedir)/mount.davfs
 pkgsyscachedir = $(dav_syscachedir)/@PACKAGE@
-mandir = $(datadir)/man
 manual5dir = $(mandir)/man5
 manual8dir = $(mandir)/man8
 SUBDIRS = @dav_linguas@
