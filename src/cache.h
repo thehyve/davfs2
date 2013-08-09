@@ -33,17 +33,12 @@
 /*============*/
 
 /* File descriptors for open files are stored within a dav_node in a linked
-   list. As coda does not return the file descriptor when closing a file,
-   this data structure contains additional information to identify the
-   appropriate file descriptor. */
+   list. */
 typedef struct dav_handle dav_handle;
 struct dav_handle {
     dav_handle *next;       /* Next in the list. */
     int fd;                 /* File descriptor of the open file. */
     int flags;              /* Access mode flags only. */
-    pid_t pid;              /* id of requesting process. */
-    pid_t pgid;             /* Group id of requesting process. */
-    uid_t uid;              /* User id of requesting process. */
 };
 
 
@@ -207,11 +202,9 @@ dav_close_cache(int got_sigterm);
 
 /* Registers the kernel_interface.
    Sets pointers to the write_dir_entry_fn flush_flag.
-   If blksize is not NULL, the preferred bloksize for IO is asigned.
    It returns the value of alignment. */
 size_t
-dav_register_kernel_interface(dav_write_dir_entry_fn write_fn, int *flush_flag,
-                              unsigned int *blksize);
+dav_register_kernel_interface(dav_write_dir_entry_fn write_fn);
 
 
 /* Scans the hash table for file nodes to be saved them back on the server,
@@ -333,8 +326,7 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
 
 
 /* Opens file or directory node according to flags and returns file descriptor
-   fd. fd, together with pid, pgid and uid, is stored in node for read, write
-   and close operations.
+   fd. fd is stored in node for read, write and close operations.
    Only the O_ACCESSMOE, O_APPEND and O_TRUNC bits in flags will be honoured.
    O_CREATE and O_EXCL are not allowed.
    Permissions:
@@ -346,8 +338,7 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
    O_CREATE. It allows dav_open to succeed if when the file mode would not
    allow this.  */
 int
-dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
-         int open_create);
+dav_open(int *fd, dav_node *node, int flags, uid_t uid, int open_create);
 
 /* Reads size bytes from file descriptor fd, starting at position offset
    and copies them into buf.

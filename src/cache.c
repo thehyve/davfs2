@@ -223,11 +223,6 @@ static off_t write_dir_entry_dummy(int fd, off_t off, const dav_node *node,
 }
 static dav_write_dir_entry_fn write_dir_entry = write_dir_entry_dummy;
 
-/* Points to a flag in the kernel interface module. If set to 1, at the end of
-   the upcall the kernel dentries will be flushed. */
-static int flush_dummy;
-static int *flush = &flush_dummy;
-
 /* Whether to create debug messages. */
 static int debug;
 
@@ -365,7 +360,7 @@ get_child(const dav_node *parent, const char *name)
 }
 
 static dav_handle *
-get_file_handle(dav_node * node, int fd, int accmode, pid_t pid, pid_t pgid);
+get_file_handle(dav_node * node, int fd);
 
 static int
 has_permission(const dav_node *node, uid_t uid, int how);
@@ -473,8 +468,7 @@ set_cache_file_times(dav_node *node)
 }
 
 static int
-open_file(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid,
-          uid_t uid); 
+open_file(int *fd, dav_node *node, int flags); 
 
 static int
 update_cache_file(dav_node *node);
@@ -685,7 +679,6 @@ dav_close_cache(int got_sigterm)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Closing cache");
 
     write_dir_entry = &write_dir_entry_dummy;
-    flush = &flush_dummy;
 
     clean_tree(root, !got_sigterm);
 
@@ -725,17 +718,10 @@ dav_close_cache(int got_sigterm)
 
 
 size_t
-dav_register_kernel_interface(dav_write_dir_entry_fn write_fn, int *flush_flag,
-                              unsigned int *blksize)
+dav_register_kernel_interface(dav_write_dir_entry_fn write_fn)
 {
     if (write_fn)
         write_dir_entry = write_fn;
-
-    if (flush_flag)
-        flush = flush_flag;
-
-    if (blksize)
-        *blksize = fs_stat->bsize;
 
     return alignment;
 }
@@ -797,7 +783,6 @@ dav_tidy_cache(void)
                 delete_cache_file(node->parent);
                 node->parent->utime = 0;
                 remove_node(node);
-                *flush = 1;
             }
         }
     } else if (is_locked(node) && !is_dirty(node) && !is_created(node)
@@ -842,9 +827,7 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), " close %s", node->path);
 
-    dav_handle *fh = get_file_handle(node, fd,
-                                     is_dir(node) ? O_RDWR : flags & O_ACCMODE,
-                                     pid, pgid);
+    dav_handle *fh = get_file_handle(node, fd);
     if (!fh)
         return EBADF;
 
@@ -853,7 +836,6 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
     if (!node->parent && node != root && !is_open(node)) {
         remove_from_table(node);
         delete_node(node);
-        *flush = 1;
         return 0;
     }
 
@@ -894,7 +876,6 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
                 delete_cache_file(node->parent);
                 node->parent->utime = 0;
                 remove_node(node);
-                *flush = 1;
             }
         }
     }
@@ -953,7 +934,6 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
                      &(*nodep)->mime_type);
         (*nodep)->utime = (*nodep)->smtime;
         delete_cache_file(parent);
-        *flush = 1;
         parent->mtime = (*nodep)->mtime;
         parent->ctime = (*nodep)->mtime;
         add_to_changed(*nodep);
@@ -1117,7 +1097,6 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
         (*nodep)->smtime = (*nodep)->mtime;
         (*nodep)->utime = (*nodep)->mtime;
         delete_cache_file(parent);
-        *flush = 1;
         parent->mtime = (*nodep)->mtime;
         parent->ctime = (*nodep)->mtime;
     } else {
@@ -1129,8 +1108,7 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
 
 
 int
-dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
-         int open_create)
+dav_open(int *fd, dav_node *node, int flags, uid_t uid, int open_create)
 {
     if (!is_valid(node))
         return ENOENT;
@@ -1157,7 +1135,7 @@ dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
         if (create_dir_cache_file(node) != 0)
             return EIO;
         node->atime = time(NULL);
-        return open_file(fd, node, O_RDWR, pid, pgid, uid);
+        return open_file(fd, node, O_RDWR);
     }
 
     int ret = 0;
@@ -1165,7 +1143,7 @@ dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
 
         ret = update_cache_file(node);
         if (!ret) 
-            ret = open_file(fd, node, flags & O_ACCMODE, pid, pgid, uid);
+            ret = open_file(fd, node, flags & O_ACCMODE);
 
     } else {
 
@@ -1177,14 +1155,12 @@ dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
             ret = create_cache_file(node);
             if (!ret) {
                 ret = open_file(fd, node,
-                                flags & (O_ACCMODE | O_TRUNC | O_APPEND),
-                                pid, pgid, uid);
+                                flags & (O_ACCMODE | O_TRUNC | O_APPEND));
             }
         } else if (!ret) {
             ret = update_cache_file(node);
             if (!ret)
-                ret = open_file(fd, node, flags & (O_ACCMODE | O_APPEND),
-                                pid, pgid, uid);
+                ret = open_file(fd, node, flags & (O_ACCMODE | O_APPEND));
         }
  
         if (!ret)
@@ -1202,7 +1178,7 @@ dav_read(ssize_t *len, dav_node * node, int fd, char *buf, size_t size,
     if (!exists(node))
         return ENOENT;
 
-    dav_handle *fh = get_file_handle(node, fd, 0, 0, 0);
+    dav_handle *fh = get_file_handle(node, fd);
     if (!fh)
         return EBADF;
     if (fh->flags == O_WRONLY)
@@ -1247,7 +1223,6 @@ dav_remove(dav_node *parent, const char *name, uid_t uid)
     if (!node) {
         delete_cache_file(parent);
         parent->utime = 0;
-        *flush = 1;
         return ENOENT;
     }
     if (is_dir(node))
@@ -1277,7 +1252,6 @@ dav_remove(dav_node *parent, const char *name, uid_t uid)
     delete_cache_file(parent);
     parent->mtime = time(NULL);
     parent->ctime = parent->mtime;
-    *flush = 1;
 
     return 0;
 }
@@ -1309,7 +1283,6 @@ dav_rename(dav_node *src_parent, const char *src_name, dav_node *dst_parent,
     if (!src) {
         delete_cache_file(src_parent);
         src_parent->utime = 0;
-        *flush = 1;
         return ENOENT;
     }
     if (src == backup || (dst && is_backup(dst)))
@@ -1341,7 +1314,6 @@ dav_rename(dav_node *src_parent, const char *src_name, dav_node *dst_parent,
         delete_cache_file(dst_parent);
         dst_parent->mtime = time(NULL);
         dst_parent->ctime = dst_parent->mtime;
-        *flush = 1;
     }
 
     return ret;
@@ -1366,7 +1338,6 @@ dav_rmdir(dav_node *parent, const char *name, uid_t uid)
     if (!node) {
         delete_cache_file(parent);
         parent->utime = 0;
-        *flush = 1;
         return ENOENT;
     }
     if (node == backup)
@@ -1382,7 +1353,6 @@ dav_rmdir(dav_node *parent, const char *name, uid_t uid)
         delete_cache_file(parent);
         parent->mtime = time(NULL);
         parent->ctime = parent->mtime;
-        *flush = 1;
     }
 
     return ret;
@@ -1595,7 +1565,7 @@ dav_write(size_t *written, dav_node * node, int fd, char *buf, size_t size,
     if (is_dir(node))
         return EBADF;
 
-    dav_handle *fh = get_file_handle(node, fd, 0, 0, 0);
+    dav_handle *fh = get_file_handle(node, fd);
     if (!fh)
         return EBADF;
     if (fh->flags == O_RDONLY)
@@ -1722,7 +1692,6 @@ backup_node(dav_node *orig)
     delete_cache_file(backup);
     backup->mtime = time(NULL);
     backup->ctime = backup->mtime;
-    *flush = 1;
 }
 
 
@@ -2185,8 +2154,7 @@ remove_node(dav_node *node)
    function will do nothing.
    utime and retry will be updated.
    If the contents or the mtime of the dir has changed, the dir-cache-file
-   will be deleted and the flush flag will be set to force new lookups
-   by the kernel. */
+   will be deleted. */
 static int
 update_directory(dav_node *dir, time_t refresh)
 {
@@ -2252,7 +2220,6 @@ update_directory(dav_node *dir, time_t refresh)
 
     if (changed) {
         delete_cache_file(dir);
-        *flush = 1;
     }
 
     if (debug) {
@@ -2268,8 +2235,6 @@ update_directory(dav_node *dir, time_t refresh)
    If props is incompatibel with node or indicates a lost update problem,
    a new node is created from props and the old node is deleted, creating
    a local back up if necessary.
-   If nodes are removed or created, flag flush is set, to force new lookups
-   by the kernel.
    node  : The node to be updated. It must not be the root node and have a
            valid parent.
    props : The properties retrieved from the server. They will be freed.
@@ -2294,7 +2259,6 @@ update_node(dav_node *node, dav_props *props)
             || (!is_dir(node) && props->is_dir)) {
         add_node(node->parent, props);
         remove_node(node);
-        *flush = 1;
         return 1;
     }
 
@@ -2302,14 +2266,12 @@ update_node(dav_node *node, dav_props *props)
         free(node->name);
         node->name = xstrdup(props->name);
         ret = 1;
-        *flush = 1;
     }
 
     if (is_created(node)) {
         if (!is_open(node) && (props->size > 0)) {
             add_node(node->parent, props);
             remove_node(node);
-            *flush = 1;
             return 1;
         } else {
             dav_delete_props(props);
@@ -2328,11 +2290,9 @@ update_node(dav_node *node, dav_props *props)
             } else if (is_dirty(node)) {
                 add_node(node->parent, props);
                 remove_node(node);
-                *flush = 1;
                 return 1;
             } else {
                 delete_cache_file(node);
-                *flush = 1;
             }
         } else {
             node->utime = time(NULL);
@@ -2348,7 +2308,6 @@ update_node(dav_node *node, dav_props *props)
         node->smtime = props->mtime;
         node->utime = 0;
         delete_cache_file(node);
-        *flush = 1;
     }
     if (props->ctime > node->ctime)
         node->ctime = props->ctime;
@@ -2365,15 +2324,12 @@ update_node(dav_node *node, dav_props *props)
             node->mode |= (node->mode & S_IWGRP) ? S_IXGRP : 0;
             node->mode |= (node->mode & S_IWOTH) ? S_IXOTH : 0;
             node->mode &= ~file_umask;
-            *flush = 1;
         } else if (props->is_exec == 0
                 && (node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))) {
             node->mode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);
-            *flush = 1;
         }
         if (props->size && props->size != node->size) {
             node->size = props->size;
-            *flush = 1;
         }
     }
 
@@ -2399,7 +2355,6 @@ update_path(dav_node *node, const char *src_path, const char *dst_path)
     if (!node->path || strstr(node->path, src_path) != node->path) {
         delete_cache_file(node->parent);
         node->parent->utime = 0;
-        *flush = 1;
         return;
     }
 
@@ -2422,28 +2377,17 @@ exists(const dav_node *node)
     if (n) {
         return 1;
     } else {
-        *flush = 1;
         return 0;
     }
 }
 
 
 static dav_handle *
-get_file_handle(dav_node * node, int fd, int accmode, pid_t pid, pid_t pgid)
+get_file_handle(dav_node * node, int fd)
 {
     dav_handle *fh = node->handles;
-    if (fd) {
-        while (fh && fh->fd != fd)
-            fh = fh->next;
-    } else {
-        while (fh && (fh->flags != accmode || fh->pid != pid))
-            fh = fh->next;
-        if (!fh) {
-            fh = node->handles;
-            while (fh && (fh->flags != accmode || fh->pgid != pgid))
-                fh = fh->next;
-        }
-    }
+    while (fh && fh->fd != fd)
+        fh = fh->next;
 
     return fh;
 }
@@ -2627,7 +2571,7 @@ create_dir_cache_file(dav_node *dir)
    of handles.
    return value : 0 on success, EIO if the file could not be opend. */
 static int
-open_file(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid)
+open_file(int *fd, dav_node *node, int flags)
 {
     *fd = open(node->cache_path, flags, node->mode);
     if (*fd <= 0)
@@ -2635,9 +2579,6 @@ open_file(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid)
     dav_handle *fh = (dav_handle *) xmalloc(sizeof(dav_handle));
     fh->fd = *fd;
     fh->flags = O_ACCMODE & flags;
-    fh->pid = pid;
-    fh->pgid = pgid;
-    fh->uid = uid;
     fh->next = node->handles;
     node->handles = fh;
     if ((O_ACCMODE & flags) == O_WRONLY || (O_ACCMODE & flags) == O_RDWR)
@@ -2683,7 +2624,6 @@ update_cache_file(dav_node *node)
                    || ret == EPERM || ret == ENOSPC) {
             delete_cache_file(node->parent);
             node->parent->utime = 0;
-            *flush = 1;
             remove_node(node);
             ret = EIO;
         }
@@ -2735,7 +2675,6 @@ update_cache_file(dav_node *node)
             if (ret == ENOENT) {
                 delete_cache_file(node->parent);
                 node->parent->utime = 0;
-                *flush = 1;
                 remove_node(node);
             }
             delete_cache_file(node);

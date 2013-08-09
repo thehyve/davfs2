@@ -1,13 +1,13 @@
 # #-#-#-#-#  mount.davfs.8.po (davfs2)  #-#-#-#-#
 # German translation of mount.davfs man page.
-# Copyright (C) 2007 Werner Baumann
+# Copyright (C) 2007, 2013 Werner Baumann
 # Werner Baumann <werner.baumann@onlinehome.de>, 2007.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2012-03-18 12:02+0100\n"
-"PO-Revision-Date: 2012-03-18 12:03+0100\n"
+"POT-Creation-Date: 2013-08-09 12:15+0300\n"
+"PO-Revision-Date: 2013-08-09 13:03+0100\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -38,27 +38,27 @@ msgstr "BESCHREIBUNG"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:518 mount.davfs.8:533 umount.davfs.8:79
+#: davfs2.conf.5:511 mount.davfs.8:533 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:524 mount.davfs.8:550 umount.davfs.8:84
+#: davfs2.conf.5:517 mount.davfs.8:550 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
 #. type: Plain text
-#: davfs2.conf.5:527 mount.davfs.8:553 umount.davfs.8:87
+#: davfs2.conf.5:520 mount.davfs.8:553 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:529 mount.davfs.8:555 umount.davfs.8:89
+#: davfs2.conf.5:522 mount.davfs.8:555 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
@@ -157,13 +157,13 @@ msgstr ""
 msgid ""
 "B<@PACKAGE@> supports B<TLS/SSL> (if the neon library supports it) and "
 "proxies. B<@PROGRAM_NAME@> runs as a daemon in userspace. It integrates into "
-"the virtual file system by either the coda or the fuse kernel files system.  "
-"Currently CODA_KERNEL_VERSION 3 and FUSE_KERNEL_VERSION 7 are supported."
+"the virtual file system by using the fuse kernel files system.  Currently "
+"FUSE_KERNEL_VERSION 7 is supported."
 msgstr ""
 "B<@PACKAGE@> unterstützt B<TLS/SSL> (falls die Neon-Bibliothek es "
-"unterstützt) und Verbindungen über einen Proxy. Es wird über das coda oder "
-"das fuse Kernel-Dateisystem in das virtuelle Dateisystem eingebunden.  "
-"Derzeit werden CODA_KERNEL_VERSION 3 und FUSE_KERNEL_VERSION 7 unterstützt."
+"unterstützt) und Verbindungen über einen Proxy. Es wird über das fuse Kernel-"
+"Dateisystem in das virtuelle Dateisystem eingebunden.  Derzeit wird die "
+"FUSE_KERNEL_VERSION 7 unterstützt."
 
 # type: Plain text
 #. type: Plain text

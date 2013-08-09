@@ -102,9 +102,6 @@ static char *url;
 /* The canonicalized mointpoint. */
 static char *mpoint;
 
-/* The type of the kernel file system used. */
-static char *kernel_fs;
-
 /* The file that holds information about mounted filesystems
    (/proc/mounts or /etc/mtab) */
 static char *mounts;
@@ -119,6 +116,9 @@ static volatile int keep_on_running = 1;
 /* This flag signals that SIGTERM was received. mount.davfs will then
    terminate without uploading dirty files. */
 static volatile int got_sigterm;
+
+/* Send debug information about the configuration to the log file. */
+static int debug;
 
 
 /* Private function prototypes */
@@ -143,12 +143,6 @@ check_permissions(dav_args *args);
 
 static void
 gain_privileges(const dav_args *args);
-
-static int
-do_mount(dav_args *args, void *mdata);
-
-static int
-is_mounted(void);
 
 static dav_args *
 parse_commandline(dav_args *args, int argc, char *argv[]);
@@ -274,46 +268,24 @@ main(int argc, char *argv[])
 
     dav_init_cache(args, mpoint);
 
-    int dev = 0;
-    dav_run_msgloop_fn run_msgloop = NULL;
-    void *mdata = NULL;
-    if (args->kernel_fs)
-        kernel_fs = xstrdup(args->kernel_fs);
-    size_t buf_size = args->buf_size * 1024;
     gain_privileges(args);
-    int mounted = dav_init_kernel_interface(&dev, &run_msgloop, &mdata,
-                                            &kernel_fs, &buf_size, url, mpoint,
-                                            args);
+    dav_init_kernel_interface(url, mpoint, args);
     release_privileges(args);
-    if (args->debug & DAV_DBG_CONFIG)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "kernel_fs: %s", kernel_fs);
 
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Writing mtab entry");
+    write_mtab_entry(args);
+
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Fork into daemon mode");
     pid_t childpid = fork();
     if (childpid > 0) {
 
-        if (args->debug & DAV_DBG_CONFIG)
+        if (debug) {
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                    "Parent: parent pid: %i, child pid: %i", getpid(), childpid);
-        if (!mounted) {
-            if (args->debug & DAV_DBG_CONFIG)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-                       "Parent: mounting filesystem");
-            if (do_mount(args, mdata) != 0) {
-                kill(childpid, SIGTERM);
-                delete_args(args);
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        if (args->debug & DAV_DBG_CONFIG)
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-                   "Parent: writing mtab entry");
-        write_mtab_entry(args);
-
-        if (args->debug & DAV_DBG_CONFIG)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Parent: leaving now");
+        }
         delete_args(args);
         exit(EXIT_SUCCESS);
 
@@ -322,7 +294,7 @@ main(int argc, char *argv[])
         error(EXIT_FAILURE, errno, _("can't start daemon process"));
     }
 
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Set signal handler");
     struct sigaction action;
     action.sa_handler = termination_handler;
@@ -335,7 +307,7 @@ main(int argc, char *argv[])
 
     int ret = 0;
 
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Releasing root privileges");
     gain_privileges(args);
     ret = setuid(args->uid);
@@ -345,14 +317,11 @@ main(int argc, char *argv[])
         kill(getppid(), SIGHUP);
     }
 
-    time_t idle_time = args->delay_upload;
-    if (!idle_time)
-        idle_time = DAV_DELAY_UPLOAD;
-    int debug = args->debug;
     delete_args(args);
     setsid();
+
     if (!ret) {
-        if (debug & DAV_DBG_CONFIG)
+        if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Releasing terminal");
         close(STDIN_FILENO);
         close(STDOUT_FILENO);
@@ -368,7 +337,7 @@ main(int argc, char *argv[])
     }
 
     if (!ret) {
-        if (debug & DAV_DBG_CONFIG)
+        if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Writing pid file");
         ret = save_pid();
         if (ret) {
@@ -379,28 +348,46 @@ main(int argc, char *argv[])
     }
 
     if (!ret) {
-        if (debug & DAV_DBG_CONFIG)
+        if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Starting message loop");
-        run_msgloop(dev, buf_size, idle_time, is_mounted, &keep_on_running,
-                    debug & DAV_DBG_KERNEL);
+        dav_run_msgloop(&keep_on_running);
     }
 
-    if (debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Closing");
     dav_close_cache(got_sigterm);
     dav_close_webdav();
-    if (is_mounted()) {
+    if (dav_is_mounted()) {
         char *prog = xasprintf("/bin/umount -il %s", mpoint);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"), mpoint);
         if (system(prog) != 0)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting failed"));
     }
-    if (debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Removing %s", pidfile);
     remove(pidfile);
-    if (debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Done.");
     return 0;
+}
+
+
+int
+dav_is_mounted(void)
+{
+    int found = 0;
+    FILE *mtab = setmntent(mounts, "r");
+    if (mtab) {
+        struct mntent *mt = getmntent(mtab);
+        while (mt && !found) {
+            if (strcmp(mpoint, mt->mnt_dir) == 0
+                        && strcmp(url, mt->mnt_fsname) == 0)
+                found = 1;
+            mt = getmntent(mtab);
+        }
+    }
+    endmntent(mtab);
+    return found;
 }
 
 
@@ -451,7 +438,7 @@ change_persona(dav_args *args)
         args->uid = args->dav_uid;
     release_privileges(args);
 
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "changing persona: euid %i, gid %i", geteuid(), getgid());
 }
@@ -476,7 +463,7 @@ check_dirs(dav_args *args)
     } else {
         mounts = _PATH_MOUNTED;
     }
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mounts in: %s", mounts);
 
     gain_privileges(args);
@@ -660,7 +647,7 @@ check_double_mounts(dav_args *args)
     }
     char *pidf = xasprintf("%s/%s.pid", DAV_SYS_RUN, mp);
     free(mp);
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "PID file: %s", pidf);
 
     FILE *file = fopen(pidf, "r");
@@ -768,7 +755,7 @@ check_permissions(dav_args *args)
     if (args->fsuid != args->uid)
         error(EXIT_FAILURE, 0,
               _("you can't set file owner different from your uid"));
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "uid ok");
 
     if (args->gid != args->fsgid) {
@@ -781,7 +768,7 @@ check_permissions(dav_args *args)
             error(EXIT_FAILURE, 0,
                   _("you must be member of the group of the file system"));
     }
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "gid ok");
 
     int i;
@@ -792,33 +779,9 @@ check_permissions(dav_args *args)
     if (i == args->ngroups)
         error(EXIT_FAILURE, 0, _("user %s must be member of group %s"),
               args->uid_name, args->dav_group);
-    if (args->debug & DAV_DBG_CONFIG)
+    if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "memeber of group %s", args->dav_group);
-}
-
-
-/* Calls the mount()-function to mount the file system.
-   Uses private global variables url and mpoint as device and mount point,
-   kernel_fs as file system type, mopts as mount options and mdata
-   as mount data.
-   return value : 0 on success, -1 if mount() fails. */
-static int
-do_mount(dav_args *args, void *mdata)
-{
-    gain_privileges(args);
-    int ret = mount(url, mpoint, kernel_fs,  args->mopts, mdata);
-    release_privileges(args);
-
-    if (ret) {
-        error(0, errno, _("can't mount %s on %s"), url, mpoint);
-        if (errno == ENODEV)
-            error(0, 0, _("kernel does not know file system %s"), kernel_fs);
-        if (errno == EBUSY)
-            error(0, 0, _("mount point is busy"));
-        return -1;
-    }
-    return 0;
 }
 
 
@@ -837,29 +800,6 @@ gain_privileges(const dav_args *args)
         error(EXIT_FAILURE, 0, _("can't change effective user id"));
 }
 
-
-/* Checks wether the file system is mounted.
-   It uses information from the private global variables mounts (mtab-file),
-   url (must be device in the mtab entry) and mpoint (mount point).
-   return value : 0 - no matching entry in the mtab-file (not mounted)
-                  1 - matching entry in the mtab-file (mounted) */
-static int
-is_mounted(void)
-{
-    int found = 0;
-    FILE *mtab = setmntent(mounts, "r");
-    if (mtab) {
-        struct mntent *mt = getmntent(mtab);
-        while (mt && !found) {
-            if (strcmp(mpoint, mt->mnt_dir) == 0
-                        && strcmp(url, mt->mnt_fsname) == 0)
-                found = 1;
-            mt = getmntent(mtab);
-        }
-    }
-    endmntent(mtab);
-    return found;
-}
 
 /* Parses commandline arguments and options and stores them in args and the
    private global variables url and mpoint.
@@ -1044,7 +984,11 @@ parse_config(dav_args *args)
     if (!args->backup_dir)
         args->backup_dir = xstrdup(DAV_BACKUP_DIR);
 
-    if (args->debug & DAV_DBG_CONFIG)
+    if (!args->delay_upload)
+        args->delay_upload = DAV_DELAY_UPLOAD;
+
+    debug = args->debug & DAV_DBG_CONFIG;
+    if (debug)
         log_dbg_config(args);
 }
 
@@ -1364,8 +1308,6 @@ delete_args(dav_args *args)
         free(args->conf);
     if (args->add_mopts)
         free(args->add_mopts);
-    if (args->kernel_fs)
-        free(args->kernel_fs);
     if (args->scheme)
         free(args->scheme);
     if (args->host)
@@ -1739,8 +1681,6 @@ log_dbg_config(dav_args *args)
            "  mopts: %#lx", args->mopts);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  add_mopts: %s", args->add_mopts);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  kernel_fs: %s", args->kernel_fs);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  buf_size: %llu KiB", (unsigned long long) args->buf_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2134,10 +2074,6 @@ read_config(dav_args *args, const char * filename, int system)
                 if (args->dav_group)
                     free(args->dav_group);
                 args->dav_group = xstrdup(parmv[1]); 
-            } else if (strcmp(parmv[0], "kernel_fs") == 0) {
-                if (args->kernel_fs)
-                    free(args->kernel_fs);
-                args->kernel_fs = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "buf_size") == 0) {
                 args->buf_size = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "trust_ca_cert") == 0

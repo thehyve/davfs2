@@ -51,7 +51,6 @@ typedef struct {
     int netdev;               /* Command line */
     unsigned long int mopts;  /* Command line */
     char *add_mopts;
-    char *kernel_fs;          /* User config file, system config file */
     size_t buf_size;          /* User config file, system config file */
     /* File mode */
     uid_t fsuid;              /* Command line */
@@ -162,6 +161,15 @@ typedef struct {
      cache, save cached information if neccessary and close the connections. */
 int
 main(int argc, char *argv[]);
+
+
+/* Checks wether the file system is mounted.
+   It uses information from the private global variables mounts (mtab-file),
+   url (must be device in the mtab entry) and mpoint (mount point).
+   return value : 0 - no matching entry in the mtab-file (not mounted)
+                  1 - matching entry in the mtab-file (mounted) */
+int
+dav_is_mounted(void);
 
 
 /* Prints prompt to stdout and reads a line from stdin.

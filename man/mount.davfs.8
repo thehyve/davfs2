@@ -39,8 +39,8 @@ from different locations.
 .PP
 \fB@PACKAGE@\fR supports \fBTLS/SSL\fR (if the neon library supports it) and
 proxies. \fB@PROGRAM_NAME@\fR runs as a daemon in userspace. It integrates into the
-virtual file system by either the coda or the fuse kernel files system.
-Currently CODA_KERNEL_VERSION 3 and FUSE_KERNEL_VERSION 7 are supported.
+virtual file system by using the fuse kernel files system.
+Currently FUSE_KERNEL_VERSION 7 is supported.
 
 .PP
 \fB@PROGRAM_NAME@\fR is usually invoked by the \fBmount\fR(8) command when
