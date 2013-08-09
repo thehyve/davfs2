@@ -100,7 +100,6 @@ enum {
     CTIME,
     SMTIME,
     ETAG,
-    MIME,
     LOCK_EXPIRE,
     DIRTY,
     REMOTE_EXISTS,
@@ -124,7 +123,6 @@ static const char* const type[] = {
     [CTIME] = "ctime",
     [SMTIME] = "smtime",
     [ETAG] = "etag",
-    [MIME] = "mime",
     [LOCK_EXPIRE] = "lock_expire",
     [DIRTY] = "dirty",
     [REMOTE_EXISTS] = "remote_exists",
@@ -764,7 +762,7 @@ dav_tidy_cache(void)
             set_execute = 1;
         int ret = dav_put(node->path, node->cache_path, &node->remote_exists,
                           &node->lock_expire, &node->etag, &node->smtime,
-                          &node->mime_type, set_execute);
+                          set_execute);
         if (!ret) {
             node->utime = time(NULL);
             node->dirty = 0;
@@ -857,7 +855,7 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
             set_execute = 1;
         int ret = dav_put(node->path, node->cache_path, &node->remote_exists,
                           &node->lock_expire, &node->etag, &node->smtime,
-                          &node->mime_type, set_execute);
+                          set_execute);
         if (!ret) {
             node->utime = time(NULL);
             node->dirty = 0;
@@ -930,8 +928,7 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     if (!ret) {
         (*nodep)->smtime = (*nodep)->mtime;
         if (!is_created(*nodep))
-            dav_head((*nodep)->path, &(*nodep)->etag, &(*nodep)->smtime, NULL,
-                     &(*nodep)->mime_type);
+            dav_head((*nodep)->path, &(*nodep)->etag, &(*nodep)->smtime, NULL);
         (*nodep)->utime = (*nodep)->smtime;
         delete_cache_file(parent);
         parent->mtime = (*nodep)->mtime;
@@ -967,58 +964,6 @@ dav_getattr(dav_node *node, uid_t uid)
         }
     } else if (is_open(node)) {
         attr_from_cache_file(node);
-    }
-
-    return 0;
-}
-
-
-int
-dav_getxattr(dav_node *node, const char *name, char *buf, size_t *size,
-             uid_t uid)
-{
-    if (!is_valid(node))
-        return ENOENT;
-    if (debug)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "getxattr %s", node->path);
-    if (node->parent != NULL && !has_permission(node->parent, uid, X_OK | R_OK))
-        return EACCES;
-    if (strcmp(name, "user.mime_type") != 0 || !node->mime_type)
-        return ENOTSUP;
-
-    if (*size == 0) {
-        *size = strlen(node->mime_type);
-    } else if (strlen(node->mime_type) > *size) {
-        return ERANGE;
-    } else {
-        *size = strlen(node->mime_type);
-        strncpy(buf, node->mime_type, *size);
-    }
-
-    return 0;
-}
-
-
-int
-dav_listxattr(dav_node *node, char *buf, size_t *size, uid_t uid)
-{
-    if (!is_valid(node))
-        return ENOENT;
-    if (debug)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "listxattr %s", node->path);
-    if (node->parent != NULL && !has_permission(node->parent, uid, X_OK | R_OK))
-        return EACCES;
-    if (!node->mime_type)
-        return ENOTSUP;
-
-    if (*size == 0) {
-        *size = strlen("user.mime_type") + 1;
-    } else if (strlen("user.mime_type") > *size) {
-        return ERANGE;
-    } else {
-        *size = strlen("user.mime_type") + 1;
-        strncpy(buf, "user.mime_type", *size - 1);
-        *(buf + *size - 1) = '\0';
     }
 
     return 0;
@@ -1487,7 +1432,7 @@ dav_setattr(dav_node *node, uid_t uid, int sm, mode_t mode, int so,
                     int err = 0;
                     time_t smtime = 0;
                     char *etag = NULL;
-                    dav_head(node->path, &etag, &smtime, NULL, NULL);
+                    dav_head(node->path, &etag, &smtime, NULL);
                     if (etag && node->etag && strcmp(etag, node->etag) != 0)
                         err = EIO;
                     if (smtime && smtime > node->smtime)
@@ -1499,8 +1444,7 @@ dav_setattr(dav_node *node, uid_t uid, int sm, mode_t mode, int so,
                 }
                 dav_set_execute(node->path, set_execute);
                 if (is_dirty(node))
-                    dav_head(node->path, &node->etag, &node->smtime, NULL,
-                             &node->mime_type);
+                    dav_head(node->path, &node->etag, &node->smtime, NULL);
             }
         }
         node->mode = (node->mode & ~DAV_A_MASK) | mode;
@@ -1678,8 +1622,6 @@ backup_node(dav_node *orig)
     node->name = xstrdup(orig->cache_path + strlen(cache_dir) +1);
     node->cache_path = orig->cache_path;
     orig->cache_path = NULL;
-    node->mime_type = orig->mime_type;
-    orig->mime_type = NULL;
     orig->dirty = 0;
     node->size = orig->size;
     node->uid = default_uid;
@@ -1746,8 +1688,7 @@ clean_tree(dav_node *node, int upload)
             set_execute = 1;
         int ret = dav_put(node->path, node->cache_path,
                           &node->remote_exists, &node->lock_expire,
-                          &node->etag, &node->smtime,
-                          &node->mime_type, set_execute);
+                          &node->etag, &node->smtime, set_execute);
         if (is_locked(node))
             dav_unlock(node->path, &node->lock_expire);
         if (!ret) {
@@ -1786,8 +1727,6 @@ delete_node(dav_node *node)
     delete_cache_file(node);
     if (node->etag)
         free(node->etag);
-    if (node->mime_type)
-        free(node->mime_type);
     while (node->handles) {
         dav_handle *tofree = node->handles;
         node->handles = node->handles->next;
@@ -1923,7 +1862,7 @@ move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
     src->smtime = time(NULL);
 
     if (!is_created(src))
-        dav_head(src->path, &src->etag, &src->smtime, NULL, &src->mime_type);
+        dav_head(src->path, &src->etag, &src->smtime, NULL);
     src->utime = time(NULL);
 
     return 0;
@@ -1958,7 +1897,7 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
             dav_lock(dst_path, &src->lock_expire, &src->remote_exists);
     }
     if (is_cached(src))
-        dav_head(dst_path, &src->etag, &src->smtime, NULL, &src->mime_type);
+        dav_head(dst_path, &src->etag, &src->smtime, NULL);
     if (dst) {
         remove_from_tree(dst);
         remove_from_changed(dst);
@@ -2015,7 +1954,6 @@ new_node(dav_node *parent, mode_t mode)
     node->name = NULL;
     node->cache_path = NULL;
     node->etag = NULL;
-    node->mime_type = NULL;
     node->handles = NULL;
     node->size = 0;
 
@@ -2614,8 +2552,7 @@ update_cache_file(dav_node *node)
         if (get_upload_time(node) >= time(NULL))
             return 0;
         ret = dav_put(node->path, node->cache_path, &node->remote_exists,
-                      &node->lock_expire, &node->etag, &node->smtime,
-                      &node->mime_type, -1);
+                      &node->lock_expire, &node->etag, &node->smtime, -1);
         if (!ret) {
             node->utime = time(NULL);
             node->dirty = 0;
@@ -2643,7 +2580,7 @@ update_cache_file(dav_node *node)
         int modified = 0;
         off_t old_size = node->size;
         ret = dav_get_file(node->path, node->cache_path, &node->size,
-                           &node->etag, &node->smtime, &node->mime_type,
+                           &node->etag, &node->smtime,
                            &modified);
         if (!ret) {
             if (modified) {
@@ -2660,7 +2597,7 @@ update_cache_file(dav_node *node)
         time_t smtime = 0;
         char *etag = NULL;
         ret = dav_get_file(node->path, node->cache_path, &node->size, &etag,
-                           &smtime, &node->mime_type, NULL);
+                           &smtime, NULL);
         if (!ret) {
             node->etag = etag;
             if (smtime) {
@@ -2994,12 +2931,6 @@ write_node(dav_node *node, FILE *file, const char *indent)
         return -1;
     }
 
-    if (is_reg(node) && node->mime_type != NULL) {
-        if (fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind, type[MIME],
-                    node->mime_type, type[MIME]) < 0)
-        return -1;
-    }
-
     if (is_reg(node)) {
         if (fprintf(file, "%s<d:%s>%lli</d:%s>\n", ind, type[SIZE],
                     (long long int) node->size, type[SIZE]) < 0)
@@ -3318,7 +3249,7 @@ xml_end_reg(void *userdata, int state, const char *nspace, const char *name)
 
 /* Finishes the creation of the root directory. userdata must be equal to root,
    or the complete tree will be deleted.
-   Members path, name, cache_path,etag and mime_type will be NULL.
+   Members path, name, cache_path and etag will be NULL.
    return value : allways 0. */
 static int
 xml_end_root(void *userdata, int state, const char *nspace, const char *name)
@@ -3340,10 +3271,6 @@ xml_end_root(void *userdata, int state, const char *nspace, const char *name)
     if (dir->etag) {
         free(dir->etag);
         dir->etag = NULL;
-    }
-    if (dir->mime_type) {
-        free(dir->mime_type);
-        dir->mime_type = NULL;
     }
     dir->size = 0;
     dir->smtime = 0;
@@ -3405,9 +3332,6 @@ xml_end_string(void *userdata, int state, const char *nspace, const char *name)
     case ETAG:
         (*((dav_node **) userdata))->etag = xml_data;
         break;
-    case MIME:
-        (*((dav_node **) userdata))->mime_type = xml_data;
-        break;
     default:
         free(xml_data);
         xml_data = NULL;
@@ -3441,9 +3365,6 @@ xml_end_string_old(void *userdata, int state, const char *nspace,
         break;
     case ETAG:
         (*((dav_node **) userdata))->etag = xml_data;
-        break;
-    case MIME:
-        (*((dav_node **) userdata))->mime_type = xml_data;
         break;
     default:
         free(xml_data);
@@ -3686,8 +3607,6 @@ xml_start_string(void *userdata, int parent, const char *nspace,
         ret = CACHE_PATH;
     } else if (strcmp(name, type[ETAG]) == 0) {
         ret = ETAG;
-    } else if (strcmp(name, type[MIME]) == 0) {
-        ret = MIME;
     } else {
         return 0;
     }

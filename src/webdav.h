@@ -141,16 +141,13 @@ dav_get_collection(const char *path, dav_props **props);
    mtime      : Points to the Last-Modified value of the cached version. Will
                 be updated if a new version of the file is retrieved.
                 May be NULL.
-   mime       : Points to the mime_type string of the cached version. Will
-                be updated by the value of the Content-Type header, if any.
-                May be NULL;
    modified   : Points to a flag that will be set 1 if the file cache_path
                 has been replaced by a new version. May be NULL.
    return value : 0 on success; an appropriate file error code otherwise.
                   Not-Modified counts as success. */
 int
 dav_get_file(const char *path, const char *cache_path, off_t *size,
-             char **etag, time_t *mtime, char **mime, int *modified);
+             char **etag, time_t *mtime, int *modified);
 
 
 /* Returns the error string from the last WebDAV request.
@@ -168,12 +165,10 @@ dav_get_webdav_error(void);
    etag  : Points to the Etag; will be updated on success. May be NULL.
    mtime : Points to mtime; will be updated on success. May be NULL.
    length: Points to length; will be updated on success. May be NULL.
-   mime  : Points to mime_type; will be updated on success. May be NULL.
    return value : 0 if the file exists; an appropriate file error code
                   otherwise. */
 int
-dav_head(const char *path, char **etag, time_t *mtime, off_t *length,
-         char **mime);
+dav_head(const char *path, char **etag, time_t *mtime, off_t *length);
 
 
 /* Locks the file path on the server with an excluse write lock and updates
@@ -238,13 +233,11 @@ dav_move(const char *src, const char *dst);
                 Updated on success. May be NULL.
    mtime      : The Last_Modified value used to check for changes on the
                 server. Updated on success. May be NULL.
-   mime       : The value of mime_type. Updated on successMay be NULL.
-                If a mime_type is set, the Content-Type header will be sent.
    execute    : if 1 set execute property, else no change of execute property.
    return value : 0 on success; an appropriate file error code otherwise. */
 int
 dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
-        char **etag, time_t *mtime, char **mime, int execute);
+        char **etag, time_t *mtime, int execute);
 
 /* Makes a PROPFIND request for path to get quota information (RFC 4331)
    and places them in total and used.

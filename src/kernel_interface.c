@@ -129,13 +129,7 @@ static uint32_t
 fuse_getattr(void);
 
 static uint32_t
-fuse_getxattr(void);
-
-static uint32_t
 fuse_init(void);
-
-static uint32_t
-fuse_listxattr(void);
 
 static uint32_t
 fuse_lookup(void);
@@ -385,15 +379,21 @@ dav_run_msgloop(volatile int *keep_on_running)
             break;
         case FUSE_SETXATTR:
             if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETXATTR:");
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_SETXATTR:");
             oh->error = -ENOSYS;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_GETXATTR:
-            oh->len = fuse_getxattr();
+            if (debug)
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETXATTR:");
+            oh->error = -ENOSYS;
+            oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_LISTXATTR:
-            oh->len = fuse_listxattr();
+            if (debug)
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LISTXATTR:");
+            oh->error = -ENOSYS;
+            oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_REMOVEXATTR:
             if (debug)
@@ -604,50 +604,6 @@ fuse_getattr(void)
 
 
 static uint32_t
-fuse_getxattr(void)
-{
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_getxattr_in *in = (struct fuse_getxattr_in *)
-                                  (buf + sizeof(struct fuse_in_header));
-    char *name = (char *) (buf + sizeof(struct fuse_in_header)
-                           + sizeof(struct fuse_getxattr_in));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_getxattr_out *out = (struct fuse_getxattr_out *)
-                                    (buf + sizeof(struct fuse_out_header));
-    char *value = (char *) (buf + sizeof(struct fuse_out_header));
-    if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETXATTR:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, %s, %i",
-               (unsigned long long) ih->nodeid, name, in->size);
-    }
-
-    size_t size = in->size;
-    if (size == 0) {
-        oh->error = dav_getxattr((dav_node *) ((size_t) ih->nodeid), name,
-                                 value, &size, ih->uid);
-        if (oh->error) {
-            oh->error *= -1;
-            return sizeof(struct fuse_out_header);
-        }
-        out->size = size;
-        out->padding = 0;
-        return sizeof(struct fuse_out_header)
-               + sizeof(struct fuse_getxattr_out);
-    } else {
-        if (size > (buf_size - sizeof(struct fuse_out_header)))
-            size = buf_size - sizeof(struct fuse_out_header);
-        oh->error = dav_getxattr((dav_node *) ((size_t) ih->nodeid), name,
-                                 value, &size, ih->uid);
-        if (oh->error) {
-            oh->error *= -1;
-            return sizeof(struct fuse_out_header);
-        }
-        return sizeof(struct fuse_out_header) +  size;
-    }
-}
-
-
-static uint32_t
 fuse_init(void)
 {
     struct fuse_in_header *ih = (struct fuse_in_header *) buf;
@@ -682,48 +638,6 @@ fuse_init(void)
                      - sizeof(struct fuse_write_in) - 4095;
 
     return sizeof(struct fuse_out_header) + sizeof(struct fuse_init_out);
-}
-
-
-static uint32_t
-fuse_listxattr(void)
-{
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_getxattr_in *in = (struct fuse_getxattr_in *)
-                                  (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_getxattr_out *out = (struct fuse_getxattr_out *)
-                                    (buf + sizeof(struct fuse_out_header));
-    char *value = (char *) (buf + sizeof(struct fuse_out_header));
-    if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LISTXATTR:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, %i",
-               (unsigned long long) ih->nodeid, in->size);
-    }
-
-    size_t size = in->size;
-    if (size == 0) {
-        oh->error = dav_listxattr((dav_node *) ((size_t) ih->nodeid), value,
-                                  &size, ih->uid);
-        if (oh->error) {
-            oh->error *= -1;
-            return sizeof(struct fuse_out_header);
-        }
-        out->size = size;
-        out->padding = 0;
-        return sizeof(struct fuse_out_header)
-               + sizeof(struct fuse_getxattr_out);
-    } else {
-        if (size > (buf_size - sizeof(struct fuse_out_header)))
-            size = buf_size - sizeof(struct fuse_out_header);
-        oh->error = dav_listxattr((dav_node *) ((size_t) ih->nodeid), value,
-                                  &size, ih->uid);
-        if (oh->error) {
-            oh->error *= -1;
-            return sizeof(struct fuse_out_header);
-        }
-        return sizeof(struct fuse_out_header) +  size;
-    }
 }
 
 

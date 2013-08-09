@@ -680,7 +680,7 @@ dav_get_webdav_error()
 
 int
 dav_get_file(const char *path, const char *cache_path, off_t *size,
-             char **etag, time_t *mtime, char **mime, int *modified)
+             char **etag, time_t *mtime, int *modified)
 {
     int ret;
     if (!initialized) {
@@ -733,13 +733,6 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
             if (*etag) free(*etag);
             *etag = normalize_etag(ne_get_response_header(req, "ETag"));
         }
-
-        value = ne_get_response_header(req, "Content-Type");
-        if (mime && value) {
-            if (*mime)
-                free(*mime);
-            *mime = xstrdup(value);
-        }
     }
 
     ne_request_destroy(req);
@@ -753,8 +746,7 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
 
 
 int
-dav_head(const char *path, char **etag, time_t *mtime, off_t *length,
-         char **mime)
+dav_head(const char *path, char **etag, time_t *mtime, off_t *length)
 {
     int ret;
     if (!initialized) {
@@ -784,13 +776,6 @@ dav_head(const char *path, char **etag, time_t *mtime, off_t *length,
     if (!ret && length && value)
         *length = strtol(value, NULL, 10);
 
-    value = ne_get_response_header(req, "Content-Type");
-    if (!ret && mime && value) {
-        if (*mime)
-            free(*mime);
-        *mime = xstrdup(value);
-    }
-
     ne_request_destroy(req);
     free(spath);
     return ret;
@@ -816,7 +801,7 @@ dav_lock(const char *path, time_t *expire, int *exists)
 #else /* NE_VERSION_MINOR == 25 */
     if (precheck && !*exists) {
 #endif /* NE_VERSION_MINOR == 25 */
-        if (dav_head(path, NULL, NULL, NULL, NULL) == 0) {
+        if (dav_head(path, NULL, NULL, NULL) == 0) {
             return EEXIST;
         }
     }
@@ -942,7 +927,7 @@ dav_move(const char *src, const char *dst)
 
 int
 dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
-        char **etag, time_t *mtime, char **mime, int execute)
+        char **etag, time_t *mtime, int execute)
 {
     int ret = 0;
     if (!initialized) {
@@ -956,7 +941,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
         char *r_etag = NULL;
         time_t r_mtime = 0;
         off_t r_length = 0;
-        ret = dav_head(path, &r_etag, &r_mtime, &r_length, NULL);
+        ret = dav_head(path, &r_etag, &r_mtime, &r_length);
         if (!ret) {
             if (!*exists && r_length) {
                 ret = EEXIST;
@@ -1072,14 +1057,6 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
             }
         }
 
-        if (mime) {
-            value = ne_get_response_header(req, "Content-Type");
-            if (value) {
-                if (*mime)
-                    free(*mime);
-                *mime = xstrdup(value);
-            }
-        }
     }
 
     ne_request_destroy(req);
@@ -1090,7 +1067,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
         if (execute == 1)
             dav_set_execute(path, execute);
         if (need_head)
-            dav_head(path, etag, mtime, NULL, mime);
+            dav_head(path, etag, mtime, NULL);
     }
 
     return ret;

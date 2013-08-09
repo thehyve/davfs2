@@ -83,8 +83,6 @@ struct dav_node {
        changed remotely. If present it overrides information from the
        Last-Modified time (smtime). */
     char *etag;
-    /* The media-type as in HTTP-header Content-Type. */
-    char *mime_type;
     /* A linked list of handles for open files. */
     dav_handle *handles;
     /* Size of the contents of the node.
@@ -285,23 +283,6 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
    well as read permission for parent. */
 int
 dav_getattr(dav_node *node, uid_t uid);
-
-
-/* Checks whether node exists and uid has permissions. The value of
-   extended attribute name is copied into buf. If its size is greater
-   than size, EOVERFLOW is returned.
-   Permissions:
-   uid must have execute permission for parent and all of its ancestors, as
-   well as read permission for parent. */
-int
-dav_getxattr(dav_node *node, const char *name, char *buf, size_t *size,
-             uid_t uid);
-
-
-/* Returns the list of supported extended attributes. This is just
-   user.mime_type. */
-int
-dav_listxattr(dav_node *node, char *buf, size_t *size, uid_t uid);
 
 
 /* Searches for a node with name name in the directory parent and returns the
