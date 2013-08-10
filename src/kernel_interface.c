@@ -182,6 +182,15 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                            "Initializing kernel interface");
 
+    buf_size = args->buf_size * 1024;
+    if (buf_size < (FUSE_MIN_READ_BUFFER + 4096))
+        buf_size = FUSE_MIN_READ_BUFFER + 4096;
+    buf = malloc(buf_size);
+    if (!buf)
+        error(EXIT_FAILURE, errno, _("can't allocate message buffer"));
+
+    idle_time = args->delay_upload;
+
     char *path = xasprintf("%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME);
 
     fuse_device = open(path, O_RDWR | O_NONBLOCK);
@@ -211,15 +220,6 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
         error(EXIT_FAILURE, errno, _("mounting failed"));
 
     free(mdata);
-
-    buf_size = args->buf_size * 1024;
-    if (buf_size < (FUSE_MIN_READ_BUFFER + 4096))
-        buf_size = FUSE_MIN_READ_BUFFER + 4096;
-    buf = malloc(buf_size);
-    if (!buf)
-        error(EXIT_FAILURE, errno, _("can't allocate message buffer"));
-
-    idle_time = args->delay_upload;
 }
 
 
