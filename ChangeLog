@@ -1,6 +1,29 @@
 ChangeLog for davfs2
 --------------------
 
+2013-08-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, mount_davfs.c, mount_davfs.h:
+      Remove file_umask and dir_umask (bug #34563).
+
+2013-08-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, mount_davfs.c, mount_davfs.h:
+      Beautify defaults.
+
+2013-08-10 Werner Baumann (werner.baumann@onlinehome.de)
+    * kernel_interface.c:
+      Assign buf_size before using it.
+
+2013-08-09 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, cache.h, kernel_interface.c, kernel_interface.h
+      webdav.c, webdav.h:
+      Remove support for extended attributes.
+
+2013-08-09 Werner Baumann (werner.baumann@onlinehome.de)
+    * src/Makefile.am, cache.c, cache.h, coda.c, dav_coda.h,
+      dav_fuse.ckernel_interface.c, kernel_interface.h,
+      mount_davfs.c, mount_davfs.h, po/, man/:
+      Remove support for Coda
+
 2012-11-01 Werner Baumann (werner.baumann@onlinehome.de)
     * man/Makefile.am, man/de/Makefile.am, man/es/Makefile.am:
       Honour configure parameter --manfile (sr #108173)

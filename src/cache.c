@@ -192,8 +192,6 @@ static uid_t default_uid;
 static gid_t default_gid;
 static mode_t default_file_mode;
 static mode_t default_dir_mode;
-static mode_t file_umask;
-static mode_t dir_umask;
 
 /* Directory for cached files and directories. */
 static char *cache_dir;
@@ -591,8 +589,6 @@ dav_init_cache(const dav_args *args, const char *mpoint)
 
     default_file_mode = args->file_mode;
     default_dir_mode = args->dir_mode;
-    file_umask = args->file_umask;
-    dir_umask = args->dir_umask;
 
     table_size = args->table_size;
     table = xcalloc(table_size, sizeof(*table));
@@ -1373,10 +1369,6 @@ dav_setattr(dav_node *node, uid_t uid, int sm, mode_t mode, int so,
             return EINVAL;
         if (uid != node->uid && uid != 0)
             return EPERM;
-        if (is_dir(node) && (mode & dir_umask))
-            return EINVAL;
-        if (is_reg(node) && (mode & file_umask))
-            return EINVAL;
     }
 
     if (sat || smt) {
@@ -1564,7 +1556,6 @@ add_node(dav_node *parent, dav_props *props)
         } else if (props->is_exec == 0) {
             node->mode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);
         }
-        node->mode &= ~file_umask;
     }
 
     parent->mtime = node->mtime;
@@ -1965,10 +1956,8 @@ new_node(dav_node *parent, mode_t mode)
     node->lock_expire = 0;
 
     if (S_ISDIR(mode)) {
-        node->mode = mode & ~dir_umask;
         node->nref = 2;
     } else {
-        node->mode = mode & ~file_umask;
         node->nref = 1;
     }
     node->remote_exists = 0;
@@ -2261,7 +2250,6 @@ update_node(dav_node *node, dav_props *props)
             node->mode |= (node->mode & S_IWUSR) ? S_IXUSR : 0;
             node->mode |= (node->mode & S_IWGRP) ? S_IXGRP : 0;
             node->mode |= (node->mode & S_IWOTH) ? S_IXOTH : 0;
-            node->mode &= ~file_umask;
         } else if (props->is_exec == 0
                 && (node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))) {
             node->mode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);

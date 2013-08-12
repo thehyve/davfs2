@@ -56,8 +56,6 @@ typedef struct {
     /* File mode */
     uid_t fsuid;              /* Command line */
     gid_t fsgid;              /* Command line */
-    mode_t dir_umask;
-    mode_t file_umask;
     mode_t dir_mode;          /* Command line */
     mode_t file_mode;         /* Command line */
     /* WebDAV */
