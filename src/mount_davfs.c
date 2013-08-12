@@ -1294,6 +1294,9 @@ delete_args(dav_args *args)
 {
     if (args->cmdline)
         free(args->cmdline);
+    if (args->conf)
+        free(args->conf);
+
     if (args->uid_name)
         free(args->uid_name);
     if (args->groups)
@@ -1304,10 +1307,9 @@ delete_args(dav_args *args)
         free(args->dav_user);
     if (args->dav_group)
         free(args->dav_group);
-    if (args->conf)
-        free(args->conf);
     if (args->add_mopts)
         free(args->add_mopts);
+
     if (args->scheme)
         free(args->scheme);
     if (args->host)
@@ -1360,6 +1362,7 @@ delete_args(dav_args *args)
         free(args->s_charset);
     if (args->header)
         free(args->header);
+
     if (args->sys_cache)
         free(args->sys_cache);
     if (args->cache_dir)
@@ -1615,7 +1618,7 @@ get_options(dav_args *args, char *option)
 /* Allocates a new dav_args-structure.
    Numerical values are initialized to the default values from
    defaults.h if they are defined there or to 0 otherwise.
-   mopts is set to DAV_USER_MOPTS.
+   mopts is set to DAV_MOPTS.
    String and array pointers are initialized to NULL. */
 static dav_args *
 new_args(void)
@@ -1624,15 +1627,20 @@ new_args(void)
 
     args->netdev = DAV_NETDEV;
     args->mopts = DAV_MOPTS;
+    args->buf_size = DAV_FUSE_BUF_SIZE;
+
+/* TODO: activate after changing default mode and rmoving
+         umask. Remove eval_mode.
+    args->dir_mode = DAV_DIR_MODE;
+    args->file_mode = DAV_FILE_MODE;
+*/
 
     args->p_port = DAV_DEFAULT_PROXY_PORT;
     args->useproxy = DAV_USE_PROXY;
-
-    args->lock_timeout = DAV_LOCK_TIMEOUT;
-    args->lock_refresh = DAV_LOCK_REFRESH;
-
     args->askauth = DAV_ASKAUTH;
     args->locks = DAV_LOCKS;
+    args->lock_timeout = DAV_LOCK_TIMEOUT;
+    args->lock_refresh = DAV_LOCK_REFRESH;
     args->expect100 = DAV_EXPECT100;
     args->if_match_bug = DAV_IF_MATCH_BUG;
     args->drop_weak_etags = DAV_DROP_WEAK_ETAGS;

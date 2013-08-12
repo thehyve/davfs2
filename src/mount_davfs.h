@@ -31,7 +31,9 @@
    Some data will be copied into global or local variables to be available in
    daemon mode. The rest will be freed when forking into daemon mode. */
 typedef struct {
+    /* Configuration */
     char *cmdline;
+    char *conf;               /* Command line */
     /* Persona */
     int privileged;
     uid_t uid;
@@ -44,7 +46,6 @@ typedef struct {
     char *dav_group;          /* System config file */
     uid_t dav_uid;
     gid_t dav_gid;
-    char *conf;               /* Command line */
     /* Mount options */
     int user;                 /* Command line */
     int users;                /* Command line */
@@ -59,7 +60,7 @@ typedef struct {
     mode_t file_umask;
     mode_t dir_mode;          /* Command line */
     mode_t file_mode;         /* Command line */
-    /* WebDAV-resource */
+    /* WebDAV */
     char *scheme;             /* Command line */
     char *host;               /* Command line */
     int port;                 /* Command line */
