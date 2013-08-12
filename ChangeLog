@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2013-08-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, mount_davfs.c;
+      Make default access modes 755 and 644.
+
+2013-08-12 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, mount_davfs.c, mount_davfs.h:
       Remove file_umask and dir_umask (bug #34563).
 

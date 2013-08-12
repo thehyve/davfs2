@@ -183,9 +183,6 @@ static void
 delete_args(dav_args *args);
 
 static void
-eval_modes(dav_args *args);
-
-static void
 expand_home(char **dir, const dav_args *args);
 
 static void
@@ -939,8 +936,6 @@ parse_config(dav_args *args)
               args->dav_group);
     args->dav_gid = grp->gr_gid;
 
-    eval_modes(args);
-
     if (args->trust_ca_cert)
         args->ca_cert = read_cert(&args->trust_ca_cert, args);
 
@@ -1373,32 +1368,6 @@ delete_args(dav_args *args)
 }
 
 
-/* Evaluates the umask and the default modes for directories and files from
-   args->mopts, umask(), args->dir_mode and args->file_mode and stores them
-   in args.
-   Requires: mopts, dir_mode, file_mode. */
-static void
-eval_modes(dav_args *args)
-{
-    mode_t default_mode = umask(0);
-    umask(default_mode);
-    default_mode = ~default_mode;
-    default_mode &= S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-
-    if (!args->dir_mode) {
-        args->dir_mode = default_mode;
-        args->dir_mode |= (args->dir_mode & S_IRUSR) ? S_IXUSR : 0;
-        args->dir_mode |= (args->dir_mode & S_IRGRP) ? S_IXGRP : 0;
-        args->dir_mode |= (args->dir_mode & S_IROTH) ? S_IXOTH : 0;
-    }
-    args->dir_mode |= S_IFDIR;
-
-    if (!args->file_mode)
-        args->file_mode = default_mode;
-    args->file_mode |= S_IFREG;
-}
-
-
 /* If *dir starts with '~/' or '~user/' it is turned into an
    absolute filename (starting with '/') in the user's home directory.
    user must be the name of the mounting user.
@@ -1617,11 +1586,8 @@ new_args(void)
     args->mopts = DAV_MOPTS;
     args->buf_size = DAV_FUSE_BUF_SIZE;
 
-/* TODO: activate after changing default mode and rmoving
-         umask. Remove eval_mode.
     args->dir_mode = DAV_DIR_MODE;
     args->file_mode = DAV_FILE_MODE;
-*/
 
     args->p_port = DAV_DEFAULT_PROXY_PORT;
     args->useproxy = DAV_USE_PROXY;

@@ -587,8 +587,8 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     default_uid = args->fsuid;
     default_gid = args->fsgid;
 
-    default_file_mode = args->file_mode;
-    default_dir_mode = args->dir_mode;
+    default_file_mode = args->file_mode | S_IFREG;
+    default_dir_mode = args->dir_mode | S_IFDIR;
 
     table_size = args->table_size;
     table = xcalloc(table_size, sizeof(*table));
