@@ -587,8 +587,8 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     default_uid = args->fsuid;
     default_gid = args->fsgid;
 
-    default_file_mode = args->file_mode | S_IFREG;
-    default_dir_mode = args->dir_mode | S_IFDIR;
+    default_file_mode = args->file_mode;
+    default_dir_mode = args->dir_mode;
 
     table_size = args->table_size;
     table = xcalloc(table_size, sizeof(*table));
@@ -1964,6 +1964,7 @@ new_node(dav_node *parent, mode_t mode)
     node->dirty = 0;
     node->uid = default_uid;
     node->gid = default_gid;
+    node->mode = mode;
 
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "new node: %p->%p",
