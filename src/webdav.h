@@ -39,8 +39,6 @@ struct dav_props {
     time_t ctime;       /* Creation date. */
     time_t mtime;       /* Date of last modification. */
     int is_dir;         /* Boolean; 1 if a directory. */
-    int is_exec;        /* -1 if not specified; 1 is executeable;
-                           0 not executeable. */
     dav_props *next;    /* Next in the list. */
 };
 
@@ -233,11 +231,10 @@ dav_move(const char *src, const char *dst);
                 Updated on success. May be NULL.
    mtime      : The Last_Modified value used to check for changes on the
                 server. Updated on success. May be NULL.
-   execute    : if 1 set execute property, else no change of execute property.
    return value : 0 on success; an appropriate file error code otherwise. */
 int
 dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
-        char **etag, time_t *mtime, int execute);
+        char **etag, time_t *mtime);
 
 /* Makes a PROPFIND request for path to get quota information (RFC 4331)
    and places them in total and used.
@@ -246,13 +243,6 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
    available, an error is returned and available and used are not changed. */ 
 int
 dav_quota(const char *path, off_t *total, off_t *used);
-
-
-/* Sets or resets the execute property of file path.
-   path : Absolute path of the file on the server.
-   set  : boolean value; 0 reset execute property; 1 set execute property. */
-int
-dav_set_execute(const char *path, int set);
 
 
 /* Tells webdav that no more terminal is available, so errors can only

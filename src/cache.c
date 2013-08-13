@@ -753,12 +753,8 @@ dav_tidy_cache(void)
             && item-> save_at <= time(NULL)) {
         if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "tidy: %s", node->path);
-        int set_execute = -1;
-        if (is_created(node) && node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-            set_execute = 1;
         int ret = dav_put(node->path, node->cache_path, &node->remote_exists,
-                          &node->lock_expire, &node->etag, &node->smtime,
-                          set_execute);
+                          &node->lock_expire, &node->etag, &node->smtime);
         if (!ret) {
             node->utime = time(NULL);
             node->dirty = 0;
@@ -846,12 +842,8 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
 
     if (delay_upload == 0 && (is_dirty(node) || is_created(node))
             && !is_open_write(node) && !is_backup(node)) {
-        int set_execute = -1;
-        if (is_created(node) && node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-            set_execute = 1;
         int ret = dav_put(node->path, node->cache_path, &node->remote_exists,
-                          &node->lock_expire, &node->etag, &node->smtime,
-                          set_execute);
+                          &node->lock_expire, &node->etag, &node->smtime);
         if (!ret) {
             node->utime = time(NULL);
             node->dirty = 0;
@@ -1410,37 +1402,8 @@ dav_setattr(dav_node *node, uid_t uid, int sm, mode_t mode, int so,
     if (sg)
         node->gid = gid;
 
-    if (sm) {
-        if (!is_backup(node) && !is_created(node)) {
-            int set_execute = -1;
-            if ((node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-                    && !(mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
-                set_execute = 0;
-            if (!(node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-                    && (mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
-                set_execute = 1;
-            if (set_execute != -1) {
-                if (is_dirty(node) && !is_locked(node)) {
-                    int err = 0;
-                    time_t smtime = 0;
-                    char *etag = NULL;
-                    dav_head(node->path, &etag, &smtime, NULL);
-                    if (etag && node->etag && strcmp(etag, node->etag) != 0)
-                        err = EIO;
-                    if (smtime && smtime > node->smtime)
-                        err = EIO;
-                    if (etag)
-                        free(etag);
-                    if (err)
-                        return EIO;
-                }
-                dav_set_execute(node->path, set_execute);
-                if (is_dirty(node))
-                    dav_head(node->path, &node->etag, &node->smtime, NULL);
-            }
-        }
+    if (sm)
         node->mode = (node->mode & ~DAV_A_MASK) | mode;
-    }
 
     if (sat)
         node->atime = atime;
@@ -1549,13 +1512,6 @@ add_node(dav_node *parent, dav_props *props)
         node = new_node(parent, default_file_mode);
         node->size = props->size;
         node->remote_exists = 1;
-        if (props->is_exec == 1) {
-            node->mode |= (node->mode & S_IRUSR) ? S_IXUSR : 0;
-            node->mode |= (node->mode & S_IRGRP) ? S_IXGRP : 0;
-            node->mode |= (node->mode & S_IROTH) ? S_IXOTH : 0;
-        } else if (props->is_exec == 0) {
-            node->mode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);
-        }
     }
 
     parent->mtime = node->mtime;
@@ -1673,13 +1629,9 @@ clean_tree(dav_node *node, int upload)
 
     } else if ((is_dirty(node) || is_created(node)) && upload) {
 
-        int set_execute = -1;
-        if (is_created(node)
-                && node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-            set_execute = 1;
         int ret = dav_put(node->path, node->cache_path,
                           &node->remote_exists, &node->lock_expire,
-                          &node->etag, &node->smtime, set_execute);
+                          &node->etag, &node->smtime);
         if (is_locked(node))
             dav_unlock(node->path, &node->lock_expire);
         if (!ret) {
@@ -1839,8 +1791,6 @@ move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
     src->remote_exists = 0;
 
     dav_lock(dst_path, &src->lock_expire, &src->remote_exists);
-    if (!is_created(src) && (src->mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
-        dav_set_execute(dst_path, 1);
 
     free(src->name);
     src->name = xstrdup(dst_name);
@@ -2245,20 +2195,8 @@ update_node(dav_node *node, dav_props *props)
     node->etag = props->etag;
     props->etag = NULL;
 
-    if (is_reg(node)) {
-        if (props->is_exec == 1
-                && !(node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))) {
-            node->mode |= (node->mode & S_IWUSR) ? S_IXUSR : 0;
-            node->mode |= (node->mode & S_IWGRP) ? S_IXGRP : 0;
-            node->mode |= (node->mode & S_IWOTH) ? S_IXOTH : 0;
-        } else if (props->is_exec == 0
-                && (node->mode & (S_IXUSR | S_IXGRP | S_IXOTH))) {
-            node->mode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);
-        }
-        if (props->size && props->size != node->size) {
-            node->size = props->size;
-        }
-    }
+    if (is_reg(node) && props->size && props->size != node->size)
+        node->size = props->size;
 
     dav_delete_props(props);
 
@@ -2541,7 +2479,7 @@ update_cache_file(dav_node *node)
         if (get_upload_time(node) >= time(NULL))
             return 0;
         ret = dav_put(node->path, node->cache_path, &node->remote_exists,
-                      &node->lock_expire, &node->etag, &node->smtime, -1);
+                      &node->lock_expire, &node->etag, &node->smtime);
         if (!ret) {
             node->utime = time(NULL);
             node->dirty = 0;

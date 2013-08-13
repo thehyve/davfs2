@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2013-08-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, webdav.c, webdav.h:
+      Remove support for property 'Execute'.
+
+2013-08-12 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, defaults.h:
       Fix default modes.
 

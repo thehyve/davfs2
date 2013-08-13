@@ -118,7 +118,6 @@ enum {
     CREATION,
     MODIFIED,
     TYPE,
-    EXECUTE,
     END
 };
 
@@ -128,7 +127,6 @@ static const ne_propname prop_names[] = {
     [CREATION] ={"DAV:", "creationdate"},
     [MODIFIED] = {"DAV:", "getlastmodified"},
     [TYPE] = {"DAV:", "resourcetype"},
-    [EXECUTE] = {"http://apache.org/dav/props/", "executable"},
     [END] = {NULL, NULL}
 };
 
@@ -138,7 +136,6 @@ static const ne_propname anonymous_prop_names[] = {
     [CREATION] ={NULL, "creationdate"},
     [MODIFIED] = {NULL, "getlastmodified"},
     [TYPE] = {NULL, "resourcetype"},
-    [EXECUTE] = {NULL, "executable"},
     [END] = {NULL, NULL}
 };
 
@@ -927,7 +924,7 @@ dav_move(const char *src, const char *dst)
 
 int
 dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
-        char **etag, time_t *mtime, int execute)
+        char **etag, time_t *mtime)
 {
     int ret = 0;
     if (!initialized) {
@@ -1064,8 +1061,6 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
     close(fd);
 
     if (!ret) {
-        if (execute == 1)
-            dav_set_execute(path, execute);
         if (need_head)
             dav_head(path, etag, mtime, NULL);
     }
@@ -1132,34 +1127,6 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
     }
 
     free(spath);
-    return ret;
-}
-
-
-int
-dav_set_execute(const char *path, int set)
-{
-    int ret;
-    if (!initialized) {
-        ret = dav_init_connection(path);
-        if (ret) return ret;
-    }
-
-    ne_proppatch_operation op[2];
-    op[0].name = &prop_names[EXECUTE];
-    op[0].type = ne_propset;
-    if (set) {
-        op[0].value = "T";
-    } else {
-        op[0].value = "F";
-    }
-    op[1].name = NULL;
-
-    char *spath = ne_path_escape(path);
-    ret = ne_proppatch(session, spath, &op[0]);
-    ret = get_error(ret, "PROPPATCH");
-    free(spath);
-
     return ret;
 }
 
@@ -1788,15 +1755,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
             result->mtime = ne_iso8601_parse(data);
         if (result->mtime == (time_t) -1)
             result->mtime = 0;
-    }
-
-    data = ne_propset_value(set, &prop_names[EXECUTE]);
-    if (!data)
-        data = ne_propset_value(set, &anonymous_prop_names[EXECUTE]);
-    if (!data) {
-        result->is_exec = -1;
-    } else if (*data == 'T') {
-        result->is_exec = 1;
     }
 
     result->next = ctx->results;
