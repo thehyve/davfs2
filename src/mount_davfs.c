@@ -936,6 +936,9 @@ parse_config(dav_args *args)
               args->dav_group);
     args->dav_gid = grp->gr_gid;
 
+    args->dir_mode |= S_IFDIR;
+    args->file_mode |= S_IFREG;
+
     if (args->trust_ca_cert)
         args->ca_cert = read_cert(&args->trust_ca_cert, args);
 

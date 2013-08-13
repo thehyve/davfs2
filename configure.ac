@@ -39,7 +39,7 @@ gl_INIT
 # Checks for libraries.
 AM_GNU_GETTEXT_VERSION(0.18)
 AM_GNU_GETTEXT([external])
-NE_REQUIRE_VERSIONS([0], [25 26 27 28 29])
+NE_REQUIRE_VERSIONS([0], [27 28 29 30])
 DAV_CHECK_NEON
 
 # Checks for header files.

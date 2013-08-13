@@ -1,7 +1,15 @@
 ChangeLog for davfs2
 --------------------
 
-2013-08-12 Werner Baumann (werner.baumann@onlinehome.de)
+2013-08-13 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, mount_davfs.c:
+      Fix evaluation of default modes.
+
+2013-08-13 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, configure.ac:
+      Remove support for Neon versions < 0.27.
+
+2013-08-13 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, webdav.c, webdav.h:
       Remove support for property 'Execute'.
 

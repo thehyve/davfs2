@@ -109,11 +109,11 @@
 
 /* Mode of directories.
    May be overridden by command line or fstab. */
-#define DAV_DIR_MODE (S_IFDIR | S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
+#define DAV_DIR_MODE (S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
 
 /* Mode of regular files.
    May be overridden by command line or fstab. */
-#define DAV_FILE_MODE (S_IFREG | S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+#define DAV_FILE_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 
 
 /* WebDAV */
