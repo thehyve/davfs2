@@ -2278,28 +2278,35 @@ has_permission(const dav_node *node, uid_t uid, int how)
     a_mode |= (how & W_OK) ? (S_IWUSR | S_IWGRP | S_IWOTH) : 0;
     a_mode |= (how & X_OK) ? (S_IXUSR | S_IXGRP | S_IXOTH) : 0;
 
-    if (!(~node->mode & S_IRWXO & a_mode))
+    if (node->uid == uid) {
+        if (~node->mode & S_IRWXU & a_mode)
+            return 0;
         return 1;
-
-    if (node->uid == uid && !(~node->mode & S_IRWXU & a_mode))
-        return 1;
+    }
 
     struct passwd *pw = getpwuid(uid);
     if (!pw)
         return 0;
-    if (pw->pw_gid != node->gid) {
-        struct group *grp = getgrgid(node->gid);
-        if (!grp)
+    if (pw->pw_gid == node->gid) {
+        if (~node->mode & S_IRWXG & a_mode)
             return 0;
-        char **members = grp->gr_mem;
-        while (*members && strcmp(*members, pw->pw_name) != 0)
-            members++;
-        if (!*members)
-            return 0;
-    }
-    if (!(~node->mode & S_IRWXG & a_mode))
         return 1;
+    }
 
+    struct group *grp = getgrgid(node->gid);
+    if (!grp)
+        return 0;
+    char **members = grp->gr_mem;
+    while (*members && strcmp(*members, pw->pw_name) != 0)
+        members++;
+    if (*members) {
+        if (~node->mode & S_IRWXG & a_mode)
+            return 0;
+        return 1;
+    }
+    
+    if (!(~node->mode & S_IRWXO & a_mode))
+        return 1;
     return 0;
 }
 

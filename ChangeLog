@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2013-08-15 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c:
+      Fix has_permission (bug #33644).
+
 2013-08-13 Werner Baumann (werner.baumann@onlinehome.de)
     * defaults.h, mount_davfs.c:
       Fix evaluation of default modes.
