@@ -170,6 +170,9 @@ write_mtab_entry(const dav_args *args);
 static int
 arg_to_int(const char *arg, int base, const char *opt);
 
+static void
+cp_file(const char *src, const char *dest);
+
 static int
 debug_opts(const char *s);
 
@@ -530,10 +533,7 @@ check_dirs(dav_args *args)
             char *file_name = ne_concat(path, "/", DAV_CONFIG, NULL);
             if (access(file_name, F_OK) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_CONFIG, NULL);
-                char *command = ne_concat("cp ", template, " ", file_name,
-                                          NULL);
-                if (system(command) != 0);
-                free(command);
+                cp_file(template, file_name);
                 free(template);
             }
             free(file_name);
@@ -542,11 +542,7 @@ check_dirs(dav_args *args)
             if (access(file_name, F_OK) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_SECRETS,
                                            NULL);
-                char *command = ne_concat("cp ", template, " ", file_name,
-                                          NULL);
-                if (system(command) == 0)
-                    chmod(file_name, S_IRUSR | S_IWUSR);
-                free(command);
+                cp_file(template, file_name);
                 free(template);
             }
             free(file_name);
@@ -1303,6 +1299,7 @@ write_mtab_entry(const dav_args *args)
    opt    : name of the option, arg belongs to. Used in the error message.
    return value: the value of the integer number in arg */
 static int
+
 arg_to_int(const char *arg, int base, const char *opt)
 {
     char *tail = NULL;
@@ -1321,6 +1318,34 @@ arg_to_int(const char *arg, int base, const char *opt)
     }
 
     return n;
+}
+
+
+/* Creates a copy of src with name dest. */
+static void
+cp_file(const char *src, const char *dest)
+{
+    FILE *in = fopen(src, "r");
+    if (!in)
+        error(EXIT_FAILURE, errno, _("can't open file %s"), src);
+
+    FILE *out = fopen(dest, "w");
+    if (!out)
+        error(EXIT_FAILURE, errno, _("can't open file %s"), dest);
+
+    size_t n = 0;
+    char *line = NULL;
+    int length = getline(&line, &n, in);
+    while (length > 0) {
+        if (fputs(line, out) == EOF) 
+            error(EXIT_FAILURE, errno, _("error writing to file %s"), dest);
+        length = getline(&line, &n, in);
+    }
+
+    if (line)
+        free(line);
+    fclose(out);
+    fclose(in);
 }
 
 

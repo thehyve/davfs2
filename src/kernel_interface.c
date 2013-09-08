@@ -167,29 +167,6 @@ init_coda(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata)
         ++minor;
     }
 
-    if (*dev <= 0 && system("/sbin/modprobe coda &>/dev/null") == 0) {
-        minor = 0;
-        while (*dev <= 0 && minor < MAX_CODADEVS) {
-            char *path;
-            if (asprintf(&path, "%s/%s%i",
-                         DAV_DEV_DIR, CODA_DEV_NAME, minor) < 0)
-                abort();
-            *dev = open(path, O_RDWR | O_NONBLOCK);
-            if (*dev <= 0) {
-                if (mknod(path, S_IFCHR, makedev(CODA_MAJOR, minor)) == 0) {
-                    if (chown(path, 0, 0) == 0
-                            && chmod(path, S_IRUSR | S_IWUSR) == 0) {
-                        *dev = open(path, O_RDWR | O_NONBLOCK);
-                    } else {
-                        remove(path);
-                    }
-                }
-            }
-            free(path);
-            ++minor;
-        }
-    }
-
     if (*dev <= 0) {
         error(0, 0, _("no free coda device to mount"));
         return -1;
@@ -225,20 +202,6 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
             abort();
 
     *dev = open(path, O_RDWR | O_NONBLOCK);
-    if (*dev <= 0 && system("/sbin/modprobe fuse &>/dev/null") == 0) {
-        *dev = open(path, O_RDWR | O_NONBLOCK);
-    }
-    if (*dev <= 0) {
-        if (mknod(path, S_IFCHR, makedev(FUSE_MAJOR, FUSE_MINOR)) == 0) {
-             if (chown(path, 0, 0) == 0
-                    && chmod(path, S_IRUSR | S_IWUSR) == 0) {
-                *dev = open(path, O_RDWR | O_NONBLOCK);
-            } else {
-                remove(path);
-            }
-        }
-    }
-
     free(path);
     if (*dev <= 0) {
         error(0, 0, _("can't open fuse device"));
