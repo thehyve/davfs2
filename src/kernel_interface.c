@@ -55,6 +55,9 @@
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
 
 #include "xalloc.h"
 #include "xvasprintf.h"
@@ -71,6 +74,17 @@
 #define _(String) gettext(String)
 #else
 #define _(String) String
+#endif
+
+
+/* Constants from Linux headers */
+/*==============================*/
+
+#ifndef MISC_MAJOR
+#define MISC_MAJOR 10
+#endif
+#ifndef FUSE_MINOR
+#define FUSE_MINOR 229
 #endif
 
 
@@ -92,6 +106,9 @@ struct create_out {
    kernel file system. */
 #define FUSE_DEV_NAME "fuse"
 
+/* Minimum minor version of fuse. */
+#define FUSE_MIN_MINOR 13
+
 
 /* Private global variables */
 /*==========================*/
@@ -102,6 +119,14 @@ static int fuse_device;
 /* Buffer used for communication with the kernel module (in and out). */
 static size_t buf_size;
 static char *buf;
+/* Header of incomming calls. */
+static struct fuse_in_header *ih;
+/* Header of outgoing replies. */
+static struct fuse_out_header *oh;
+/* Start of upcall specific structure. */
+static char *upcall;
+/* Start of upcall specific reply structure. */
+static char *reply;
 
 /* Time to wait for upcalls before calling dav_tidy_cache(). */
 static time_t idle_time;
@@ -161,6 +186,10 @@ fuse_stat(void);
 static uint32_t
 fuse_write(void);
 
+static uint32_t
+not_implemented(const char *msg);
+
+
 /* Auxiliary functions. */
 
 static off_t
@@ -183,11 +212,16 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
                            "Initializing kernel interface");
 
     buf_size = args->buf_size * 1024;
-    if (buf_size < (FUSE_MIN_READ_BUFFER + 4096))
-        buf_size = FUSE_MIN_READ_BUFFER + 4096;
+    if (buf_size < (FUSE_MIN_READ_BUFFER + 1024))
+        buf_size = FUSE_MIN_READ_BUFFER + 1024;
     buf = malloc(buf_size);
     if (!buf)
         error(EXIT_FAILURE, errno, _("can't allocate message buffer"));
+
+    ih = (struct fuse_in_header *) buf;
+    oh = (struct fuse_out_header *) buf;
+    upcall = buf + sizeof(struct fuse_in_header);
+    reply = buf + sizeof(struct fuse_out_header);
 
     idle_time = args->delay_upload;
 
@@ -198,7 +232,7 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
         fuse_device = open(path, O_RDWR | O_NONBLOCK);
     }
     if (fuse_device <= 0) {
-        if (mknod(path, S_IFCHR, makedev(FUSE_MAJOR, FUSE_MINOR)) == 0) {
+        if (mknod(path, S_IFCHR, makedev(MISC_MAJOR, FUSE_MINOR)) == 0) {
             if (chown(path, 0, 0) == 0 && chmod(path, S_IRUSR | S_IWUSR) == 0) {
                 fuse_device = open(path, O_RDWR | O_NONBLOCK);
             } else {
@@ -214,7 +248,7 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
     char *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
                             "allow_other,max_read=%lu", fuse_device,
                             args->dir_mode, args->fsuid, args->fsgid,
-                            (unsigned long int) (buf_size - 4096));
+                            (unsigned long int) (buf_size - 1024));
 
     if (mount(url, mpoint, "fuse", args->mopts, mdata) != 0)
         error(EXIT_FAILURE, errno, _("mounting failed"));
@@ -273,8 +307,6 @@ dav_run_msgloop(volatile int *keep_on_running)
             break;
         }
 
-        struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-        struct fuse_out_header *oh = (struct fuse_out_header *) buf;
         if (ih->nodeid == 1)
               ih->nodeid = root;
 
@@ -286,7 +318,6 @@ dav_run_msgloop(volatile int *keep_on_running)
             if (debug)
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                        "FUSE_FORGET: no reply");
-            oh->error = 0;
             oh->len = 0;
             break;
         case FUSE_GETATTR:
@@ -296,16 +327,10 @@ dav_run_msgloop(volatile int *keep_on_running)
             oh->len = fuse_setattr();
             break;
         case FUSE_READLINK:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_READLINK:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_READLINK:");
             break;
         case FUSE_SYMLINK:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_SYMLINK:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_SYMLINK:");
             break;
         case FUSE_MKNOD:
             oh->len = fuse_mknod();
@@ -315,28 +340,30 @@ dav_run_msgloop(volatile int *keep_on_running)
             break;
         case FUSE_UNLINK:
             if (debug) {
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_UNLINK:");
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-                       (unsigned long long) ih->nodeid,
-                       (char *) (buf + sizeof(struct fuse_in_header)));
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                                   "FUSE_UNLINK %llu: n=0x%llx",
+                                   (unsigned long long) ih->unique,
+                                   (unsigned long long) ih->nodeid);
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+                       ih->uid, ih->gid, ih->pid);
             }
-            oh->error = dav_remove((dav_node *) ((size_t) ih->nodeid),
-                             (char *) (buf + sizeof(struct fuse_in_header)),
-                             ih->uid);
+            oh->error = dav_remove((dav_node *) ((size_t) ih->nodeid), upcall,
+                                   ih->uid);
             if (oh->error)
                 oh->error *= -1;
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_RMDIR:
             if (debug) {
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RMDIR:");
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-                       (unsigned long long) ih->nodeid,
-                       (char *) (buf + sizeof(struct fuse_in_header)));
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                                   "FUSE_RMDIR %llu: n=0x%llx",
+                                   (unsigned long long) ih->unique,
+                                   (unsigned long long) ih->nodeid);
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+                       ih->uid, ih->gid, ih->pid);
             }
-            oh->error = dav_rmdir((dav_node *) ((size_t) ih->nodeid),
-                            (char *) (buf + sizeof(struct fuse_in_header)),
-                            ih->uid);
+            oh->error = dav_rmdir((dav_node *) ((size_t) ih->nodeid), upcall,
+                                  ih->uid);
             if (oh->error)
                 oh->error *= -1;
             oh->len = sizeof(struct fuse_out_header);
@@ -345,10 +372,7 @@ dav_run_msgloop(volatile int *keep_on_running)
             oh->len = fuse_rename();
             break;
         case FUSE_LINK:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LINK:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_LINK:");
             break;
         case FUSE_OPEN:
             oh->len = fuse_open();
@@ -368,9 +392,12 @@ dav_run_msgloop(volatile int *keep_on_running)
             break;
         case FUSE_FSYNC:
             if (debug) {
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_FSYNC:");
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx",
-                (unsigned long long) ih->nodeid);
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                                   "FUSE_FSYNC %llu: n=0x%llx",
+                                   (unsigned long long) ih->unique,
+                                   (unsigned long long) ih->nodeid);
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+                       ih->uid, ih->gid, ih->pid);
             }
             oh->error = dav_sync((dav_node *) ((size_t) ih->nodeid));
             if (oh->error)
@@ -378,28 +405,16 @@ dav_run_msgloop(volatile int *keep_on_running)
             oh->len = sizeof(struct fuse_out_header);
             break;
         case FUSE_SETXATTR:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_SETXATTR:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_SETXATTR:");
             break;
         case FUSE_GETXATTR:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETXATTR:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_GETXATTR:");
             break;
         case FUSE_LISTXATTR:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LISTXATTR:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_LISTXATTR:");
             break;
         case FUSE_REMOVEXATTR:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_REMOVEXATTR:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_REMOVEXATTR:");
             break;
         case FUSE_FLUSH:
             if (debug)
@@ -421,16 +436,46 @@ dav_run_msgloop(volatile int *keep_on_running)
             oh->len = fuse_release();
             break;
         case FUSE_FSYNCDIR:
-            if (debug)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_FSYNCDIR:");
-            oh->error = -ENOSYS;
-            oh->len = sizeof(struct fuse_out_header);
+            oh->len = not_implemented("FUSE_FSYNCDIR:");
+            break;
+        case FUSE_GETLK:
+            oh->len = not_implemented("FUSE_GETLK:");
+            break;
+        case FUSE_SETLK:
+            oh->len = not_implemented("FUSE_SETLK:");
+            break;
+        case FUSE_SETLKW:
+            oh->len = not_implemented("FUSE_SETLKW:");
             break;
         case FUSE_ACCESS:
             oh->len = fuse_access();
             break;
         case FUSE_CREATE:
             oh->len = fuse_create();
+            break;
+        case FUSE_INTERRUPT:
+            oh->len = not_implemented("FUSE_INTERRUPT:");
+            break;
+        case FUSE_BMAP:
+            oh->len = not_implemented("FUSE_BMAP:");
+            break;
+        case FUSE_DESTROY:
+            oh->len = not_implemented("FUSE_DESTROY:");
+            break;
+        case FUSE_IOCTL:
+            oh->len = not_implemented("FUSE_IOCTL:");
+            break;
+        case FUSE_POLL:
+            oh->len = not_implemented("FUSE_POLL:");
+            break;
+        case FUSE_NOTIFY_REPLY:
+            oh->len = not_implemented("FUSE_NOTIFY_REPLY:");
+            break;
+        case FUSE_BATCH_FORGET:
+            oh->len = not_implemented("FUSE_BATCH_FORGET:");
+            break;
+        case FUSE_FALLOCATE:
+            oh->len = not_implemented("FUSE_FALLOCATE:");
             break;
         default:
             if (debug)
@@ -478,15 +523,16 @@ dav_run_msgloop(volatile int *keep_on_running)
 static uint32_t
 fuse_access(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_access_in *in = (struct fuse_access_in *)
-                                (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
+    struct fuse_access_in *in = (struct fuse_access_in *) upcall;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_ACCESS:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               (unsigned long long) ih->nodeid, in->mask);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  uid %i", ih->uid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_ACCESS %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  m=0x%x",
+               in->mask);
     }
 
     oh->error = dav_access((dav_node *) ((size_t) ih->nodeid), ih->uid,
@@ -502,18 +548,18 @@ fuse_access(void)
 static uint32_t
 fuse_create(void)
 {
-    struct fuse_in_header *ih= (struct fuse_in_header *) buf;
-    struct fuse_open_in *in = (struct fuse_open_in *)
-                              (buf + sizeof(struct fuse_in_header));
-    char *name = buf + sizeof(struct fuse_in_header)
-                 + sizeof(struct fuse_open_in);
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct create_out *out = (struct create_out *)
-                             (buf + sizeof(struct fuse_out_header));
+    struct fuse_create_in *in = (struct fuse_create_in *) upcall;
+    char *name = upcall + sizeof(struct fuse_create_in);
+    struct create_out *out = (struct create_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_CREATE:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               (unsigned long long) ih->nodeid, in->flags);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_CREATE %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  f=0x%x m=0%o um=0%o",
+               in->flags, in->mode, in->umask);
     }
 
     int created = 0;
@@ -570,6 +616,7 @@ fuse_create(void)
 
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  fd %i", fd);
+
     return sizeof(struct fuse_out_header) + sizeof(struct create_out);
 }
 
@@ -577,14 +624,17 @@ fuse_create(void)
 static uint32_t
 fuse_getattr(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_attr_out *out = (struct fuse_attr_out *)
-                                (buf + sizeof(struct fuse_out_header));
+    struct fuse_getattr_in *in = (struct fuse_getattr_in *) upcall;
+    struct fuse_attr_out *out = (struct fuse_attr_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETATTR:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx",
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_GETATTR %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
                (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  f=0x%x fh=%llu",
+               in->getattr_flags, in->fh);
     }
 
     oh->error = dav_getattr((dav_node *) ((size_t) ih->nodeid), ih->uid);
@@ -606,16 +656,33 @@ fuse_getattr(void)
 static uint32_t
 fuse_init(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_init_in *in = (struct fuse_init_in *)
-                                  (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_init_out *out = (struct fuse_init_out *)
-                                (buf + sizeof(struct fuse_out_header));
+    struct fuse_init_in *in = (struct fuse_init_in *) upcall;
+    struct fuse_init_out *out = (struct fuse_init_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_INIT:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  version %i.%i",
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_INIT %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  verson=%u.%u",
                in->major, in->minor);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  ra=%u f=0x%x",
+               in->max_readahead, in->flags);
+    }
+
+    if (in->major < FUSE_KERNEL_VERSION
+        || (in->major == FUSE_KERNEL_VERSION && in->minor < FUSE_MIN_MINOR)) {
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+               "FATAL: Kernel-version too old.");
+        oh->error = -ENOSYS;
+        return sizeof(struct fuse_out_header);
+    }
+
+    if (in->major > FUSE_KERNEL_VERSION) {
+        oh->error = 0;
+        out->major = FUSE_KERNEL_VERSION;
+        return sizeof(struct fuse_out_header);
     }
 
     dav_node *node;
@@ -630,12 +697,16 @@ fuse_init(void)
 
     root = (size_t) node;
     out->major = FUSE_KERNEL_VERSION;
-    out->minor = FUSE_KERNEL_MINOR_VERSION;
-    out->unused[0] = 0;
-    out->unused[1] = 0;
-    out->unused[2] = 0;
-    out->max_write = buf_size - sizeof(struct fuse_in_header)
-                     - sizeof(struct fuse_write_in) - 4095;
+    if (in->minor > FUSE_KERNEL_MINOR_VERSION) {
+        out->minor = FUSE_KERNEL_MINOR_VERSION;
+    } else {
+        out->minor = in->minor;
+    }
+    out->max_readahead = 0;
+    out->flags = 0;
+    out->max_background = 0;
+    out->congestion_threshold = 0;
+    out->max_write = buf_size - 1024;
 
     return sizeof(struct fuse_out_header) + sizeof(struct fuse_init_out);
 }
@@ -644,15 +715,16 @@ fuse_init(void)
 static uint32_t
 fuse_lookup(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    char * name = (char *) (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_entry_out *out = (struct fuse_entry_out *)
-                                 (buf + sizeof(struct fuse_out_header));
+    char * name = upcall;
+    struct fuse_entry_out *out = (struct fuse_entry_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LOOKUP:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-               (unsigned long long) ih->nodeid, name);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_LOOKUP %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  %s", name);
     }
 
     dav_node *node = NULL;
@@ -666,7 +738,7 @@ fuse_lookup(void)
         return sizeof(struct fuse_out_header);
     }
 
-    out->nodeid = (size_t) node;
+    out->nodeid = (uint64_t) ((size_t) node);
     out->generation = out->nodeid;
     out->entry_valid = 1;
     out->attr_valid = 1;
@@ -681,18 +753,18 @@ fuse_lookup(void)
 static uint32_t
 fuse_mkdir(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_mkdir_in *in = (struct fuse_mkdir_in *)
-                               (buf + sizeof(struct fuse_in_header));
-    char *name = (char *) (buf + sizeof(struct fuse_in_header)
-                           + sizeof(struct fuse_mkdir_in));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_entry_out *out = (struct fuse_entry_out *)
-                                 (buf + sizeof(struct fuse_out_header));
+    struct fuse_mkdir_in *in = (struct fuse_mkdir_in *) upcall;
+    char *name = upcall + sizeof(struct fuse_mkdir_in);
+    struct fuse_entry_out *out = (struct fuse_entry_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_MKDIR:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, %s",
-               (unsigned long long) ih->nodeid, name);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_MKDIR %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  m=0%o um=0%o %s",
+               in->mode, in->umask, name);
     }
 
     dav_node *node = NULL;
@@ -721,18 +793,18 @@ fuse_mkdir(void)
 static uint32_t
 fuse_mknod(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_mknod_in *in = (struct fuse_mknod_in *)
-                               (buf + sizeof(struct fuse_in_header));
-    char *name = (char *) (buf + sizeof(struct fuse_in_header)
-                           + sizeof(struct fuse_mknod_in));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_entry_out *out = (struct fuse_entry_out *)
-                                 (buf + sizeof(struct fuse_out_header));
+    struct fuse_mknod_in *in = (struct fuse_mknod_in *) upcall;
+    char *name = upcall + sizeof(struct fuse_mknod_in);
+    struct fuse_entry_out *out = (struct fuse_entry_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_MKNOD:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  p 0x%llx, m 0%o",
-               (unsigned long long) ih->nodeid, in->mode);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_MKNOD %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  m=0%o r=%u um=0%o",
+               in->mode, in->rdev, in->umask);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  %s", name);
     }
 
@@ -767,20 +839,24 @@ fuse_mknod(void)
 static uint32_t
 fuse_open(void)
 {
-    struct fuse_in_header *ih= (struct fuse_in_header *) buf;
-    struct fuse_open_in *in = (struct fuse_open_in *)
-                              (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_open_out *out = (struct fuse_open_out *)
-                                (buf + sizeof(struct fuse_out_header));
+    struct fuse_open_in *in = (struct fuse_open_in *) upcall;
+    struct fuse_open_out *out = (struct fuse_open_out *) reply;
+
     if (debug) {
         if (ih->opcode == FUSE_OPENDIR) {
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_OPENDIR:");
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                   "FUSE_OPENDIR %llu: n=0x%llx",
+                   (unsigned long long) ih->unique,
+                   (unsigned long long) ih->nodeid);
         } else {
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_OPEN:");
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                   "FUSE_OPEN %llu: n=0x%llx",
+                   (unsigned long long) ih-> unique,
+                   (unsigned long long) ih->nodeid);
         }
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               (unsigned long long) ih->nodeid, in->flags);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  f=0x%x", in->flags);
     }
 
     int fd = 0;
@@ -800,6 +876,7 @@ fuse_open(void)
 
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  fd %i", fd);
+
     return sizeof(struct fuse_out_header) + sizeof(struct fuse_open_out);
 }
 
@@ -807,21 +884,27 @@ fuse_open(void)
 static uint32_t
 fuse_read(void)
 {
-    struct fuse_in_header *ih= (struct fuse_in_header *) buf;
-    struct fuse_read_in *in = (struct fuse_read_in *)
-                              (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
+    struct fuse_read_in *in = (struct fuse_read_in *) upcall;
+
     if (debug) {
         if (ih->opcode == FUSE_READDIR) {
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_READDIR:");
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                   "FUSE_READDIR %llu: n=0x%llx",
+                   (unsigned long long) ih->unique,
+                   (unsigned long long) ih->nodeid);
         } else {
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_READ:");
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                   "FUSE_READ %llu: n=0x%llx",
+                   (unsigned long long) ih-> unique,
+                   (unsigned long long) ih->nodeid);
         }
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, fd %llu",
-               (unsigned long long) ih->nodeid, (unsigned long long) in->fh);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i", ih->pid);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  size %u, off %llu",
-               in->size, (unsigned long long) in->offset);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  fh=%llu, off=%llu, sz=%u",
+               (unsigned long long) in->fh, (unsigned long long) in->offset,
+               in->size);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  rf=0x%x, f=0x%x",
+               in->read_flags, in->flags);
     }
 
     if (in->size > (buf_size - sizeof(struct fuse_out_header))) {
@@ -831,8 +914,7 @@ fuse_read(void)
 
     ssize_t len;
     oh->error = dav_read(&len, (dav_node *) ((size_t) ih->nodeid),
-                         in->fh, buf + sizeof(struct fuse_out_header),
-                         in->size, in->offset);
+                         in->fh, reply, in->size, in->offset);
 
     if (oh->error)
         oh->error *= -1;
@@ -844,20 +926,24 @@ fuse_read(void)
 static uint32_t
 fuse_release(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_release_in *in = (struct fuse_release_in *)
-                                 (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
+    struct fuse_release_in *in = (struct fuse_release_in *) upcall;
+
     if (debug) {
         if (ih->opcode == FUSE_RELEASEDIR) {
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RELEASEDIR:");
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                   "FUSE_RELEASEDIR %llu: n=0x%llx",
+                   (unsigned long long) ih->unique,
+                   (unsigned long long) ih->nodeid);
         } else {
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RELEASE:");
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                   "FUSE_RELEASE %llu: n=0x%llx",
+                   (unsigned long long) ih->unique,
+                   (unsigned long long) ih->nodeid);
         }
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, f 0%o",
-               (unsigned long long) ih->nodeid, in->flags);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i, fd %llu",
-               ih->pid, (unsigned long long) in->fh);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  fh=%llu, f=0x%x, rf=0x%x",
+               (unsigned long long) in->fh, in->flags, in->release_flags);
     }
 
     oh->error = dav_close((dav_node *) ((size_t) ih->nodeid), in->fh,
@@ -873,18 +959,18 @@ fuse_release(void)
 static uint32_t
 fuse_rename(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_rename_in *in = (struct fuse_rename_in *)
-                                (buf + sizeof(struct fuse_in_header));
-    char *old = (char *) (buf + sizeof(struct fuse_in_header)
-                          + sizeof(struct fuse_rename_in));
+    struct fuse_rename_in *in = (struct fuse_rename_in *) upcall;
+    char *old = upcall + sizeof(struct fuse_rename_in);
     char *new = old + strlen(old) + 1;
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RENAME:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  sp 0x%llx, %s",
-               (unsigned long long) ih->nodeid, old);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  dp 0x%llx, %s",
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_RENAME %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  %s", old);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n=0x%llx %s",
                (unsigned long long) in->newdir, new);
     }
 
@@ -903,22 +989,21 @@ fuse_rename(void)
 static uint32_t
 fuse_setattr(void)
 {
-    struct fuse_in_header *ih = (struct fuse_in_header *) buf;
-    struct fuse_setattr_in *in = (struct fuse_setattr_in *)
-                                 (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_attr_out *out = (struct fuse_attr_out *)
-                                (buf + sizeof(struct fuse_out_header));
+    struct fuse_setattr_in *in = (struct fuse_setattr_in *) upcall;
+    struct fuse_attr_out *out = (struct fuse_attr_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_SETATTR:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, m 0%o",
-               (unsigned long long) ih->nodeid, in->mode);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  uid %i, gid %i",
-               in->uid, in->gid);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  sz %llu, at %llu,",
-               (unsigned long long) in->size, (unsigned long long) in->atime);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  mt %llu",
-               (unsigned long long) in->mtime);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_SETATTR %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  v=0x%x sz=%llu",
+               in->valid, (unsigned long long) in->size);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  at=%llu mt=%llu",
+               (unsigned long long) in->atime, (unsigned long long) in->mtime);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  m=0%o uid=%u gid=%u",
+               in->mode, in->uid, in->gid);
     }
 
     oh->error = dav_setattr((dav_node *) ((size_t) ih->nodeid), ih->uid,
@@ -946,11 +1031,15 @@ fuse_setattr(void)
 static uint32_t
 fuse_stat(void)
 {
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_statfs_out *out = (struct fuse_statfs_out *)
-                                  (buf + sizeof(struct fuse_out_header));
-    if (debug)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_STATFS:");
+    struct fuse_statfs_out *out = (struct fuse_statfs_out *) reply;
+
+    if (debug) {
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_STATFS %llu: n=0x%llx",
+               (unsigned long long) ih->unique,
+               (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+    }
 
     dav_stat *st = dav_statfs();
     if (!st) {
@@ -988,20 +1077,20 @@ fuse_stat(void)
 static uint32_t
 fuse_write(void)
 {
-    struct fuse_in_header *ih= (struct fuse_in_header *) buf;
-    struct fuse_write_in *in = (struct fuse_write_in *)
-                               (buf + sizeof(struct fuse_in_header));
-    struct fuse_out_header *oh = (struct fuse_out_header *) buf;
-    struct fuse_write_out *out = (struct fuse_write_out *)
-                                 (buf + sizeof(struct fuse_out_header));
+    struct fuse_write_in *in = (struct fuse_write_in *) upcall;
+    struct fuse_write_out *out = (struct fuse_write_out *) reply;
+
     if (debug) {
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_WRITE:");
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  n 0x%llx, fd %llu",
-               (unsigned long long) ih->nodeid, (unsigned long long) in->fh);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  pid %i, flags 0%o",
-               ih->pid, in->write_flags);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  size %u, off %llu",
-               in->size, (unsigned long long) in->offset);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "FUSE_WRITE %llu: n=0x%llx",
+                   (unsigned long long) ih->unique,
+                   (unsigned long long) ih->nodeid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
+               ih->uid, ih->gid, ih->pid);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  fh=%llu, off=%llu, sz=%u",
+               (unsigned long long) in->fh, (unsigned long long) in->offset,
+               in->size);
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  wf=0x%x, f=0x%x",
+               in->write_flags, in->flags);
     }
 
     if (in->size > (buf_size - sizeof(struct fuse_in_header)
@@ -1012,8 +1101,7 @@ fuse_write(void)
 
     size_t size;
     oh->error = dav_write(&size, (dav_node *) ((size_t) ih->nodeid),
-                          in->fh, buf + sizeof(struct fuse_in_header)
-                          + sizeof(struct fuse_write_in),
+                          in->fh, upcall + sizeof(struct fuse_write_in),
                           in->size, in->offset);
 
     if (oh->error) {
@@ -1025,6 +1113,17 @@ fuse_write(void)
     out->padding = 0;
 
     return sizeof(struct fuse_out_header) + sizeof(struct fuse_write_out);
+}
+
+static uint32_t
+not_implemented(const char *msg)
+{
+    if (debug)
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "%s", msg);
+
+    oh->error = -ENOSYS;
+
+    return sizeof(struct fuse_out_header);
 }
 
 
@@ -1101,4 +1200,7 @@ set_attr(struct fuse_attr *attr, const dav_node *node)
     attr->uid = node->uid;
     attr->gid = node->gid;
     attr->rdev = 0;
+/* TODO: set blocksize */
+    attr->blksize = 0;
+    attr->padding = 0;
 }

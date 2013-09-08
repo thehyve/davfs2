@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.5.0\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2013-08-09 12:39+0200\n"
+"POT-Creation-Date: 2013-09-01 18:45+0200\n"
 "PO-Revision-Date: 2013-08-09 12:49+0100\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/cache.c:656
+#: src/cache.c:650
 #, c-format
 msgid ""
 "connection timed out two times;\n"
@@ -26,12 +26,12 @@ msgstr ""
 "die Verbindung wurde zweimal wegen Zeitüberschreitung abgebrochen;\n"
 "ich versuche es zum letzten mal"
 
-#: src/cache.c:661
+#: src/cache.c:655
 #, c-format
 msgid "Last try succeeded.\n"
 msgstr "Der letzte Versuch war erfolgreich.\n"
 
-#: src/cache.c:664
+#: src/cache.c:658
 #, c-format
 msgid ""
 "server temporarily unreachable;\n"
@@ -40,7 +40,7 @@ msgstr ""
 "der Server ist zur Zeit nicht erreichbar;\n"
 "das Dateisystem wird trotzdem eingehängt"
 
-#: src/cache.c:667
+#: src/cache.c:661
 #, c-format
 msgid ""
 "Mounting failed.\n"
@@ -49,22 +49,22 @@ msgstr ""
 "das Einhängen schlug fehl;\n"
 "%s"
 
-#: src/cache.c:706
+#: src/cache.c:700
 #, c-format
 msgid "can't replace %s with %s"
 msgstr "kann %s nicht durch %s ersetzen"
 
-#: src/cache.c:710
+#: src/cache.c:704
 #, c-format
 msgid "error writing new index file %s"
 msgstr "Fehler beim Schreiben der neuen Indexdatei %s"
 
-#: src/cache.c:714
+#: src/cache.c:708
 #, c-format
 msgid "can't create new index file for %s"
 msgstr "kann keine neue Indexdatei für %s erzeugen"
 
-#: src/cache.c:925
+#: src/cache.c:911
 #, c-format
 msgid ""
 "File %s exists on the server but should not. Maybe it is an error in the "
@@ -74,156 +74,156 @@ msgstr ""
 "behandelt der Server LOCK-Requests fehlerhaft. Du kannst es mit der Option "
 "'use_locks 0' in davfs2.conf versuchen."
 
-#: src/cache.c:2512 src/cache.c:2545
+#: src/cache.c:2384 src/cache.c:2417
 #, c-format
 msgid "can't create cache file %s"
 msgstr "kann die Cachedatei %s nicht erzeugen"
 
-#: src/cache.c:2560
+#: src/cache.c:2432
 #, c-format
 msgid "error writing directory %s"
 msgstr "Fehler beim Schreiben des Verzeichnisses %s"
 
-#: src/cache.c:2723 src/mount_davfs.c:1013
+#: src/cache.c:2594 src/mount_davfs.c:1011
 #, c-format
 msgid "can't read user data base"
 msgstr "kann die Benutzerdatenbank nicht lesen"
 
-#: src/cache.c:2735
+#: src/cache.c:2606
 #, c-format
 msgid "can't open cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht öffnen"
 
-#: src/cache.c:2750
+#: src/cache.c:2621
 #, c-format
 msgid "can't create cache directory %s"
 msgstr "kann das Cacheverzeichnis %s nicht erzeugen"
 
-#: src/cache.c:2757
+#: src/cache.c:2628
 #, c-format
 msgid "can't access cache directory %s"
 msgstr "Zugriff auf das Cachverzeichnis %s verweigert"
 
-#: src/cache.c:2760
+#: src/cache.c:2631
 #, c-format
 msgid "wrong owner of cache directory %s"
 msgstr "das Cacheverzeichnis %s hat den falschen Besitzer"
 
-#: src/cache.c:2764
+#: src/cache.c:2635
 #, c-format
 msgid "wrong permissions set for cache directory %s"
 msgstr "das Cachverzeichnis %s hat die falschen Dateirechte"
 
-#: src/cache.c:2794
+#: src/cache.c:2665
 msgid "found orphaned file in cache:"
 msgstr "fand verwaiste Datei im Cache:"
 
-#: src/cache.c:2867
+#: src/cache.c:2738
 #, c-format
 msgid "error parsing %s"
 msgstr "Syntaxfehler in %s"
 
-#: src/cache.c:2868
+#: src/cache.c:2739
 #, c-format
 msgid "  at line %i"
 msgstr "  in Zeile %i"
 
-#: src/cache.c:2913
+#: src/cache.c:2784
 #, c-format
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
 "Die Größe der offenen Dateien überschreitet die maximale Größe des Cache um "
 "%llu MiBytes"
 
-#: src/kernel_interface.c:209
-#, c-format
-msgid "can't open fuse device"
-msgstr "kann die fuse-Gerätedatei nicht öffnen"
-
-#: src/kernel_interface.c:217
-#, c-format
-msgid "mounting failed"
-msgstr "das Aushängen schlug fehl"
-
-#: src/kernel_interface.c:226
+#: src/kernel_interface.c:219
 #, c-format
 msgid "can't allocate message buffer"
 msgstr "kein Speicher für den Nachrichtenpuffer verfügbar"
 
-#: src/mount_davfs.c:294
+#: src/kernel_interface.c:246
+#, c-format
+msgid "can't open fuse device"
+msgstr "kann die fuse-Gerätedatei nicht öffnen"
+
+#: src/kernel_interface.c:254
+#, c-format
+msgid "mounting failed"
+msgstr "das Aushängen schlug fehl"
+
+#: src/mount_davfs.c:291
 #, c-format
 msgid "can't start daemon process"
 msgstr "kann den Hintergrundprozess nicht starten"
 
-#: src/mount_davfs.c:316
+#: src/mount_davfs.c:313
 msgid "can't release root privileges"
 msgstr "ich werde die root-Rechte nicht los"
 
-#: src/mount_davfs.c:333
+#: src/mount_davfs.c:330
 msgid "failed to release tty properly"
 msgstr "kann das Terminal nicht freigeben"
 
-#: src/mount_davfs.c:345
+#: src/mount_davfs.c:342
 #, c-format
 msgid "can't write pid file %s"
 msgstr "kann die PID-Datei %s nicht schreiben"
 
-#: src/mount_davfs.c:362
+#: src/mount_davfs.c:359
 #, c-format
 msgid "unmounting %s"
 msgstr "hänge %s aus"
 
-#: src/mount_davfs.c:364
+#: src/mount_davfs.c:361
 msgid "unmounting failed"
 msgstr "das Aushängen schlug fehl"
 
-#: src/mount_davfs.c:435
+#: src/mount_davfs.c:432
 #, c-format
 msgid "can't change group id"
 msgstr "kann die Gruppenkennung nicht ändern"
 
-#: src/mount_davfs.c:473 src/mount_davfs.c:567 src/mount_davfs.c:593
+#: src/mount_davfs.c:470 src/mount_davfs.c:564 src/mount_davfs.c:590
 #, c-format
 msgid "can't create directory %s"
 msgstr "kann das Verzeichnis %s nicht erzeugen"
 
-#: src/mount_davfs.c:477 src/mount_davfs.c:571 src/mount_davfs.c:597
-#: src/mount_davfs.c:602 src/mount_davfs.c:610
+#: src/mount_davfs.c:474 src/mount_davfs.c:568 src/mount_davfs.c:594
+#: src/mount_davfs.c:599 src/mount_davfs.c:607
 #, c-format
 msgid "can't access directory %s"
 msgstr "Zugriff auf das Verzeichnis %s verweigert"
 
-#: src/mount_davfs.c:483 src/mount_davfs.c:577
+#: src/mount_davfs.c:480 src/mount_davfs.c:574
 #, c-format
 msgid "can't change mode of directory %s"
 msgstr "kann die Rechte des Verzeichnisses %s nicht ändern"
 
-#: src/mount_davfs.c:488 src/mount_davfs.c:583
+#: src/mount_davfs.c:485 src/mount_davfs.c:580
 #, c-format
 msgid "can't change group of directory %s"
 msgstr "kann die Gruppenkennung des Verneichnisses %s nicht ändern"
 
-#: src/mount_davfs.c:495 src/mount_davfs.c:551
+#: src/mount_davfs.c:492 src/mount_davfs.c:548
 #, c-format
 msgid "file %s has wrong owner"
 msgstr "die Datei %s hat den falschen Besitzer"
 
-#: src/mount_davfs.c:499 src/mount_davfs.c:556
+#: src/mount_davfs.c:496 src/mount_davfs.c:553
 #, c-format
 msgid "file %s has wrong permissions"
 msgstr "die Dateirechte für %s sind falsch"
 
-#: src/mount_davfs.c:628 src/mount_davfs.c:680
+#: src/mount_davfs.c:625 src/mount_davfs.c:677
 #, c-format
 msgid "can't open file %s"
 msgstr "kann die Datei %s nicht öffnen"
 
-#: src/mount_davfs.c:633
+#: src/mount_davfs.c:630
 #, c-format
 msgid "%s is already mounted on %s"
 msgstr "%s ist bereits auf %s eingehängt"
 
-#: src/mount_davfs.c:655
+#: src/mount_davfs.c:652
 #, c-format
 msgid ""
 "found PID file %s.\n"
@@ -234,84 +234,84 @@ msgstr ""
 "Möglicherweise wird %s von einem anderen Prozess benutzt,\n"
 "oder ein anderer Mount-Prozess endete irregulär"
 
-#: src/mount_davfs.c:697
+#: src/mount_davfs.c:694
 #, c-format
 msgid "no entry for %s found in %s"
 msgstr "für %s ist kein Eintrag in %s"
 
-#: src/mount_davfs.c:701
+#: src/mount_davfs.c:698
 #, c-format
 msgid "different URL in %s"
 msgstr "in %s ist eine andere URL angegeben"
 
-#: src/mount_davfs.c:704
+#: src/mount_davfs.c:701
 #, c-format
 msgid "different file system type in %s"
 msgstr "in %s ist ein anderer Dateisystemtyp angegeben"
 
-#: src/mount_davfs.c:715
+#: src/mount_davfs.c:712
 #, c-format
 msgid "different config file in %s"
 msgstr "in %s ist eine andere Konfigurationsdatei angegeben"
 
-#: src/mount_davfs.c:721
+#: src/mount_davfs.c:718
 #, c-format
 msgid "different username in %s"
 msgstr "in %s ist ein anderer Benutzername angegeben"
 
-#: src/mount_davfs.c:725
+#: src/mount_davfs.c:722
 #, c-format
 msgid "neither option `user' nor option `users' set in %s"
 msgstr "in %s ist weder die Option „user” noch die Option „users” angegeben"
 
-#: src/mount_davfs.c:728
+#: src/mount_davfs.c:725
 #, c-format
 msgid "different mount options in %s"
 msgstr "in %s sind andere Mount-Optionen angegeben"
 
-#: src/mount_davfs.c:731
+#: src/mount_davfs.c:728
 #, c-format
 msgid "different uid in %s"
 msgstr "in %s ist eine andere uid angegeben"
 
-#: src/mount_davfs.c:733
+#: src/mount_davfs.c:730
 #, c-format
 msgid "different gid in %s"
 msgstr "in %s ist eine andere gid angegeben"
 
-#: src/mount_davfs.c:735
+#: src/mount_davfs.c:732
 #, c-format
 msgid "different dir_mode in %s"
 msgstr "in %s ist ein anderer dir_mode angegeben"
 
-#: src/mount_davfs.c:737
+#: src/mount_davfs.c:734
 #, c-format
 msgid "different file_mode in %s"
 msgstr "in %s ist ein anderer file_mode angegeben"
 
-#: src/mount_davfs.c:757
+#: src/mount_davfs.c:754
 #, c-format
 msgid "you can't set file owner different from your uid"
 msgstr ""
 "du kannst als Besitzer des Dateisystems keine fremde Benutzerkennung angeben"
 
-#: src/mount_davfs.c:769
+#: src/mount_davfs.c:766
 #, c-format
 msgid "you must be member of the group of the file system"
 msgstr ""
 "du musst Mitglied in der Gruppe sein, zu der das Dateisystem gehören soll"
 
-#: src/mount_davfs.c:780
+#: src/mount_davfs.c:777
 #, c-format
 msgid "user %s must be member of group %s"
 msgstr "der Benutzer %s muss Mitglied der Gruppe %s sein"
 
-#: src/mount_davfs.c:800 src/mount_davfs.c:1139
+#: src/mount_davfs.c:797 src/mount_davfs.c:1137
 #, c-format
 msgid "can't change effective user id"
 msgstr "kann die effektive Benutzer-ID nicht ändern"
 
-#: src/mount_davfs.c:844 src/umount_davfs.c:92
+#: src/mount_davfs.c:841 src/umount_davfs.c:92
 #, c-format
 msgid ""
 "This is free software; see the source for copying conditions.  There is NO\n"
@@ -322,67 +322,67 @@ msgstr ""
 "gibt keine Garantie; auch nicht für VERKAUFBARKEIT oder FÜR SPEZIELLE "
 "ZWECKE.\n"
 
-#: src/mount_davfs.c:860 src/umount_davfs.c:117
+#: src/mount_davfs.c:857 src/umount_davfs.c:117
 #, c-format
 msgid "unknown error parsing arguments"
 msgstr "Fehler beim Analysieren der Befehlsargumente"
 
-#: src/mount_davfs.c:869 src/umount_davfs.c:123
+#: src/mount_davfs.c:866 src/umount_davfs.c:123
 #, c-format
 msgid "missing argument"
 msgstr "zu wenig Argumente"
 
-#: src/mount_davfs.c:882
+#: src/mount_davfs.c:879
 #, c-format
 msgid "can't evaluate path of mount point %s"
 msgstr "kann den eindeutigen Pfad des Einhängepunktes %s nicht ermitteln"
 
-#: src/mount_davfs.c:885 src/umount_davfs.c:125
+#: src/mount_davfs.c:882 src/umount_davfs.c:125
 #, c-format
 msgid "too many arguments"
 msgstr "zu viele Argumente"
 
-#: src/mount_davfs.c:892
+#: src/mount_davfs.c:889
 #, c-format
 msgid "A relative mount point must lie within your home directory"
 msgstr "Ein relativer Einhängepunkt muss in deinem Home-Verzeichnis liegen"
 
-#: src/mount_davfs.c:897
+#: src/mount_davfs.c:894
 #, c-format
 msgid "no WebDAV-server specified"
 msgstr "es wurde kein WebDAV-Server angegeben"
 
-#: src/mount_davfs.c:900
+#: src/mount_davfs.c:897
 #, c-format
 msgid "invalid URL"
 msgstr "die URL ist ungültig"
 
-#: src/mount_davfs.c:930
+#: src/mount_davfs.c:927
 #, c-format
 msgid "user %s does not exist"
 msgstr "der Benutzer %s existiert nicht"
 
-#: src/mount_davfs.c:938
+#: src/mount_davfs.c:935
 #, c-format
 msgid "group %s does not exist"
 msgstr "die Gruppe %s existiert nicht"
 
-#: src/mount_davfs.c:1004
+#: src/mount_davfs.c:1002
 #, c-format
 msgid "program is not setuid root"
 msgstr "die Programmdatei hat das setuid-Bit nicht gesetzt"
 
-#: src/mount_davfs.c:1022
+#: src/mount_davfs.c:1020
 #, c-format
 msgid "can't read group data base"
 msgstr "kann die Gruppendatenbank nicht lesen"
 
-#: src/mount_davfs.c:1049 src/mount_davfs.c:1062 src/mount_davfs.c:1064
-#: src/mount_davfs.c:1082 src/mount_davfs.c:1084 src/mount_davfs.c:1099
+#: src/mount_davfs.c:1047 src/mount_davfs.c:1060 src/mount_davfs.c:1062
+#: src/mount_davfs.c:1080 src/mount_davfs.c:1082 src/mount_davfs.c:1097
 msgid "Password: "
 msgstr "Passwort:"
 
-#: src/mount_davfs.c:1053
+#: src/mount_davfs.c:1051
 #, c-format
 msgid ""
 "Please enter the username to authenticate with proxy\n"
@@ -391,11 +391,11 @@ msgstr ""
 "Gib bitte den Benutzernamen für den Proxy %s an; wenn du keinen angeben "
 "willst, drücke Return.\n"
 
-#: src/mount_davfs.c:1055 src/mount_davfs.c:1075
+#: src/mount_davfs.c:1053 src/mount_davfs.c:1073
 msgid "Username:"
 msgstr "Benutzername:"
 
-#: src/mount_davfs.c:1059
+#: src/mount_davfs.c:1057
 #, c-format
 msgid ""
 "Please enter the password to authenticate user %s with proxy\n"
@@ -404,7 +404,7 @@ msgstr ""
 "Gib bitte das Passwort von %s für den Proxy %s\n"
 "an; wenn du keines angeben willst, drücke Return.\n"
 
-#: src/mount_davfs.c:1073
+#: src/mount_davfs.c:1071
 #, c-format
 msgid ""
 "Please enter the username to authenticate with server\n"
@@ -413,7 +413,7 @@ msgstr ""
 "Gib bitte den Benutzernamen für den Server %s an; wenn du keinen angeben "
 "willst, drücke Return.\n"
 
-#: src/mount_davfs.c:1079
+#: src/mount_davfs.c:1077
 #, c-format
 msgid ""
 "Please enter the password to authenticate user %s with server\n"
@@ -422,7 +422,7 @@ msgstr ""
 "Gib bitte das Passwort von %s für den Server %s\n"
 "an; wenn du keines angeben willst, drücke Return.\n"
 
-#: src/mount_davfs.c:1097
+#: src/mount_davfs.c:1095
 #, c-format
 msgid ""
 "Please enter the password to decrypt client\n"
@@ -431,17 +431,17 @@ msgstr ""
 "Gib bitte das Passwort für die Entschlüsselung des\n"
 "Client-Zertifikats %s ein.\n"
 
-#: src/mount_davfs.c:1104
+#: src/mount_davfs.c:1102
 #, c-format
 msgid "can't decrypt client certificate %s"
 msgstr "kann das Zertifikat %s nicht entschlüsseln"
 
-#: src/mount_davfs.c:1167
+#: src/mount_davfs.c:1165
 #, c-format
 msgid "pid %i, got signal %i"
 msgstr "PID %i, erhielt Signal %i"
 
-#: src/mount_davfs.c:1206
+#: src/mount_davfs.c:1204
 #, c-format
 msgid ""
 "Warning: can't write entry into mtab, but will mount the file system anyway"
@@ -449,72 +449,72 @@ msgstr ""
 "Warnung: kann keinen Eintrag in die mtab schreiben, häne das Dateisystem "
 "trotzdem ein."
 
-#: src/mount_davfs.c:1232
+#: src/mount_davfs.c:1230
 #, c-format
 msgid "option %s has invalid argument;it must be a decimal number"
 msgstr "das Argument der Option %s ist ungültig; es muss eine Dezimalzahl sein"
 
-#: src/mount_davfs.c:1235
+#: src/mount_davfs.c:1233
 #, c-format
 msgid "option %s has invalid argument;it must be an octal number"
 msgstr "das Argument der Option %s ist ungültig; es muss eine Oktalzahl sein"
 
-#: src/mount_davfs.c:1238
+#: src/mount_davfs.c:1236
 #, c-format
 msgid "option %s has invalid argument;it must be a number"
 msgstr "das Argument der Option %s ist ungültig; es muss eine Zahl sein"
 
-#: src/mount_davfs.c:1513
+#: src/mount_davfs.c:1476
 #, c-format
 msgid "option %s requires argument"
 msgstr "die Option %s verlangt ein Argument"
 
-#: src/mount_davfs.c:1605
+#: src/mount_davfs.c:1568
 #, c-format
 msgid "Unknown option %s.\n"
 msgstr "unbekannte Option %s.\n"
 
-#: src/mount_davfs.c:1976
+#: src/mount_davfs.c:1937
 #, c-format
 msgid "can't read certificate %s"
 msgstr "kann das Zertifikat %s nicht lesen"
 
-#: src/mount_davfs.c:2008 src/mount_davfs.c:2021
+#: src/mount_davfs.c:1969 src/mount_davfs.c:1982
 #, c-format
 msgid "can't read client certificate %s"
 msgstr "kann das Client-Zertifikat %s nicht lesen"
 
-#: src/mount_davfs.c:2012
+#: src/mount_davfs.c:1973
 #, c-format
 msgid "client certificate file %s has wrong owner"
 msgstr ""
 "die Datei %s\n"
 "des Client-Zertifikats hat den falschen Besitzer"
 
-#: src/mount_davfs.c:2016
+#: src/mount_davfs.c:1977
 #, c-format
 msgid "client certificate file %s has wrong permissions"
 msgstr ""
 "die Dateirechte für das Cient-Zertifikat\n"
 "%s sind falsch"
 
-#: src/mount_davfs.c:2038 src/mount_davfs.c:2266
+#: src/mount_davfs.c:1999 src/mount_davfs.c:2227
 #, c-format
 msgid "opening %s failed"
 msgstr "konnte %s nicht öffnen"
 
-#: src/mount_davfs.c:2059 src/mount_davfs.c:2104 src/mount_davfs.c:2196
-#: src/mount_davfs.c:2293 src/mount_davfs.c:2351 src/mount_davfs.c:2364
+#: src/mount_davfs.c:2020 src/mount_davfs.c:2065 src/mount_davfs.c:2157
+#: src/mount_davfs.c:2254 src/mount_davfs.c:2312 src/mount_davfs.c:2325
 #, c-format
 msgid "malformed line"
 msgstr "Syntaxfehler in der Zeile"
 
-#: src/mount_davfs.c:2174 src/mount_davfs.c:2190
+#: src/mount_davfs.c:2135 src/mount_davfs.c:2151
 #, c-format
 msgid "unknown option"
 msgstr "unbekannte Option"
 
-#: src/mount_davfs.c:2496
+#: src/mount_davfs.c:2457
 #, c-format
 msgid ""
 "Usage:\n"
@@ -527,7 +527,7 @@ msgstr ""
 "    %s -h, --help     : diese Hilfe anzeigen\n"
 "\n"
 
-#: src/mount_davfs.c:2500
+#: src/mount_davfs.c:2461
 #, c-format
 msgid ""
 "To mount a WebDAV-resource don't call %s directly, but use\n"
@@ -536,7 +536,7 @@ msgstr ""
 "Um eine WebDAV-Resource zu einzuhängen, sollte %s nicht direkt\n"
 "aufgerufen werden; stattdessen sollte „mount” benutzt werden.\n"
 
-#: src/mount_davfs.c:2502
+#: src/mount_davfs.c:2463
 #, c-format
 msgid ""
 "    mount <mountpoint>  : or\n"
@@ -547,7 +547,7 @@ msgstr ""
 "    mount <server-url>  : hänge die WebDAV-Resource entsprechend den\n"
 "                          Angaben in /etc/fstab ein.\n"
 
-#: src/mount_davfs.c:2505
+#: src/mount_davfs.c:2466
 #, c-format
 msgid ""
 "    mount -t davfs <server-url> <mountpoint> [-o options]\n"
@@ -564,7 +564,7 @@ msgstr ""
 "                          Kommas unterteilte Liste von Optionen.\n"
 "\n"
 
-#: src/mount_davfs.c:2510
+#: src/mount_davfs.c:2471
 #, c-format
 msgid ""
 "Recognised options:\n"
@@ -581,7 +581,7 @@ msgstr ""
 "    file_mode=   : Standard-Rechte für Dateien (oktal)\n"
 "    dir_mode=    : Standard-Rechte für Verzeichnisse (oktal)\n"
 
-#: src/mount_davfs.c:2516
+#: src/mount_davfs.c:2477
 #, c-format
 msgid ""
 "    ro           : mount read-only\n"
@@ -684,96 +684,96 @@ msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr ""
 "während des Wartens trat ein Fehler auf; bitte warte bis der %s-Prozess endet"
 
-#: src/webdav.c:360
+#: src/webdav.c:337
 #, c-format
 msgid "socket library initialization failed"
 msgstr "die socket-Bibliothek konnte nicht initialisiert werden"
 
-#: src/webdav.c:372
+#: src/webdav.c:349
 #, c-format
 msgid "can't open stream to log neon-messages"
 msgstr "kann die Ausgabe für neon-Log-Meldungen nicht öffnen"
 
-#: src/webdav.c:413
+#: src/webdav.c:380
 #, c-format
 msgid "neon library does not support TLS/SSL"
 msgstr "die Neon-Bibliothek uterstützt TLS/SSL nicht"
 
-#: src/webdav.c:475 src/webdav.c:478
+#: src/webdav.c:440 src/webdav.c:443
 #, c-format
 msgid "mounting failed; the server does not support WebDAV"
 msgstr "das Einhängen schlug fehl; der Server unterstützt WebDAV nicht"
 
-#: src/webdav.c:486
+#: src/webdav.c:451
 #, c-format
 msgid "warning: the server does not support locks"
 msgstr "Warnung: der Server kann Dateien nicht sperren"
 
-#: src/webdav.c:1566
+#: src/webdav.c:1454
 msgid "authentication failure:"
 msgstr "Authentifizierungsfehler"
 
-#: src/webdav.c:1604
+#: src/webdav.c:1492
 #, c-format
 msgid "%i can't open cache file"
 msgstr "%i kann die Cache-Datei nicht öffnen"
 
-#: src/webdav.c:1612
+#: src/webdav.c:1500
 #, c-format
 msgid "%i error writing to cache file"
 msgstr "%i Fehler beim Schreiben der Cache-Datei"
 
-#: src/webdav.c:1922 src/webdav.c:1951 src/webdav.c:1988
+#: src/webdav.c:1741 src/webdav.c:1770 src/webdav.c:1807
 #, c-format
 msgid "the server certificate is not trusted"
 msgstr "wir trauen dem Zertifikat nicht"
 
-#: src/webdav.c:1931 src/webdav.c:1934
+#: src/webdav.c:1750 src/webdav.c:1753
 #, c-format
 msgid "error processing server certificate"
 msgstr "Fehler beim Analysieren des Server-Zertifikats"
 
-#: src/webdav.c:1945 src/webdav.c:1979
+#: src/webdav.c:1764 src/webdav.c:1798
 #, c-format
 msgid "the server certificate is not yet valid"
 msgstr "das Server-Zertifikat ist noch nicht gültig"
 
-#: src/webdav.c:1947 src/webdav.c:1982
+#: src/webdav.c:1766 src/webdav.c:1801
 #, c-format
 msgid "the server certificate has expired"
 msgstr "das Server-Zertifikat ist nicht mehr gültig"
 
-#: src/webdav.c:1949 src/webdav.c:1985
+#: src/webdav.c:1768 src/webdav.c:1804
 #, c-format
 msgid "the server certificate does not match the server name"
 msgstr "das Server-Zertifikat passt nicht zum Namen des Servers"
 
-#: src/webdav.c:1953 src/webdav.c:1991
+#: src/webdav.c:1772 src/webdav.c:1810
 #, c-format
 msgid "unknown certificate error"
 msgstr "Fehler beim Analysieren des Server-Zertifikats"
 
-#: src/webdav.c:1954
+#: src/webdav.c:1773
 #, c-format
 msgid "  issuer:      %s"
 msgstr "  Aussteller:    %s"
 
-#: src/webdav.c:1956
+#: src/webdav.c:1775
 #, c-format
 msgid "  subject:     %s"
 msgstr "  Inhaber:       %s"
 
-#: src/webdav.c:1958
+#: src/webdav.c:1777
 #, c-format
 msgid "  identity:    %s"
 msgstr "  Name:          %s"
 
-#: src/webdav.c:1960
+#: src/webdav.c:1779
 #, c-format
 msgid "  fingerprint: %s"
 msgstr "  Fingerabdruck: %s"
 
-#: src/webdav.c:1962
+#: src/webdav.c:1781
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -784,28 +784,26 @@ msgstr ""
 "dass der Fingerabdruck stimmt. Der Server könnte gefälscht sein oder\n"
 "ein Angreifer könnte sich in die Verbindung zum Server eingeschaltet haben.\n"
 
-#: src/webdav.c:1965
+#: src/webdav.c:1784
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr "Ich akzeptiere das Zertifikat für diese Sitzung [j,N]: "
 
-#: src/webdav.c:1992
+#: src/webdav.c:1811
 #, c-format
 msgid "  issuer: %s"
 msgstr "  Aussteller des Zertifikats: %s"
 
-#: src/webdav.c:1993
+#: src/webdav.c:1812
 #, c-format
 msgid "  subject: %s"
 msgstr "  Inhaber des Zertifikats: %s"
 
-#: src/webdav.c:1994
+#: src/webdav.c:1813
 #, c-format
 msgid "  identity: %s"
 msgstr "  Name: %s"
 
-#: src/webdav.c:1997
+#: src/webdav.c:1816
 msgid "  accepted by user"
 msgstr "  durch den Benutzer akzeptiert"
-
-

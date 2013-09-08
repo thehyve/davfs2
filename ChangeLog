@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2013-09-08 Werner Baumann (werner.baumann@onlinehome.de)
+    * Updating to fuse kernel version 7.19.
+
 2013-08-15 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c:
       Fix has_permission (bug #33644).
