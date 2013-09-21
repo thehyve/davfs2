@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2013-09-21 Werner Baumann (werner.baumann@onlinehome.de)
+    * configure.ac:
+      Add neon version 0.30 (sr #108392).
+
 2013-09-08 Werner Baumann (werner.baumann@onlinehome.de)
     * kernel_interface.c, mount_davfs.c:
       Don't create /dev/coda and /dev/fuse.
