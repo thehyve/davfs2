@@ -1,6 +1,12 @@
 ChangeLog for davfs2
 --------------------
 
+2013-09-22 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, check_fstab:
+      Replace xxfsent functions by xxmntent functions.
+      Don't compare commandline and fstab for options
+      'user' and 'users', only check fstab for presence.
+
 2013-09-21 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac:
       Add neon version 0.30 (sr #108392).
