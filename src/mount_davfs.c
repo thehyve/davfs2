@@ -95,7 +95,7 @@
 /* The URL of the WebDAV server as taken from commandline.  */
 static char *url;
 
-/* The mointpoint as taken from the command line. */
+/* The canonicalized mointpoint. */
 static char *mpoint;
 
 /* The type of the kernel file system used. */
@@ -135,9 +135,6 @@ static void
 check_fstab(const dav_args *args);
 
 static void
-check_mountpoint(dav_args *args);
-
-static void
 check_permissions(dav_args *args);
 
 static int
@@ -150,7 +147,7 @@ static dav_args *
 parse_commandline(int argc, char *argv[]);
 
 static void
-parse_config(char *argv[], dav_args *args);
+parse_config(dav_args *args);
 
 static void
 parse_secrets(dav_args *args);
@@ -194,10 +191,7 @@ static dav_args *
 new_args(void);
 
 static void
-log_dbg_cmdline(char *argv[]);
-
-static void
-log_dbg_config(char *argv[], dav_args *args);
+log_dbg_config(dav_args *args);
 
 static int
 parse_line(char *line, int parmc, char *parmv[]);
@@ -246,9 +240,7 @@ main(int argc, char *argv[])
     if (getuid() != 0)
         check_fstab(args);
 
-    parse_config(argv, args);
-
-    check_mountpoint(args);
+    parse_config(args);
 
     check_dirs(args);
 
@@ -676,19 +668,24 @@ check_fstab(const dav_args *args)
     if (!fstab)
         error(EXIT_FAILURE, errno, _("can't open file %s"), _PATH_MNTTAB);
 
-    char *mp = NULL;
-    if (asprintf(&mp, "%s/", mpoint) < 0) abort();
     struct mntent *ft = getmntent(fstab);
     while (ft && ft->mnt_dir) {
-        if (strcmp(ft->mnt_dir, mpoint) == 0 || strcmp(ft->mnt_dir, mp) == 0)
-            break;
+        if (ft->mnt_dir) {
+            char *mp = canonicalize_file_name(ft->mnt_dir);
+            if (mp) {
+                if (strcmp(mp, mpoint) == 0) {
+                    free(mp);
+                    break;
+                }
+                free(mp);
+            }
+        }
         ft = getmntent(fstab);
     }
 
-    if (!ft || !ft->mnt_dir)
-        error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), url,
+    if (!ft)
+        error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), mpoint,
               _PATH_MNTTAB);
-    if (mp) free(mp);
 
     if (strcmp(url, ft->mnt_fsname) != 0) {
         char *fstab_url = decode_octal(ft->mnt_fsname);
@@ -734,52 +731,6 @@ check_fstab(const dav_args *args)
         error(EXIT_FAILURE, 0, _("different file_mode in %s"), _PATH_MNTTAB);
 
     delete_args(n_args);
-}
-
-
-/* Checks if a valid mountpoint is specified.
-   For non root users this must meet the additional conditions:
-   - if the mount point is given as relative path, it must lie within
-     the mounting users home directory (so a relative path in fstab
-     - which might be useful in some cases - will not allow to to
-     gain access to directories not intended).
-   - if given as an absulute path it must not lie within another users
-     home directory (even the administrator can't give the right to mount
-     into another users home directory).
-   If this conditions are not met or an error occurs, an error message is
-   printed and exit(EXIT_FAILURE) is called. */
-static void
-check_mountpoint(dav_args *args)
-{
-
-    struct passwd *pw;
-
-    if (*mpoint != '/') {
-        char *mp = canonicalize_file_name(mpoint);
-        if (!mp)
-            error(EXIT_FAILURE, 0,
-                  _("can't evaluate path of mount point %s"), mpoint);
-        if (getuid() != 0) {
-            pw = getpwuid(getuid());
-            if (!pw || !pw->pw_dir)
-                error(EXIT_FAILURE, 0,
-                      _("can't get home directory for uid %i"), getuid());
-            if (strstr(mp, pw->pw_dir) != mp)
-                error(EXIT_FAILURE, 0, _("A relative mount point must lie "
-                      "within your home directory"));
-        }
-        free(mpoint);
-        mpoint = mp;
-    }
-
-    if (strcmp(mpoint, "/") == 0 || strlen(mpoint) < 2)
-        error(EXIT_FAILURE, 0, _("invalid mount point %s"), mpoint);
-
-    if (access(mpoint, F_OK) != 0)
-        error(EXIT_FAILURE, 0, _("mount point %s does not exist"), mpoint);
-
-    if (args->debug & DAV_DBG_CONFIG)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mountpoint: %s", mpoint);
 }
 
 
@@ -920,8 +871,21 @@ is_mounted(void)
 static dav_args *
 parse_commandline(int argc, char *argv[])
 {
-    log_dbg_cmdline(argv);
     dav_args *args = new_args();
+
+    size_t len = argc;
+    int i;
+    for (i = 0; i < argc; i++)
+        len += strlen(argv[i]);
+    args->cmdline = ne_malloc(len);
+    char *p = args->cmdline;
+    for (i = 0; i < argc - 1; i++) {
+        strcpy(p, argv[i]);
+        p += strlen(argv[i]);
+        *p = ' ';
+        p++;
+    }
+    strcpy(p, argv[argc - 1]);
 
     char *short_options = "vwVho:";
     static const struct option options[] = {
@@ -958,7 +922,7 @@ parse_commandline(int argc, char *argv[])
         o = getopt_long(argc, argv, short_options, options, NULL);
     }
 
-    int i = optind;
+    i = optind;
     switch (argc - i) {
     case 0:
     case 1:
@@ -972,7 +936,10 @@ parse_commandline(int argc, char *argv[])
             url = ne_strdup(argv[i]);
         }
         i++;
-        mpoint = ne_strdup(argv[i]);
+        mpoint = canonicalize_file_name(argv[i]);
+        if (!mpoint)
+            error(EXIT_FAILURE, 0,
+                  _("can't evaluate path of mount point %s"), mpoint);
         break;
     default:
         error(0, 0, _("too many arguments"));
@@ -980,10 +947,15 @@ parse_commandline(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (!mpoint)
-        error(EXIT_FAILURE, 0, _("no mountpoint specified"));
-    while (strlen(mpoint) > 1 && *(mpoint + strlen(mpoint) -1) == '/')
-        *(mpoint + strlen(mpoint) -1) = '\0';
+    if (getuid() != 0 && *argv[i] != '/') {
+        struct passwd *pw = getpwuid(getuid());
+        if (!pw || !pw->pw_dir)
+            error(EXIT_FAILURE, 0,
+                  _("can't get home directory for uid %i"), getuid());
+        if (strstr(mpoint, pw->pw_dir) != mpoint)
+            error(EXIT_FAILURE, 0, _("A relative mount point must lie "
+                  "within your home directory"));
+    }
 
     if (!url)
         error(EXIT_FAILURE, 0, _("no WebDAV-server specified"));
@@ -1002,7 +974,7 @@ parse_commandline(int argc, char *argv[])
    given it will be parsed too and overwrites the values from the system
    wide configuration file. */
 static void
-parse_config(char *argv[], dav_args *args)
+parse_config(dav_args *args)
 {
     read_config(args, DAV_SYS_CONF_DIR "/" DAV_CONFIG, 1);
 
@@ -1121,7 +1093,7 @@ parse_config(char *argv[], dav_args *args)
     }
 
     if (args->debug & DAV_DBG_CONFIG)
-        log_dbg_config(argv, args);
+        log_dbg_config(args);
 }
 
 
@@ -1431,6 +1403,8 @@ decode_octal(const char *s)
 static void
 delete_args(dav_args *args)
 {
+    if (args->cmdline)
+        free(args->cmdline);
     if (args->dav_user)
         free(args->dav_user);
     if (args->dav_group)
@@ -1725,6 +1699,7 @@ new_args(void)
 
     dav_args *args = ne_malloc(sizeof(*args));
 
+    args->cmdline = NULL;
     args->dav_user = ne_strdup(DAV_USER);
     args->dav_group = ne_strdup(DAV_GROUP);
 
@@ -1816,21 +1791,10 @@ new_args(void)
 
 
 static void
-log_dbg_cmdline(char *argv[])
+log_dbg_config(dav_args *args)
 {
-    size_t len;
-    char *cmdline;
-    if (argz_create(argv, &cmdline, &len) == 0) {
-        argz_stringify(cmdline, len, ' ');
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "%s", cmdline);
-        free(cmdline);
-    }
-}
-
-
-static void
-log_dbg_config(char *argv[], dav_args *args)
-{
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "%s", args->cmdline);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "Configuration:");
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2142,7 +2106,11 @@ read_config(dav_args *args, const char * filename, int system)
                 error_at_line(EXIT_FAILURE, 0, filename, lineno,
                               _("malformed line"));
             *(parmv[0] + strlen(parmv[0]) - 1) = '\0';
-            applies = (strcmp(parmv[0] + 1, mpoint) == 0);
+            char *mp = canonicalize_file_name(parmv[0] + 1);
+            if (mp) {
+                applies = (strcmp(mp, mpoint) == 0);
+                free(mp);
+            }
 
         } else if (applies && count == 2) {
 
@@ -2377,6 +2345,8 @@ read_secrets(dav_args *args, const char *filename)
             if (scheme && !port)
                 port = ne_uri_defaultport(scheme);
 
+            char *mp = canonicalize_file_name(parmv[0]);
+
             char *ccert = NULL;
             if (args->clicert) {
                 ccert = strrchr(args->clicert, '/');
@@ -2386,10 +2356,7 @@ read_secrets(dav_args *args, const char *filename)
                     ccert++;
             }
 
-            if ((mpoint && strcmp(parmv[0], mpoint) == 0)
-                    || (mpoint && strstr(parmv[0], mpoint) == parmv[0]
-                        && *(parmv[0] + strlen(mpoint)) == '/'
-                        && *(parmv[0] + strlen(mpoint) + 1) == '\0')
+            if ((mp && strcmp(mp, mpoint) == 0)
                     || (scheme && args->scheme
                         && strcmp(scheme, args->scheme) == 0
                         && host && args->host && strcmp(host, args->host) == 0
@@ -2443,6 +2410,7 @@ read_secrets(dav_args *args, const char *filename)
             if (scheme) free(scheme);
             if (host) free(host);
             if (path) free(path);
+            if (mp) free(mp);
         }
 
         memset(line, '\0', strlen(line));
