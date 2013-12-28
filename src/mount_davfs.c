@@ -20,9 +20,6 @@
 
 #include "config.h"
 
-#ifdef HAVE_ARGZ_H
-#include <argz.h>
-#endif
 #include <ctype.h>
 #include <errno.h>
 #include <error.h>
