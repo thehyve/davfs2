@@ -663,7 +663,7 @@ check_fstab(const dav_args *args)
         error(EXIT_FAILURE, errno, _("can't open file %s"), _PATH_MNTTAB);
 
     struct mntent *ft = getmntent(fstab);
-    while (ft && ft->mnt_dir) {
+    while (ft) {
         if (ft->mnt_dir) {
             char *mp = canonicalize_file_name(ft->mnt_dir);
             if (mp) {
