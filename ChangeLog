@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-03-03 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, check_fstab:
+      Remove unnecessary decode_octal.
+
 2013-12-28 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, configure.ac:
       Remove #include <argz.h>
