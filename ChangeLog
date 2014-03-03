@@ -5,6 +5,8 @@ ChangeLog for davfs2
     * mount_davfs.c, check_fstab:
       Remove unnecessary decode_octal.
       Remove double check for ft->mnt_dir.
+    * cache.c:
+      Missing 'static'.
 
 2013-12-28 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, configure.ac:

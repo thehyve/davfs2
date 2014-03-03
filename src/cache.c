@@ -197,10 +197,10 @@ static char *cache_dir;
 
 /* Maximum cache size. If open files require more space, this will
    be ignored. */
-unsigned long long max_cache_size;
+static unsigned long long max_cache_size;
 
 /* Actual cache size. */
-unsigned long long cache_size;
+static unsigned long long cache_size;
 
 /* Alignment boundary of dav_node in byte.
    Used to compute a hash value and file numbers from node pointers. */
