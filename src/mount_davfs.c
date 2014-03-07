@@ -454,7 +454,7 @@ check_dirs(dav_args *args)
 {
     struct stat st;
 
-    if (access(DAV_MOUNTS, R_OK) == 0) {
+    if (stat(DAV_MOUNTS, &st) == 0) {
         mounts = DAV_MOUNTS;
     } else {
         mounts = _PATH_MOUNTED;
@@ -463,7 +463,7 @@ check_dirs(dav_args *args)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mounts in: %s", mounts);
 
     seteuid(0);
-    if (access(DAV_SYS_RUN, F_OK) != 0) {
+    if (stat(DAV_SYS_RUN, &st) != 0) {
         if (mkdir(DAV_SYS_RUN, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_ISVTX)
                 != 0)
             error(EXIT_FAILURE, errno, _("can't create directory %s"),
@@ -495,28 +495,28 @@ check_dirs(dav_args *args)
         struct passwd *pw = getpwuid(getuid());
         if (pw && pw->pw_dir)
             path = ne_concat(pw->pw_dir, "/.", PACKAGE, NULL);
-        if (path && access(path, F_OK) != 0)
+        if (path && stat(path, &st) != 0)
             mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 
-        if (path && access(path, F_OK) == 0) {
+        if (path && stat(path, &st) == 0) {
             char *dir = ne_concat(path, "/", DAV_CACHE, NULL);
-            if (access(dir, F_OK) != 0)
+            if (stat(dir, &st) != 0)
                 mkdir(dir, S_IRWXU);
             free(dir);
 
             dir = ne_concat(path, "/", DAV_CERTS_DIR, NULL);
-            if (access(dir, F_OK) != 0)
+            if (stat(dir, &st) != 0)
                 mkdir(dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
             free(dir);
 
             dir = ne_concat(path, "/", DAV_CERTS_DIR, "/", DAV_CLICERTS_DIR,
                             NULL);
-            if (access(dir, F_OK) != 0)
+            if (stat(dir, &st) != 0)
                 mkdir(dir, S_IRWXU);
             free(dir);
 
             char *file_name = ne_concat(path, "/", DAV_CONFIG, NULL);
-            if (access(file_name, F_OK) != 0) {
+            if (stat(file_name, &st) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_CONFIG, NULL);
                 cp_file(template, file_name);
                 free(template);
@@ -524,7 +524,7 @@ check_dirs(dav_args *args)
             free(file_name);
 
             file_name = ne_concat(path, "/", DAV_SECRETS, NULL);
-            if (access(file_name, F_OK) != 0) {
+            if (stat(file_name, &st) != 0) {
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_SECRETS,
                                            NULL);
                 cp_file(template, file_name);
@@ -538,7 +538,7 @@ check_dirs(dav_args *args)
     if (strcmp(args->cache_dir, args->sys_cache) == 0) {
 
         seteuid(0);
-        if (access(args->sys_cache, F_OK) != 0) {
+        if (stat(args->sys_cache, &st) != 0) {
             if (mkdir(args->sys_cache, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
                 error(EXIT_FAILURE, errno, _("can't create directory %s"),
@@ -573,7 +573,7 @@ check_dirs(dav_args *args)
             error(EXIT_FAILURE, errno, _("can't read user data base"));
         if (!pw->pw_name)
             error(EXIT_FAILURE, 0, _("can't read user data base"));
-        if (access(args->cache_dir, F_OK) != 0) {
+        if (stat(args->cache_dir, &st) != 0) {
             if (mkdir(args->cache_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
                 error(EXIT_FAILURE, errno, _("can't create directory %s"),
@@ -989,6 +989,7 @@ parse_config(dav_args *args)
 
     eval_modes(args);
 
+    struct stat st;
     if (args->servercert && *args->servercert == '~') {
         int p = 1;
         if (*(args->servercert + p) == '/')
@@ -1000,7 +1001,7 @@ parse_config(dav_args *args)
     if (args->servercert && *args->servercert != '/' && getuid() != 0) {
         char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
                             args->servercert, NULL);
-        if (access(f, F_OK) == 0) {
+        if (stat(f, &st) == 0) {
             free(args->servercert);
             args->servercert = f;
         } else {
@@ -1034,7 +1035,7 @@ parse_config(dav_args *args)
     if (args->clicert && *args->clicert != '/' && getuid() != 0) {
         char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
                             DAV_CLICERTS_DIR, "/", args->clicert, NULL);
-        if (access(f, F_OK) == 0) {
+        if (stat(f, &st) == 0) {
             free(args->clicert);
             args->clicert = f;
         }
