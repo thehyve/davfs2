@@ -1426,21 +1426,12 @@ delete_args(dav_args *args)
 }
 
 
-/* Evaluates the umask and thedefault modes for directories and files from
+/* Evaluates the default modes for directories and files from
    args->mopts, umask(), args->dir_mode and args->file_mode and stores them
    in args. */
 static void
 eval_modes(dav_args *args)
 {
-    if (args->mopts & MS_NOSUID)
-        args->dir_umask = S_ISUID | S_ISGID;
-    if (args->mopts & MS_RDONLY)
-        args->dir_umask |= S_IWUSR | S_IWGRP | S_IWOTH;
-
-    args->file_umask = args->dir_umask;
-    if (args->mopts & MS_NOEXEC)
-        args->file_umask |= S_IXUSR | S_IXGRP | S_IXOTH;
-
     mode_t default_mode = umask(0);
     umask(default_mode);
     default_mode = ~default_mode;
@@ -1452,12 +1443,10 @@ eval_modes(dav_args *args)
         args->dir_mode |= (args->dir_mode & S_IRGRP) ? S_IXGRP : 0;
         args->dir_mode |= (args->dir_mode & S_IROTH) ? S_IXOTH : 0;
     }
-    args->dir_mode &= ~args->dir_umask;
     args->dir_mode |= S_IFDIR;
 
     if (!args->file_mode)
         args->file_mode = default_mode;
-    args->file_mode &= ~args->file_umask;
     args->file_mode |= S_IFREG;
 }
 
@@ -1678,8 +1667,6 @@ new_args(void)
 
     args->uid = getuid();
     args->gid = getgid();
-    args->dir_umask = 0;
-    args->file_umask = 0;
     args->dir_mode = 0;
     args->file_mode = 0;
 
@@ -1782,10 +1769,6 @@ log_dbg_config(dav_args *args)
            "  uid: %i", args->uid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  gid: %i", args->gid);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  dir_umask: %#o", args->dir_umask);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  file_umask: %#o", args->file_umask);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  dir_mode: %#o", args->dir_mode);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
