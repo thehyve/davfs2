@@ -176,9 +176,6 @@ static void
 delete_args(dav_args *args);
 
 static void
-eval_modes(dav_args *args);
-
-static void
 get_options(dav_args *args, char *option);
 
 static dav_args *
@@ -987,7 +984,8 @@ parse_config(dav_args *args)
 
     args->mopts |= DAV_MOPTS;
 
-    eval_modes(args);
+    args->dir_mode |= S_IFDIR;
+    args->file_mode |= S_IFREG;
 
     struct stat st;
     if (args->servercert && *args->servercert == '~') {
@@ -1426,31 +1424,6 @@ delete_args(dav_args *args)
 }
 
 
-/* Evaluates the default modes for directories and files from
-   args->mopts, umask(), args->dir_mode and args->file_mode and stores them
-   in args. */
-static void
-eval_modes(dav_args *args)
-{
-    mode_t default_mode = umask(0);
-    umask(default_mode);
-    default_mode = ~default_mode;
-    default_mode &= S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-
-    if (!args->dir_mode) {
-        args->dir_mode = default_mode;
-        args->dir_mode |= (args->dir_mode & S_IRUSR) ? S_IXUSR : 0;
-        args->dir_mode |= (args->dir_mode & S_IRGRP) ? S_IXGRP : 0;
-        args->dir_mode |= (args->dir_mode & S_IROTH) ? S_IXOTH : 0;
-    }
-    args->dir_mode |= S_IFDIR;
-
-    if (!args->file_mode)
-        args->file_mode = default_mode;
-    args->file_mode |= S_IFREG;
-}
-
-
 /* Parses the string option and stores the values in the appropriate fields of
    args. If an unknown option is found exit(EXIT_FAILURE) is called.
    All strings returned in args are newly allocated, and the calling function
@@ -1667,8 +1640,8 @@ new_args(void)
 
     args->uid = getuid();
     args->gid = getgid();
-    args->dir_mode = 0;
-    args->file_mode = 0;
+    args->dir_mode = DAV_DIR_MODE;
+    args->file_mode = DAV_FILE_MODE;
 
     args->scheme = NULL;
     args->host = NULL;

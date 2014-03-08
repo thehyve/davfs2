@@ -36,8 +36,13 @@
    command line and even fstab will be silently ignored. */
 #define DAV_MOPTS (MS_MGC_VAL | MS_NOSUID | MS_NODEV)
 
-/* By default add option "_netdev" to mtab entry. */
-#define DAV_NETDEV 1
+/* Mode of directories.
+   May be overridden by command line or fstab. */
+#define DAV_DIR_MODE (S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
+
+/* Mode of regular files.
+   May be overridden by command line or fstab. */
+#define DAV_FILE_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 
 /* XML namespace for the cache index file. */
 #define DAV_XML_NS "http://dav.sf.net/"
