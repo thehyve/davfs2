@@ -1458,6 +1458,7 @@ get_options(dav_args *args, char *option)
         ASYNC,
         AUTO,
         NOAUTO,
+        COMMENT,
         DEFAULTS,
         END
     };
@@ -1484,6 +1485,7 @@ get_options(dav_args *args, char *option)
         [ASYNC] = "async",
         [AUTO] = "auto",
         [NOAUTO] = "noauto",
+        [COMMENT] = "comment",
         [DEFAULTS] = "defaults",
         [END] = NULL
     };
@@ -1590,6 +1592,7 @@ get_options(dav_args *args, char *option)
         case ASYNC:
         case AUTO:
         case NOAUTO:
+        case COMMENT:
         case DEFAULTS:
             break;
         default:
