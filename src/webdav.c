@@ -225,10 +225,8 @@ static FILE *log_stream;
 /* A user defined header that is added to all requests. */
 char *custom_header;
 
-#if NE_VERSION_MINOR > 25
 /* Session cookie. */
 static char *cookie;
-#endif
 
 
 /* Private function prototypes and inline functions */
@@ -274,20 +272,6 @@ auth(void *userdata, const char *realm, int attempt, char *user, char *pwd);
 static int
 file_reader(void *userdata, const char *block, size_t length);
 
-#if NE_VERSION_MINOR < 26
-
-static void
-lock_result(void *userdata, const struct ne_lock *lock, const char *uri,
-            const ne_status *status);
-
-static void
-prop_result(void *userdata, const char *href, const ne_prop_result_set *set);
-
-static void
-quota_result(void *userdata, const char *href, const ne_prop_result_set *set);
-
-#else /* NE_VERSION_MINOR >= 26 */
-
 static void
 lock_result(void *userdata, const struct ne_lock *lock, const ne_uri *uri,
             const ne_status *status);
@@ -298,18 +282,14 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set);
 static void
 quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set);
 
-#endif /* NE_VERSION_MINOR >= 26 */
-
 static int
 quota_reader(void *userdata, const char *block, size_t length);
 
 static int
 ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert);
 
-#if NE_VERSION_MINOR > 25
 static int
 update_cookie(ne_request *req, void *userdata, const ne_status *status);
-#endif /* NE_VERSION_MINOR > 25 */
 
 
 /* Public functions */
@@ -370,9 +350,7 @@ dav_init_webdav(const dav_args *args)
 
     ne_set_read_timeout(session, args->read_timeout);
 
-#if NE_VERSION_MINOR > 26
     ne_set_connect_timeout(session, args->connect_timeout);
-#endif /* NE_VERSION_MINOR > 26 */
 
     char *useragent = ne_concat(PACKAGE_TARNAME, "/", PACKAGE_VERSION, NULL);
     ne_set_useragent(session, useragent);
@@ -382,11 +360,7 @@ dav_init_webdav(const dav_args *args)
         username = ne_strdup(args->username);
     if (args->password)
         password = ne_strdup(args->password);
-#if NE_VERSION_MINOR < 26
-    ne_set_server_auth(session, auth, "server");
-#else /* NE_VERSION_MINOR >= 26 */
     ne_add_server_auth(session, NE_AUTH_ALL, auth, "server");
-#endif /* NE_VERSION_MINOR >= 26 */
 
     if (args->useproxy && args->p_host) {
         ne_session_proxy(session, args->p_host, args->p_port);
@@ -394,11 +368,7 @@ dav_init_webdav(const dav_args *args)
             p_username = ne_strdup(args->p_user);
         if (args->p_passwd)
             p_password = ne_strdup(args->p_passwd);
-#if NE_VERSION_MINOR < 26
-        ne_set_proxy_auth(session, auth, "proxy");
-#else /* NE_VERSION_MINOR >= 26 */
         ne_add_proxy_auth(session, NE_AUTH_ALL, auth, "proxy");
-#endif /* NE_VERSION_MINOR >= 26 */
     }
 
     if (strcmp(args->scheme, "https") == 0) {
@@ -475,10 +445,8 @@ dav_init_webdav(const dav_args *args)
         ne_hook_pre_send(session, add_header, custom_header);
     }
 
-#if NE_VERSION_MINOR > 25
     if (args->allow_cookie)
         ne_hook_post_send(session, update_cookie, NULL);
-#endif /* NE_VERSION_MINOR > 25 */
 
     use_expect100 = args->expect100;
     has_if_match_bug = args->if_match_bug;
@@ -839,11 +807,7 @@ dav_lock(const char *path, time_t *expire, int *exists)
         return 0;
     }
 
-#if NE_VERSION_MINOR > 25
     if (precheck && has_if_match_bug && !*exists) {
-#else /* NE_VERSION_MINOR == 25 */
-    if (precheck && !*exists) {
-#endif /* NE_VERSION_MINOR == 25 */
         if (dav_head(path, NULL, NULL, NULL, NULL) == 0) {
             return EEXIST;
         }
@@ -865,19 +829,15 @@ dav_lock(const char *path, time_t *expire, int *exists)
     lock->owner = ne_strdup(owner);
     lock->timeout = lock_timeout;
 
-#if NE_VERSION_MINOR > 25
     if (!has_if_match_bug && !*exists)
         ne_hook_pre_send(session, add_header, none_match_header);
-#endif /* NE_VERSION_MINOR > 25 */
     ret = ne_lock(session, lock);
     ret = get_error(ret, "LOCK");
-#if NE_VERSION_MINOR > 25
     if (!has_if_match_bug && !*exists) {
         ne_unhook_pre_send(session, add_header, none_match_header);
         if (ret && strtol(ne_get_error(session), NULL, 10) == 412)
             ret = EEXIST;
     }
-#endif /* NE_VERSION_MINOR > 25 */
 
     if (!ret) {
         ne_lockstore_add(locks, lock);
@@ -1028,18 +988,10 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
     }
 
     if (use_expect100)
-#if NE_VERSION_MINOR == 25
-        ne_set_request_expect100(req, 1);
-#else /* NE_VERSION_MINOR > 25 */
         ne_set_request_flag(req, NE_REQFLAG_EXPECT100, 1);
-#endif /* NE_VERSION_MINOR > 25 */
 
     ne_lock_using_resource(req, spath, 0);
-#if _FILE_OFFSET_BITS == 64 && NE_VERSION_MINOR < 27
-    ne_set_request_body_fd64(req, fd, 0, st.st_size);
-#else /* _FILE_OFFSET_BITS != 64 || NE_VERSION_MINOR >= 27 */
     ne_set_request_body_fd(req, fd, 0, st.st_size);
-#endif /* _FILE_OFFSET_BITS != 64 || NE_VERSION_MINOR >= 27 */
 
     ret = ne_request_dispatch(req);
     ret = get_error(ret, "PUT");
@@ -1059,18 +1011,10 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
         }
 
         if (use_expect100)
-#if NE_VERSION_MINOR == 25
-            ne_set_request_expect100(req, 1);
-#else /* NE_VERSION_MINOR > 25 */
             ne_set_request_flag(req, NE_REQFLAG_EXPECT100, 1);
-#endif /* NE_VERSION_MINOR > 25 */
 
         ne_lock_using_resource(req, spath, 0);
-#if _FILE_OFFSET_BITS == 64  && NE_VERSION_MINOR < 27
-        ne_set_request_body_fd64(req, fd, 0, st.st_size);
-#else /* _FILE_OFFSET_BITS != 64 || NE_VERSION_MINOR >= 27 */
         ne_set_request_body_fd(req, fd, 0, st.st_size);
-#endif /* _FILE_OFFSET_BITS != 64 || NE_VERSION_MINOR >= 27 */
 
         ret = ne_request_dispatch(req);
         ret = get_error(ret, "PUT");
@@ -1654,23 +1598,10 @@ file_reader(void *userdata, const char *block, size_t length)
    lock     : a lock found by ne_lock_discover() on the server.
    uri      : not used.
    status   : not used. */
- 
-#if NE_VERSION_MINOR < 26
-
-static void
-lock_result(void *userdata, const struct ne_lock *lock, const char *uri,
-            const ne_status *status)
-{
-
-#else     /* NE_VERSION_MINOR >= 26 */
-
 static void
 lock_result(void *userdata, const struct ne_lock *lock, const ne_uri *uri,
             const ne_status *status)
 {
-
-#endif    /* NE_VERSION_MINOR >= 26 */
-
     if (!locks || !owner || !userdata || !lock || !lock->owner)
         return;
 
@@ -1700,34 +1631,8 @@ lock_result(void *userdata, const struct ne_lock *lock, const ne_uri *uri,
    that is not a directory or that is less specific.
    userdata : A pointer to a propfind_context structure containing the path of
               the collection and the linked list of properties.
-if NE_VERSION_MINOR < 26
-   href     : Value of the href propertiy returned by the server. It may be
-              the complete URL of the collection or the path only.
-else
    uri      : ne_uri of the resource as returned from the server.
-endif
    set      : Points to the set of properties returned from the server.*/
-
-#if NE_VERSION_MINOR < 26
-
-static void
-prop_result(void *userdata, const char *href, const ne_prop_result_set *set)
-{
-    propfind_context *ctx = (propfind_context *) userdata;
-    if (!ctx || !href || !set)
-        return;
-
-    ne_uri uri;
-    if (ne_uri_parse(href, &uri) != 0 || !uri.path) {
-        ne_uri_free(&uri);
-        return;
-    }
-
-    char *tmp_path = (char *) ne_malloc(strlen(uri.path) + 1);
-    const char *from = uri.path;
-
-#else /* NE_VERSION_MINOR >= 26 */
-
 static void
 prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 {
@@ -1737,9 +1642,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 
     char *tmp_path = (char *) ne_malloc(strlen(uri->path) + 1);
     const char *from = uri->path;
-
-#endif /* NE_VERSION_MINOR >= 26 */
-
     char *to = tmp_path;
     while (*from) {
         while (*from == '/' && *(from + 1) == '/')
@@ -1750,11 +1652,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     dav_props *result = ne_calloc(sizeof(dav_props));
     result->path = ne_path_unescape(tmp_path);
     free (tmp_path);
-
-#if NE_VERSION_MINOR < 26
-    ne_uri_free(&uri);
-#endif
-
 
     if (!result->path || strlen(result->path) < 1) {
         dav_delete_props(result);
@@ -1885,25 +1782,12 @@ quota_reader(void *userdata, const char *block, size_t length)
 
 /* Reads available and used bytes from set and stores them in
    userdata. */
-#if NE_VERSION_MINOR < 26
-
-static void
-quota_result(void *userdata, const char *href, const ne_prop_result_set *set)
-{
-    quota_context *ctx = (quota_context *) userdata;
-    if (!ctx || !href || !set)
-        return;
-
-#else /* NE_VERSION_MINOR >= 26 */
-
 static void
 quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 {
     quota_context *ctx = (quota_context *) userdata;
     if (!ctx  || !uri || !uri->path || !set)
         return;
-
-#endif /* NE_VERSION_MINOR >= 26 */
 
     const char *data = ne_propset_value(set, &quota_names[AVAILABLE]);
     if (data) {
@@ -2022,7 +1906,6 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
 }
 
 
-#if NE_VERSION_MINOR > 25
 static int
 update_cookie(ne_request *req, void *userdata, const ne_status *status)
 {
@@ -2060,4 +1943,4 @@ update_cookie(ne_request *req, void *userdata, const ne_status *status)
     ne_hook_pre_send(session, add_header, cookie);
     return NE_OK;
 }
-#endif /* NE_VERSION_MINOR > 25 */
+
