@@ -174,6 +174,9 @@
    May be overridden by system config file and user config file. */
 #define DAV_IGNORE_DAV_HEADER 0
 
+/* Use "Content-Encoding: gzip" for GET requests. */
+#define DAV_USE_COMPRESSION 1
+
 /* Timeout in seconds used when libneon supports non blocking io
    A value of zero means use the TCP default
    May be overriden by system config file and user config file. */

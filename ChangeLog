@@ -1,9 +1,14 @@
 ChangeLog for davfs2
 --------------------
 
+2014-03-11 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, mount_davfs.h, mount_davfs.c, wedav.c:
+      Support compression for GET responses (bug #41355,
+      thanks Evili del Rio).
+
 2014-03-09 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, get_options:
-      Add option "comment=" (bug #41354)
+      Add option "comment=" (bug #41354).
 
 2013-09-08 Werner Baumann (werner.baumann@onlinehome.de)
     * Updating to fuse kernel version 7.19.

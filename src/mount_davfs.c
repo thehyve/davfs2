@@ -1607,6 +1607,7 @@ new_args(void)
     args->allow_cookie = DAV_ALLOW_COOKIE;
     args->precheck = DAV_PRECHECK;
     args->ignore_dav_header = DAV_IGNORE_DAV_HEADER;
+    args->use_compression = DAV_USE_COMPRESSION;
     args->connect_timeout = DAV_CONNECT_TIMEOUT;
     args->read_timeout = DAV_READ_TIMEOUT;
     args->retry = DAV_RETRY;
@@ -2092,6 +2093,8 @@ read_config(dav_args *args, const char * filename, int system)
                 args->precheck = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "ignore_dav_header") == 0) {
                 args->ignore_dav_header = arg_to_int(parmv[1], 10, parmv[0]);
+            } else if (strcmp(parmv[0], "use_compression") == 0) {
+                args->use_compression = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "connect_timeout") == 0) {
                 args->connect_timeout = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "read_timeout") == 0) {

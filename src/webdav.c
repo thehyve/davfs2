@@ -62,6 +62,7 @@
 
 #include <ne_auth.h>
 #include <ne_basic.h>
+#include <ne_compress.h>
 #include <ne_dates.h>
 #include <ne_locks.h>
 #include <ne_props.h>
@@ -197,6 +198,9 @@ static int precheck;
 
 /* Ignore the information in the DAV-header because it is wrong. */
 static int ignore_dav_header;
+
+/* Use "Content-Encoding: gzip" for GET requests. */
+static int use_compression;
 
 /* Will be set to 1 when dav_init_connection() succeeded. */
 static int initialized;
@@ -422,6 +426,7 @@ dav_init_webdav(dav_args *args)
     drop_weak_etags = args->drop_weak_etags;
     precheck = args->precheck;
     ignore_dav_header = args->ignore_dav_header;
+    use_compression = args->use_compression & ne_has_support(NE_FEATURE_ZLIB);
 }
 
 
@@ -669,9 +674,18 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
         ne_add_request_header(req, "If-Modified-Since", mod_time);
     }
 
-    ne_add_response_body_reader(req, ne_accept_2xx, file_reader, &ctx);
+    ne_decompress *dc_state = NULL;
+    if (use_compression) {
+        dc_state = ne_decompress_reader(req, ne_accept_2xx, file_reader, &ctx);
+    } else {
+        ne_add_response_body_reader(req, ne_accept_2xx, file_reader, &ctx);
+    }
 
     ret = ne_request_dispatch(req);
+
+    if (use_compression)
+        ne_decompress_destroy(dc_state);
+
     ret = get_error(ret, "GET");
     if (ctx.error)
         ret = ctx.error;
