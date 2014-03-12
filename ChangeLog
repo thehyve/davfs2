@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-03-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, new_node:
+      Fix missing mode.
+
 2014-03-11 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, configure.ac:
       Remove support for Neon versions < 0.27.

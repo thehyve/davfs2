@@ -2055,6 +2055,7 @@ new_node(dav_node *parent, mode_t mode)
     node->dirty = 0;
     node->uid = default_uid;
     node->gid = default_gid;
+    node->mode = mode;
 
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "new node: %p->%p",
