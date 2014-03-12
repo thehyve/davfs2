@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.4.0\n"
-"POT-Creation-Date: 2014-03-09 21:05+0100\n"
-"PO-Revision-Date: 2014-03-09 21:09+0100\n"
+"POT-Creation-Date: 2014-03-12 17:38+0100\n"
+"PO-Revision-Date: 2014-03-12 17:40+0100\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -38,27 +38,27 @@ msgstr "BESCHREIBUNG"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:511 mount.davfs.8:538 umount.davfs.8:79
+#: davfs2.conf.5:511 mount.davfs.8:537 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:517 mount.davfs.8:555 umount.davfs.8:84
+#: davfs2.conf.5:517 mount.davfs.8:554 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
 #. type: Plain text
-#: davfs2.conf.5:520 mount.davfs.8:558 umount.davfs.8:87
+#: davfs2.conf.5:520 mount.davfs.8:557 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:522 mount.davfs.8:560 umount.davfs.8:89
+#: davfs2.conf.5:522 mount.davfs.8:559 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
@@ -787,22 +787,20 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:266
+#: mount.davfs.8:265
 msgid ""
 "In I<fstab> spaces must be replaced by a three digit octal escape sequence. "
 "Write I<http://foo.bar/path\\(rs040with\\(rs040spaces> instead of I<http://"
-"foo.bar/path with spaces>. It might also be necessary to replace the '#'-"
-"character by \\(rs043."
+"foo.bar/path with spaces>."
 msgstr ""
 "In der I<fstab> müssen Leerzeichen durch den dreistelligen oktalen "
 "Zeichencode mit vorangestelltem Escape-Zeichen ersetzt werden. Also z.B.  "
 "I<http://foo.bar/path\\(rs040with\\(rs040spaces> anstelle von I<http://foo."
-"bar/path with spaces>. Möglicherweise muss auch das #-Zeichen durch \\(rs043 "
-"ersetzt werden."
+"bar/path with spaces>."
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:270
+#: mount.davfs.8:269
 msgid ""
 "For the I<@CONFIGFILE@> and the I<@SECRETSFILE@> files please see the escape "
 "and quotation rules described in the B<@CONFIGFILE@>(5) man page."
@@ -812,20 +810,20 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:273
+#: mount.davfs.8:272
 msgid "On I<command line> you must obey the escaping rules of the shell."
 msgstr "Auf der Kommandozeile müssen die Regeln der Shell beachtet werden."
 
 # type: SH
 #. type: SH
-#: mount.davfs.8:275
+#: mount.davfs.8:274
 #, no-wrap
 msgid "CACHING"
 msgstr "CACHE"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:280
+#: mount.davfs.8:279
 msgid ""
 "B<@PROGRAM_NAME@> tries to reduce HTTP-traffic by caching and reusing data.  "
 "Information about directories and files are held in memory, while downloaded "
@@ -837,7 +835,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:288
+#: mount.davfs.8:287
 msgid ""
 "B<@PROGRAM_NAME@> will consider cached information about directories and "
 "file attributes valid for a configurable time and look up this information "
@@ -855,7 +853,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:294
+#: mount.davfs.8:293
 msgid ""
 "This will not affect the content of files and directory listings. Whenever a "
 "file is opened, the server is looked up for a newer version of the file.  "
@@ -869,14 +867,14 @@ msgstr ""
 
 # type: SH
 #. type: SH
-#: mount.davfs.8:296
+#: mount.davfs.8:295
 #, no-wrap
 msgid "LOCKS, LOST UPDATE PROBLEM AND BACKUP FILES"
 msgstr "SPERREN, VERLORENGEGANGENE ÄNDERUNGEN UND BACKUP-DATEIEN"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:301
+#: mount.davfs.8:300
 msgid ""
 "WebDAV introduced locks and B<@PROGRAM_NAME@> uses them by default. This "
 "will in most cases prevent two people from changing the same file in "
@@ -888,7 +886,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:306
+#: mount.davfs.8:305
 msgid ""
 "You might have disabled locks in I<@SYS_CONF_DIR@/@CONFIGFILE@> or I<~/."
 "@PACKAGE@/@CONFIGFILE@>."
@@ -898,7 +896,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:309
+#: mount.davfs.8:308
 msgid "The server might not support locks (they are not mandatory)."
 msgstr ""
 "Möglicherweise unterstützt der Server keine Sperren (sie sind in WevDAV "
@@ -906,7 +904,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:313
+#: mount.davfs.8:312
 msgid ""
 "A bad connection might prevent B<@PROGRAM_NAME@> from refreshing the lock in "
 "time."
@@ -916,7 +914,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:317
+#: mount.davfs.8:316
 msgid ""
 "Another WebDAV-client might use your lock (that is not too difficult and "
 "might even happen without intention)."
@@ -926,7 +924,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:325
+#: mount.davfs.8:324
 msgid ""
 "B<@PROGRAM_NAME@> will therefore check if the file has been changed on the "
 "the server before it uploads a new version. If it finds it impossible to "
@@ -942,7 +940,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:333
+#: mount.davfs.8:332
 msgid ""
 "Sometimes locks held by some client on the server will not be released. "
 "Maybe the client crashes or the network connection fails. When "
@@ -963,7 +961,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:340
+#: mount.davfs.8:339
 msgid ""
 "WebDAV allows to lock files that don't exist (to protect the name when a "
 "client intends to create a new file). This locks will be displayed as files "
@@ -982,14 +980,14 @@ msgstr ""
 
 # type: SH
 #. type: SH
-#: mount.davfs.8:342
+#: mount.davfs.8:341
 #, no-wrap
 msgid "FILE OWNER AND PERMISSIONS"
 msgstr "EIGENTÜMER UND DATEIRECHTE"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:348
+#: mount.davfs.8:347
 msgid ""
 "B<@PACKAGE@> implements Unix permissions for access control. But changing "
 "owner and permissions of a file is only B<local>. It is intended as a means "
@@ -1003,7 +1001,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:353
+#: mount.davfs.8:352
 msgid ""
 "The server does not know about this. From the servers point of view there is "
 "just one user (identified by the credentials) connected. Another WebDAV-"
@@ -1016,7 +1014,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:359
+#: mount.davfs.8:358
 msgid ""
 "There is one exeption: The B<execute bit> on files is stored as a property "
 "on the sever. You may think of this property as an information about the "
@@ -1031,7 +1029,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:365
+#: mount.davfs.8:364
 msgid ""
 "When the file system is unmounted, attributes of cached files (including "
 "owner and permissions) are stored in cache, as well as the attributs of the "
@@ -1045,34 +1043,34 @@ msgstr ""
 
 # type: SH
 #. type: SH
-#: mount.davfs.8:367 umount.davfs.8:67
+#: mount.davfs.8:366 umount.davfs.8:67
 #, no-wrap
 msgid "FILES"
 msgstr "DATEIEN"
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:369
+#: mount.davfs.8:368
 #, no-wrap
 msgid "I<@SYS_CONF_DIR@/@CONFIGFILE@>"
 msgstr "I<@SYS_CONF_DIR@/@CONFIGFILE@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:372
+#: mount.davfs.8:371
 msgid "System wide configuration file."
 msgstr "Systemweite Konfigurationsdatei."
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:373
+#: mount.davfs.8:372
 #, no-wrap
 msgid "I<~/.@PACKAGE@/@CONFIGFILE@>"
 msgstr "I<~/.@PACKAGE@/@CONFIGFILE@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:378
+#: mount.davfs.8:377
 msgid ""
 "Configuration file in the users home directory.The user configuration takes "
 "precedence over the system wide configuration. If it does not exist, "
@@ -1084,14 +1082,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:379
+#: mount.davfs.8:378
 #, no-wrap
 msgid "I<@SYS_CONF_DIR@/@SECRETSFILE@>"
 msgstr "I<@SYS_CONF_DIR@/@SECRETSFILE@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:384
+#: mount.davfs.8:383
 msgid ""
 "Holds the credentials for WebDAV servers and the proxy, as well as "
 "decryption passwords for client certificates. The file must be read-writable "
@@ -1103,14 +1101,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:385
+#: mount.davfs.8:384
 #, no-wrap
 msgid "I<~/.@PACKAGE@/@SECRETSFILE@>"
 msgstr "I<~/.@PACKAGE@/@SECRETSFILE@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:395
+#: mount.davfs.8:394
 msgid ""
 "Holds credentials for WebDAV servers and proxy, as well as decryption "
 "passwords for client certificates. The file must be read-writable by the "
@@ -1131,14 +1129,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:396
+#: mount.davfs.8:395
 #, no-wrap
 msgid "I<@SYS_CONF_DIR@/@CERTS_DIR@>"
 msgstr "I<@SYS_CONF_DIR@/@CERTS_DIR@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:403
+#: mount.davfs.8:402
 msgid ""
 "You may store trusted server certificates here, that can not be verified by "
 "use of the system wide CA-Certificates. This is useful when your server uses "
@@ -1155,20 +1153,20 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:405 mount.davfs.8:414
+#: mount.davfs.8:404 mount.davfs.8:413
 msgid "Be sure to verify the certificate."
 msgstr "Vergiss nicht, das Zertifikat selbst zu prüfen."
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:406
+#: mount.davfs.8:405
 #, no-wrap
 msgid "I<~/.@PACKAGE@/@CERTS_DIR@>"
 msgstr "I<~/.@PACKAGE@/@CERTS_DIR@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:412
+#: mount.davfs.8:411
 msgid ""
 "You may store trusted server certificates here, that can not be verified by "
 "use of the system wide CA-Certificates. This is useful when your server uses "
@@ -1184,14 +1182,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:415
+#: mount.davfs.8:414
 #, no-wrap
 msgid "I<@SYS_CONF_DIR@/@CERTS_DIR@/@CLICERTS_DIR@>"
 msgstr "I<@SYS_CONF_DIR@/@CERTS_DIR@/@CLICERTS_DIR@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:421
+#: mount.davfs.8:420
 msgid ""
 "To store client certificates. Certificates must be in PKCS#12 format. You "
 "must configure the B<clientcert> option in I<@SYS_CONF_DIR@/@CONFIGFILE@> or "
@@ -1205,14 +1203,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:422
+#: mount.davfs.8:421
 #, no-wrap
 msgid "I<~/.@PACKAGE@/@CERTS_DIR@/@CLICERTS_DIR@>"
 msgstr "I<~/.@PACKAGE@/@CERTS_DIR@/@CLICERTS_DIR@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:427
+#: mount.davfs.8:426
 msgid ""
 "To store client certificates. Certificates must be in PKCS#12 format. You "
 "must configure the B<clientcert> option in I<~/.@PACKAGE@/@CONFIGFILE@> to "
@@ -1225,14 +1223,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:428 umount.davfs.8:69
+#: mount.davfs.8:427 umount.davfs.8:69
 #, no-wrap
 msgid "I<@SYS_RUN@>"
 msgstr "I<@SYS_RUN@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:434
+#: mount.davfs.8:433
 msgid ""
 "PID-files of running mount.davfs processes are stored there. This directory "
 "must belong to group B<@USER@> with write permissions for the group and the "
@@ -1246,14 +1244,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:435
+#: mount.davfs.8:434
 #, no-wrap
 msgid "I<@SYS_CACHE_DIR@>"
 msgstr "I<@SYS_CACHE_DIR@>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:442
+#: mount.davfs.8:441
 msgid ""
 "System wide directory for cached files. Used when the file system is mounted "
 "by root. It must belong do group B<@USER@> and read, write and execute bits "
@@ -1269,14 +1267,14 @@ msgstr ""
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:443
+#: mount.davfs.8:442
 #, no-wrap
 msgid "I<~/.@PACKAGE@/cache>"
 msgstr "I<~/.@PACKAGE@/cache>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:447
+#: mount.davfs.8:446
 msgid ""
 "Cache directory in the mounting users home directory. For every mounted "
 "WebDAV resource a subdirectory is created."
@@ -1286,7 +1284,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:451
+#: mount.davfs.8:450
 msgid ""
 "B<@PROGRAM_NAME@> will try to create missing directories, but it will B<not> "
 "touch I<@SYS_CONF_DIR@>."
@@ -1296,21 +1294,21 @@ msgstr ""
 
 # type: SH
 #. type: SH
-#: mount.davfs.8:452
+#: mount.davfs.8:451
 #, no-wrap
 msgid "ENVIRONMENT"
 msgstr "UMGEBUNGSVARIABLEN"
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:454
+#: mount.davfs.8:453
 #, no-wrap
 msgid "B<https_proxy http_proxy all_proxy>"
 msgstr "B<https_proxy http_proxy all_proxy>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:459
+#: mount.davfs.8:458
 msgid ""
 "If no proxy is defined in the configuration file the value is taken from "
 "this environment variables. The proxy may be given with or without scheme "
@@ -1322,26 +1320,26 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:461
+#: mount.davfs.8:460
 msgid "http_proxy=[http://]foo.bar[:3218]"
 msgstr "http_proxy=[http://]foo.bar[:3218]"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:463 mount.davfs.8:471
+#: mount.davfs.8:462 mount.davfs.8:470
 msgid "Only used when the mounting user is root."
 msgstr "Wird nur benutzt, wenn der Benutzer root das Dateisystem einhängt."
 
 # type: TP
 #. type: TP
-#: mount.davfs.8:464
+#: mount.davfs.8:463
 #, no-wrap
 msgid "B<no_proxy>"
 msgstr "B<no_proxy>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:469
+#: mount.davfs.8:468
 msgid ""
 "A comma separated list of domain names that shall be accessed directly.  "
 "B<*> matches any domain name. A domain name starting with B<.> (period) "
@@ -1353,27 +1351,27 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:473
+#: mount.davfs.8:472
 msgid "Not applied when the proxy is defined in I<@SYS_CONF_DIR@>."
 msgstr ""
 "Wird nicht benutzt, wenn der Proxy in I<@SYS_CONF_DIR@> festgelegt wird."
 
 # type: SH
 #. type: SH
-#: mount.davfs.8:475
+#: mount.davfs.8:474
 #, no-wrap
 msgid "EXAMPLES"
 msgstr "BEISPIELE"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:478
+#: mount.davfs.8:477
 msgid "B<Non root user (e.g. filomena):>"
 msgstr "B<Normaler Benutzer (z.B filomena):>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:481
+#: mount.davfs.8:480
 msgid "To allow an ordinary user to mount there must be an entry in I<fstab>"
 msgstr ""
 "Damit ein normaler Benutzer ein Dateisystem einhängen kann, ist ein Eintrag "
@@ -1381,13 +1379,13 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:483
+#: mount.davfs.8:482
 msgid "http://webdav.org/dav /media/dav davfs noauto,user 0 0"
 msgstr "http://webdav.org/dav /media/dav davfs noauto,user 0 0"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:488
+#: mount.davfs.8:487
 msgid ""
 "If a proxy must be used this should be configured in I<@SYS_CONF_DIR@/"
 "@CONFIGFILE@>"
@@ -1397,13 +1395,13 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:490
+#: mount.davfs.8:489
 msgid "proxy proxy.mycompany.com:8080"
 msgstr "proxy proxy.mycompany.com:8080"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:494
+#: mount.davfs.8:493
 msgid "Credentials are stored in I</home/filomena/.@PACKAGE@/@SECRETSFILE@>"
 msgstr ""
 "Die vertraulichen Zugangsdaten für den Server werden in I</home/filomena/."
@@ -1411,49 +1409,49 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:496
+#: mount.davfs.8:495
 msgid "proxy.mycompany.com filomena \"my secret\""
 msgstr "proxy.mycompany.com filomena \"my secret\""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:498
+#: mount.davfs.8:497
 msgid "/media/dav webdav-username password"
 msgstr "/media/dav webdav-username password"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:502
+#: mount.davfs.8:501
 msgid "Now the WebDAV resource may be mounted by user filomena invoking"
 msgstr "Jetzt kann Benutzerin filomena das Dateisystem einhängen durch "
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:504
+#: mount.davfs.8:503
 msgid "B<mount /media/dav>"
 msgstr "B<mount /media/dav>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:508
+#: mount.davfs.8:507
 msgid "and unmounted by user filomena invoking"
 msgstr "und dieselbe Benutzerin filomena kann es aushängen durch"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:510
+#: mount.davfs.8:509
 msgid "B<umount /media/dav>"
 msgstr "B<umount /media/dav>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:514
+#: mount.davfs.8:513
 msgid "B<Root user only:>"
 msgstr "B<Nur Benutzer root:>"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:520
+#: mount.davfs.8:519
 msgid ""
 "Mounts the resource I<https://asciigirl.com/webdav> at mount point I</mount/"
 "site>, encrypting all traffic with SSL. Credentials for I<http://webdav.org/"
@@ -1468,7 +1466,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:522
+#: mount.davfs.8:521
 msgid ""
 "B<mount -t davfs -o uid=otto,gid=users,mode=775 https://asciigirl.com/"
 "webdav /mount/site>"
@@ -1478,14 +1476,14 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:526
+#: mount.davfs.8:525
 msgid "Mounts the resource I<http://linux.org.ar/repos> at I</dav>."
 msgstr ""
 "Die WebDAV-Resource I<http://linux.org.ar/repos> wird auf I</dav> eingehängt."
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:528
+#: mount.davfs.8:527
 msgid ""
 "B<mount.davfs -o uid=otto,gid=users,mode=775 http://linux.org.ar/repos/ /dav>"
 msgstr ""
@@ -1493,20 +1491,20 @@ msgstr ""
 
 # type: SH
 #. type: SH
-#: mount.davfs.8:531 umount.davfs.8:74
+#: mount.davfs.8:530 umount.davfs.8:74
 #, no-wrap
 msgid "BUGS"
 msgstr "FEHLER"
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:534
+#: mount.davfs.8:533
 msgid "B<@PACKAGE@> does not support links."
 msgstr "B<@PACKAGE@> unterstützt keine Links."
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:536
+#: mount.davfs.8:535
 msgid "A B<@PACKAGE@> file system cannot be moved with I<mount --move>."
 msgstr ""
 "Ein B<@PACKAGE@>-Dateisystem kann nicht mit I<mount --move> verschoben "
@@ -1514,7 +1512,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:542
+#: mount.davfs.8:541
 msgid ""
 "This man page was written by Luciano Bello E<lt>luciano@linux.org.arE<gt> "
 "for Debian, for version 0.2.3 of davfs2."
@@ -1524,7 +1522,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:546
+#: mount.davfs.8:545
 msgid ""
 "It has been updated for this version by Werner Baumann E<lt>werner."
 "baumann@onlinhome.deE<gt>."
@@ -1534,13 +1532,13 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:549
+#: mount.davfs.8:548
 msgid "@PACKAGE@ is developed by Sung Kim E<lt>hunkim@gmail.comE<gt>."
 msgstr "@PACKAGE@ wurde von Sung Kim E<lt>hunkim@gmail.comE<gt> entwickelt."
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:553
+#: mount.davfs.8:552
 msgid ""
 "Version 1.0.0 (and later) of @PACKAGE@ is a complete rewrite by Werner "
 "Baumann."
@@ -1550,7 +1548,7 @@ msgstr ""
 
 # type: Plain text
 #. type: Plain text
-#: mount.davfs.8:566
+#: mount.davfs.8:565
 msgid ""
 "B<u@PROGRAM_NAME@>(8), B<@CONFIGFILE@>(5), B<mount>(8), B<umount>(8), "
 "B<fstab>(5)"

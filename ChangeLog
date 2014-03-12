@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-03-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * man/mount.davfs.8:
+      Fix escape rules for fstab.
+
 2014-03-11 Werner Baumann (werner.baumann@onlinehome.de)
     * defaults.h, mount_davfs.h, mount_davfs.c, wedav.c:
       Support compression for GET responses (bug #41355,
