@@ -4,6 +4,8 @@ ChangeLog for davfs2
 2014-03-12 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, new_node:
       Fix missing mode.
+    * man/mount.davfs.8:
+      Fix escape rules for fstab.
 
 2014-03-11 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, configure.ac:
