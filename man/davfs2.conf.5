@@ -296,6 +296,13 @@ In this case the header should be ignored.
 Default: 0
 
 .TP
+.B use_compression
+Use gzip-compression for downloading files, if supported by the server.
+Uploads will still be uncompressed.
+.br
+Default: 1
+
+.TP
 .B server_charset
 When extracting file names from the path component of the URL,
 \fB@PROGRAM_NAME@\fR will assume they are encoded using this character set

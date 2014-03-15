@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2014-03-15 Werner Baumann (werner.baumann@onlinehome.de)
+    * Document option "use_compression".
+
 2014-03-12 Werner Baumann (werner.baumann@onlinehome.de)
     * man/mount.davfs.8:
       Fix escape rules for fstab.
