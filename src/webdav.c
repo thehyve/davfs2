@@ -111,7 +111,6 @@ typedef struct {
 enum {
     ETAG = 0,
     LENGTH,
-    CREATION,
     MODIFIED,
     TYPE,
     EXECUTE,
@@ -121,7 +120,6 @@ enum {
 static const ne_propname prop_names[] = {
     [ETAG] = {"DAV:", "getetag"},
     [LENGTH] = {"DAV:", "getcontentlength"},
-    [CREATION] ={"DAV:", "creationdate"},
     [MODIFIED] = {"DAV:", "getlastmodified"},
     [TYPE] = {"DAV:", "resourcetype"},
     [EXECUTE] = {"http://apache.org/dav/props/", "executable"},
@@ -131,7 +129,6 @@ static const ne_propname prop_names[] = {
 static const ne_propname anonymous_prop_names[] = {
     [ETAG] = {NULL, "getetag"},
     [LENGTH] = {NULL, "getcontentlength"},
-    [CREATION] ={NULL, "creationdate"},
     [MODIFIED] = {NULL, "getlastmodified"},
     [TYPE] = {NULL, "resourcetype"},
     [EXECUTE] = {NULL, "executable"},
@@ -1705,17 +1702,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 #else /* _FILE_OFFSET_BITS != 64 */
          result->size = strtol(data, NULL, 10);
 #endif /* _FILE_OFFSET_BITS != 64 */
-
-    data = ne_propset_value(set, &prop_names[CREATION]);
-    if (!data)
-        data = ne_propset_value(set, &anonymous_prop_names[CREATION]);
-    if (data) {
-        result->ctime = ne_iso8601_parse(data);
-        if (result->ctime == (time_t) -1)
-            result->ctime = ne_httpdate_parse(data);
-        if (result->ctime == (time_t) -1)
-            result->ctime = 0;
-    }
 
     data = ne_propset_value(set, &prop_names[MODIFIED]);
     if (!data)

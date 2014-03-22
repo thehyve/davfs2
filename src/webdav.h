@@ -36,7 +36,6 @@ struct dav_props {
     char *etag;         /* The etag string, including quotation characters,
                            but without the mark for weak etags. */
     off_t size;         /* File size in bytes (regular files only). */
-    time_t ctime;       /* Creation date. */
     time_t mtime;       /* Date of last modification. */
     int is_dir;         /* Boolean; 1 if a directory. */
     int is_exec;        /* -1 if not specified; 1 is executeable;
