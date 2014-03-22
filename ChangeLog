@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-03-22 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, cache.h, dav_fuse.c, webdav.c, webdav.h:
+      Remove support for extended attributes.
+
 2014-03-15 Werner Baumann (werner.baumann@onlinehome.de)
     * Document option "use_compression".
 
