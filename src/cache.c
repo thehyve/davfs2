@@ -1523,11 +1523,7 @@ add_node(dav_node *parent, dav_props *props)
     node->smtime = props->mtime;
     if (node->smtime > 0)
         node->mtime = node->smtime;
-    if (props->ctime > 0) {
-        node->ctime = props->ctime;
-    } else {
-        node->ctime = node->mtime;
-    }
+    node->ctime = node->mtime;
 
     free(props);
     if (debug)
@@ -2083,8 +2079,6 @@ update_directory(dav_node *dir, time_t refresh)
             changed = 1;
         } else {
             dir->mtime = props->mtime;
-            if (props->ctime > dir->ctime)
-                dir->ctime = props->ctime;
             if (dir->mtime > dir->ctime)
                 dir->ctime = dir->mtime;
             if (dir->etag)
@@ -2187,8 +2181,6 @@ update_node(dav_node *node, dav_props *props)
         node->utime = 0;
         delete_cache_file(node);
     }
-    if (props->ctime > node->ctime)
-        node->ctime = props->ctime;
 
     if (node->etag)
         free(node->etag);
