@@ -61,6 +61,7 @@
 #include <ne_dates.h>
 #include <ne_locks.h>
 #include <ne_props.h>
+#include <ne_redirect.h>
 #include <ne_request.h>
 #include <ne_session.h>
 #include <ne_socket.h>
@@ -160,6 +161,12 @@ static char *none_match_header = "If-None-Match: *\r\n";
    Will be set by dav_init_webdav(). */
 static ne_session *session;
 
+/* Timeout for requests. Set by dav_init_webdav(). */
+static int read_timeout;
+
+/* Timeout for creating a connection. Set by dav_init_webdav(). */
+static int connect_timeout;
+
 /* Lock store, lock owner and lock timeout for session.
    Will be set by dav_init_webdav(). */
 static ne_lock_store *locks;
@@ -193,6 +200,9 @@ static int ignore_dav_header;
 
 /* Use "Content-Encoding: gzip" for GET requests. */
 static int use_compression;
+
+/* Follow redirects on GET-requests. */
+static int follow_redirect = 1;
 
 /* Will be set to 1 when dav_init_connection() succeeded. */
 static int initialized;
@@ -238,11 +248,18 @@ static void
 convert(char **s, iconv_t conv);
 #endif
 
-static int
-get_error(int ret, const char *method);
+static ne_session *
+create_rd_session(const ne_uri *uri);
 
 static int
-get_ne_error(const char *method);
+get_error(int ret, const char *method, ne_session *sess);
+
+static int
+get_ne_error(const char *method, ne_session *sess);
+
+int
+get_redirect(const ne_uri *uri, const char *cache_path, off_t *size,
+             char **etag, time_t *mtime, int *modified);
 
 static struct ne_lock *
 lock_by_path(const char *path);
@@ -349,13 +366,17 @@ dav_init_webdav(const dav_args *args)
 
     session = ne_session_create(args->scheme, args->host, args->port);
 
-    ne_set_read_timeout(session, args->read_timeout);
-
-    ne_set_connect_timeout(session, args->connect_timeout);
+    read_timeout = args->read_timeout;
+    ne_set_read_timeout(session, read_timeout);
+    connect_timeout = args->connect_timeout;
+    ne_set_connect_timeout(session, connect_timeout);
 
     char *useragent = ne_concat(PACKAGE_TARNAME, "/", PACKAGE_VERSION, NULL);
     ne_set_useragent(session, useragent);
     free(useragent);
+
+    if (follow_redirect)
+        ne_redirect_register(session);
 
     if (args->username)
         username = ne_strdup(args->username);
@@ -486,7 +507,7 @@ dav_init_connection(const char *path)
             locks = NULL;
         }
     } else {
-        ret = get_error(ret, "OPTIONS");
+        ret = get_error(ret, "OPTIONS", session);
     }
 
     free(spath);
@@ -506,7 +527,7 @@ dav_close_webdav(void)
         while (lock) {
             if (session) {
                 int ret = ne_unlock(session, lock);
-                get_error(ret, "UNLOCK");
+                get_error(ret, "UNLOCK", session);
             }
             lock = ne_lockstore_next(locks);
         }
@@ -578,14 +599,14 @@ dav_delete(const char *path, time_t *expire)
     struct ne_lock *lock = NULL;
     char *spath = ne_path_escape(path);
     ret = ne_delete(session, spath);
-    ret = get_error(ret, "DELETE");
+    ret = get_error(ret, "DELETE", session);
 
     if ((ret == EACCES || ret == ENOENT) && locks) {
         lock_discover(spath, expire);
         lock = lock_by_path(spath);
         if (lock && ret == EACCES) {
             ret = ne_delete(session, spath);
-            ret = get_error(ret, "DELETE");
+            ret = get_error(ret, "DELETE", session);
         } else if (lock) {
             ne_unlock(session, lock);
             ret = 0;
@@ -616,7 +637,7 @@ dav_delete_dir(const char *path)
 
     char *spath = ne_path_escape(path);
     ret = ne_delete(session, spath);
-    ret = get_error(ret, "DELETE");
+    ret = get_error(ret, "DELETE", session);
 
     free(spath);
     return ret;
@@ -652,7 +673,7 @@ dav_get_collection(const char *path, dav_props **props)
     char *spath = ne_path_escape(path);
     ne_propfind_handler *ph = ne_propfind_create(session, spath, NE_DEPTH_ONE);
     ret = ne_propfind_named(ph, prop_names, prop_result, &ctx);
-    ret = get_error(ret, "PROPFIND");
+    ret = get_error(ret, "PROPFIND", session);
     ne_propfind_destroy(ph);
     free(spath);
 
@@ -714,7 +735,40 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
     if (use_compression)
         ne_decompress_destroy(dc_state);
 
-    ret = get_error(ret, "GET");
+    /* This section is required for redirects. */
+    ne_session *rd_sess = NULL;
+    const ne_uri *rd_uri = NULL;
+    if (ret == NE_REDIRECT)
+        rd_uri = ne_redirect_location(session);
+
+    if (rd_uri) {
+        rd_sess = create_rd_session(rd_uri);
+
+        ne_request_destroy(req);
+        req = ne_request_create(rd_sess, "GET", rd_uri->path);
+
+        if (etag && *etag)
+            ne_add_request_header(req, "If-None-Match", *etag);
+
+        if (use_compression) {
+            dc_state = ne_decompress_reader(req, ne_accept_2xx, file_reader,
+                                            &ctx);
+        } else {
+            ne_add_response_body_reader(req, ne_accept_2xx, file_reader, &ctx);
+        }
+
+        ret = ne_request_dispatch(req);
+
+        if (use_compression)
+            ne_decompress_destroy(dc_state);
+    }
+    /* End of redirect section. */
+
+    if (rd_uri) {
+        ret = get_error(ret, "GET", rd_sess);
+    } else {
+        ret = get_error(ret, "GET", session);
+    }
     if (ctx.error)
         ret = ctx.error;
     const ne_status *status = ne_get_status(req);
@@ -744,6 +798,8 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
     }
 
     ne_request_destroy(req);
+    if (rd_sess)
+        ne_session_destroy(rd_sess);
     if (ctx.fd > 0)
         close(ctx.fd);
     if (mod_time)
@@ -765,7 +821,7 @@ dav_head(const char *path, char **etag, time_t *mtime, off_t *length)
     char *spath = ne_path_escape(path);
     ne_request *req = ne_request_create(session, "HEAD", spath);
     ret = ne_request_dispatch(req);
-    ret = get_error(ret, "HEAD");
+    ret = get_error(ret, "HEAD", session);
 
     const char *value = ne_get_response_header(req, "ETag");
     if (!ret && etag && value) {
@@ -829,7 +885,7 @@ dav_lock(const char *path, time_t *expire, int *exists)
     if (!has_if_match_bug && !*exists)
         ne_hook_pre_send(session, add_header, none_match_header);
     ret = ne_lock(session, lock);
-    ret = get_error(ret, "LOCK");
+    ret = get_error(ret, "LOCK", session);
     if (!has_if_match_bug && !*exists) {
         ne_unhook_pre_send(session, add_header, none_match_header);
         if (ret && strtol(ne_get_error(session), NULL, 10) == 412)
@@ -890,7 +946,7 @@ dav_make_collection(const char *path)
 
     char *spath = ne_path_escape(path);
     ret = ne_mkcol(session, spath);
-    ret = get_error(ret, "MKCOL");
+    ret = get_error(ret, "MKCOL", session);
 
     free(spath);
     return ret;
@@ -909,7 +965,7 @@ dav_move(const char *src, const char *dst)
     char *spath = ne_path_escape(src);
     char *dst_path = ne_path_escape(dst);
     ret = ne_move(session, 1, spath, dst_path); 
-    ret = get_error(ret, "MOVE");
+    ret = get_error(ret, "MOVE", session);
 
     if (!ret && locks) {
         struct ne_lock *lock = lock_by_path(spath);
@@ -991,7 +1047,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
     ne_set_request_body_fd(req, fd, 0, st.st_size);
 
     ret = ne_request_dispatch(req);
-    ret = get_error(ret, "PUT");
+    ret = get_error(ret, "PUT", session);
 
     if (ret == EACCES && lock_discover(spath, expire) == 0) {
 
@@ -1014,7 +1070,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
         ne_set_request_body_fd(req, fd, 0, st.st_size);
 
         ret = ne_request_dispatch(req);
-        ret = get_error(ret, "PUT");
+        ret = get_error(ret, "PUT", session);
     }
 
     int need_head = 0;
@@ -1081,7 +1137,7 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
         ne_propfind_handler *ph = ne_propfind_create(session, spath,
                                                      NE_DEPTH_ZERO);
         ret = ne_propfind_named(ph, quota_names, quota_result, &ctx);
-        ret = get_error(ret, "PROPFIND");
+        ret = get_error(ret, "PROPFIND", session);
         ne_propfind_destroy(ph);
 
         if (!ret && ctx.error) {
@@ -1096,7 +1152,7 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
         ne_request *req = ne_request_create(session, "USERINFO", spath);
         ne_add_response_body_reader(req, ne_accept_2xx, quota_reader, &ctx);
         ret = ne_request_dispatch(req);
-        ret = get_error(ret, "USERINFO");
+        ret = get_error(ret, "USERINFO", session);
         ne_request_destroy(req);
 
         if (!ret) {
@@ -1138,7 +1194,7 @@ dav_set_execute(const char *path, int set)
 
     char *spath = ne_path_escape(path);
     ret = ne_proppatch(session, spath, &op[0]);
-    ret = get_error(ret, "PROPPATCH");
+    ret = get_error(ret, "PROPPATCH", session);
     free(spath);
 
     return ret;
@@ -1176,7 +1232,7 @@ dav_unlock(const char *path, time_t *expire)
     }
 
     ret = ne_unlock(session, lock);
-    ret = get_error(ret, "UNLOCK");
+    ret = get_error(ret, "UNLOCK", session);
 
     if (!ret || ret == ENOENT || ret == EINVAL) {
         ne_lockstore_remove(locks, lock);
@@ -1217,20 +1273,76 @@ convert(char **s, iconv_t conv)
 #endif /* HAVE_ICONV */
 
 
+/* Creates a new session.
+   Scheme, host and port are taken from uri.
+   read_timout, connect_timeout, useragent and proxy are the same as for the
+   main sessions. The values are taken from the main session or from global
+   variables.
+   The same call back functions for auth and custom headers as for the main
+   session are registered, using the same credentials as the main session.
+   If the scheme is https the ssl_verify function is registered. It is set up
+   to trust in the default CAs. A server certificate or client certificate
+   configured by the user are not used because it may be a different server.
+   TODO: usage of certificates and credentials should depend on uri->host.
+   Return value : the newly created session. It must be destroyed by the
+                  caller. */
+static ne_session *
+create_rd_session(const ne_uri *uri)
+{
+    if (!uri->scheme || !uri->host || !uri->path)
+        return NULL;
+    if (strcmp(uri->scheme, "https") == 0 && !ne_has_support(NE_FEATURE_SSL))
+        return NULL;
+
+    int port = uri->port;
+    if (port == 0)
+        port = ne_uri_defaultport(uri->scheme);
+
+    ne_session *rd_sess = ne_session_create(uri->scheme, uri->host, port);
+    
+    ne_set_read_timeout(rd_sess, read_timeout);
+    ne_set_connect_timeout(rd_sess, connect_timeout);
+
+    char *useragent = ne_concat(PACKAGE_TARNAME, "/", PACKAGE_VERSION, NULL);
+    ne_set_useragent(session, useragent);
+    free(useragent);
+
+    ne_add_server_auth(rd_sess, NE_AUTH_ALL, auth, "server");
+
+    ne_uri *proxy = (ne_uri *) ne_calloc(sizeof(ne_uri));
+    ne_fill_proxy_uri(rd_sess, proxy);
+    if (proxy->host) {
+        ne_session_proxy(rd_sess, proxy->host, proxy->port);
+        ne_add_proxy_auth(rd_sess, NE_AUTH_ALL, auth, "proxy");
+    }    
+
+    if (strcmp(uri->scheme, "https") == 0) {
+        ne_ssl_set_verify(rd_sess, ssl_verify, NULL);
+        ne_ssl_trust_default_ca(rd_sess);
+    }
+
+    if (custom_header)
+        ne_hook_pre_send(rd_sess, add_header, custom_header);
+
+    return rd_sess;
+}
+
+
 /* Returns a file error code according to ret from the last WebDAV
    method call. If ret has value NE_ERROR the error code from the session is
    fetched and translated.
    ret    : the error code returned from NEON.
    method : name of the WebDAV method, used for debug messages.
+   sess   : the session to get the HTTP status code from.
    return value : a file error code according to errno.h. */
 static int
-get_error(int ret, const char *method)
+get_error(int ret, const char *method, ne_session *sess)
 {
     int err;
     switch (ret) {
     case NE_OK:
     case NE_ERROR:
-        err = get_ne_error(method);
+        err = get_ne_error(method, sess);
         break;
     case NE_LOOKUP:
         err = EIO;
@@ -1267,11 +1379,12 @@ get_error(int ret, const char *method)
 
 /* Get the error from the session and translates it into a file error code.
    method : name of the WebDAV method, used for debug messages.
+   sess   : the session to get the HTTP status code from.
    return value : a file error code according to errno.h. */
 static int
-get_ne_error(const char *method)
+get_ne_error(const char *method, ne_session *sess)
 {
-    const char *text = ne_get_error(session);
+    const char *text = ne_get_error(sess);
 
     char *tail;
     int err = strtol(text, &tail, 10);
@@ -1374,7 +1487,7 @@ lock_discover(const char *path, time_t *expire)
 
     struct ne_lock *lock = NULL;
     int ret = ne_lock_discover(session, path, lock_result, &lock);
-    ret = get_error(ret, "LOCKDISCOVER");
+    ret = get_error(ret, "LOCKDISCOVER", session);
 
     if (!ret && lock)  {
         *expire = -1;
@@ -1396,7 +1509,7 @@ static void
 lock_refresh(struct ne_lock *lock, time_t *expire)
 {
     int ret = ne_lock_refresh(session, lock);
-    ret = get_error(ret, "LOCKREFRESH");
+    ret = get_error(ret, "LOCKREFRESH", session);
 
     if (!ret) {
         if (lock->timeout <= 0) {
