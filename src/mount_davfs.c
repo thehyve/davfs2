@@ -1682,6 +1682,7 @@ new_args(void)
     args->precheck = DAV_PRECHECK;
     args->ignore_dav_header = DAV_IGNORE_DAV_HEADER;
     args->use_compression = DAV_USE_COMPRESSION;
+    args->follow_redirect = DAV_FOLLOW_REDIRECT;
     args->connect_timeout = DAV_CONNECT_TIMEOUT;
     args->read_timeout = DAV_READ_TIMEOUT;
     args->retry = DAV_RETRY;
@@ -1792,6 +1793,10 @@ log_dbg_config(dav_args *args)
            "  precheck: %i", args->precheck);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  ignore_dav_header: %i", args->ignore_dav_header);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  use_compression: %i", args->use_compression);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  follow_redirect: %i", args->follow_redirect);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  connect_timeout: %li s", args->connect_timeout);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2092,6 +2097,8 @@ read_config(dav_args *args, const char * filename, int system)
                 args->ignore_dav_header = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "use_compression") == 0) {
                 args->use_compression = arg_to_int(parmv[1], 10, parmv[0]);
+            } else if (strcmp(parmv[0], "follow_redirect") == 0) {
+                args->follow_redirect = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "connect_timeout") == 0) {
                 args->connect_timeout = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "read_timeout") == 0) {

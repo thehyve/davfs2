@@ -296,6 +296,20 @@ Uploads will still be uncompressed.
 Default: 1
 
 .TP
+.B follow_redirect
+If the server redirects a GET-request to a different resource (maybe on
+a different server) then follow this redirection.
+.br
+Currently there are some restrictions: all redirects are treated as
+temporary redirects; if the new server requires authentication then the
+same credentials are use as for the original server; if the connection
+is over TLS the server certificate will be checked against the trusted
+CAs known by the system; user configured server certificates and client
+certificates are not used for the new server.
+.br
+Default: 1
+
+.TP
 .B server_charset
 When extracting file names from the path component of the URL,
 \fB@PROGRAM_NAME@\fR will assume they are encoded using this character set
