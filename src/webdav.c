@@ -201,9 +201,6 @@ static int ignore_dav_header;
 /* Use "Content-Encoding: gzip" for GET requests. */
 static int use_compression;
 
-/* Follow redirects on GET-requests. */
-static int follow_redirect = 1;
-
 /* Will be set to 1 when dav_init_connection() succeeded. */
 static int initialized;
 
@@ -375,7 +372,7 @@ dav_init_webdav(const dav_args *args)
     ne_set_useragent(session, useragent);
     free(useragent);
 
-    if (follow_redirect)
+    if (args->follow_redirect)
         ne_redirect_register(session);
 
     if (args->username)
@@ -735,7 +732,6 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
     if (use_compression)
         ne_decompress_destroy(dc_state);
 
-    /* This section is required for redirects. */
     ne_session *rd_sess = NULL;
     const ne_uri *rd_uri = NULL;
     if (ret == NE_REDIRECT)
@@ -761,14 +757,11 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
 
         if (use_compression)
             ne_decompress_destroy(dc_state);
-    }
-    /* End of redirect section. */
-
-    if (rd_uri) {
         ret = get_error(ret, "GET", rd_sess);
     } else {
         ret = get_error(ret, "GET", session);
     }
+
     if (ctx.error)
         ret = ctx.error;
     const ne_status *status = ne_get_status(req);

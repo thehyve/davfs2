@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-03-30 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, webdav.c:
+      Set default of follow_redirect to 0.
+
 2014-03-23 Werner Baumann (werner.baumann@onlinehome.de)
     * defaults.h, mount_davfs.h, mount_davfs.c, webdav.c:
       Support temporary redirects.
