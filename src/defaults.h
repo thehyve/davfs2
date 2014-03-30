@@ -164,7 +164,7 @@
 #define DAV_USE_COMPRESSION 1
 
 /* Follow redirect responses on GET requests. */
-#define DAV_FOLLOW_REDIRECT 1
+#define DAV_FOLLOW_REDIRECT 0
 
 /* Timeout in seconds used when libneon supports non blocking io
    A value of zero means use the TCP default
