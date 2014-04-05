@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2014-04-05 20:04+0200\n"
+"POT-Creation-Date: 2014-04-05 22:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -605,11 +605,16 @@ msgid ""
 "                          /etc/fstab.\n"
 msgstr ""
 
-#: src/umount_davfs.c:130
-msgid "can't determine mount point"
+#: src/umount_davfs.c:134
+#, c-format
+msgid ""
+"\n"
+"  can't evaluate PID file name;\n"
+"  trying to unmount anyway;\n"
+"  please wait for %s to terminate"
 msgstr ""
 
-#: src/umount_davfs.c:150
+#: src/umount_davfs.c:157
 #, c-format
 msgid ""
 "\n"
@@ -618,7 +623,7 @@ msgid ""
 "  please wait for %s to terminate"
 msgstr ""
 
-#: src/umount_davfs.c:162
+#: src/umount_davfs.c:169
 #, c-format
 msgid ""
 "\n"
@@ -627,7 +632,7 @@ msgid ""
 "  please wait for %s to terminate"
 msgstr ""
 
-#: src/umount_davfs.c:178
+#: src/umount_davfs.c:185
 #, c-format
 msgid ""
 "\n"
@@ -636,12 +641,12 @@ msgid ""
 "  you propably have to remove %s manually"
 msgstr ""
 
-#: src/umount_davfs.c:189
+#: src/umount_davfs.c:196
 #, c-format
 msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
 msgstr ""
 
-#: src/umount_davfs.c:202
+#: src/umount_davfs.c:209
 #, c-format
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr ""

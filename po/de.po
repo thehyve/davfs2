@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: davfs2 1.4.6\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2014-04-05 20:04+0200\n"
-"PO-Revision-Date: 2014-04-05 20:8+0200\n"
+"POT-Creation-Date: 2014-04-05 22:16+0200\n"
+"PO-Revision-Date: 2014-04-05 22:19+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -675,11 +675,20 @@ msgstr ""
 "    umount <server-url> : hänge die WebDAV-Resource entsprechend den\n"
 "                          Angaben in /etc/fstab aus.\n"
 
-#: src/umount_davfs.c:130
-msgid "can't determine mount point"
-msgstr "kann den Einhängepunkt nicht ermitteln"
+#: src/umount_davfs.c:134
+#, c-format
+msgid ""
+"\n"
+"  can't evaluate PID file name;\n"
+"  trying to unmount anyway;\n"
+"  please wait for %s to terminate"
+msgstr ""
+"\n"
+"  kann den Namen der PID-Datei nicht ermitteln;\n"
+"  versuche trotzdem das Dateisystem auszuhängen;\n"
+"  bitte warte bis der %s-Prozess endet"
 
-#: src/umount_davfs.c:150
+#: src/umount_davfs.c:157
 #, c-format
 msgid ""
 "\n"
@@ -692,7 +701,7 @@ msgstr ""
 "  versuche trotzdem das Dateisystem auszuhängen;\n"
 "  bitte warte bis der %s-Prozess endet"
 
-#: src/umount_davfs.c:162
+#: src/umount_davfs.c:169
 #, c-format
 msgid ""
 "\n"
@@ -705,7 +714,7 @@ msgstr ""
 "  versuche trotzdem das Dateisystem auszuhängen;\n"
 "   bitte warte bis der %s-Prozess endet"
 
-#: src/umount_davfs.c:178
+#: src/umount_davfs.c:185
 #, c-format
 msgid ""
 "\n"
@@ -718,14 +727,14 @@ msgstr ""
 "  versuche trotzdem das Dateisystem auszuhängen;\n"
 "   %s muss wahrscheinlich von Hand gelöscht werden"
 
-#: src/umount_davfs.c:189
+#: src/umount_davfs.c:196
 #, c-format
 msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
 msgstr ""
 "%s: warte bis %s (PID %s) die Dateien im Cache\n"
 "gesichert hat ."
 
-#: src/umount_davfs.c:202
+#: src/umount_davfs.c:209
 #, c-format
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr ""
@@ -862,18 +871,3 @@ msgstr "  Name: %s"
 #: src/webdav.c:1983
 msgid "  accepted by user"
 msgstr "  durch den Benutzer akzeptiert"
-
-#~ msgid "different option `user' in %s"
-#~ msgstr "in %s ist die Option „user” anders gesetzt"
-
-#~ msgid "different option `users' in %s"
-#~ msgstr "in %s ist die Option „users” anders gesetzt"
-
-#~ msgid "invalid mount point %s"
-#~ msgstr "der Einhängepunkt %s ist nicht erlaubt"
-
-#~ msgid "mount point %s does not exist"
-#~ msgstr "der Einhängepunkt %s existiert nicht"
-
-#~ msgid "no mountpoint specified"
-#~ msgstr "es wurde kein Einhängepunkt angegeben"
