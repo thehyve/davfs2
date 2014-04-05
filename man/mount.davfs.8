@@ -175,9 +175,8 @@ Default: ordinary users are not allowed to mount.
 .B users
 Like \fBuser\fR, but \fBany\fR user is allowed to unmount the file system,
 not only the mounting user. This is generally not recomended.
-On systems with no \fImtab\fP file with the \fBuser\fR option unmounting by
-the mounting user will fail. In this case the \fBusers\fR may be an appropriate
-work around.
+If the \fBuser\fR option allows an unprivileged user to mount, but unmounting by
+the mounting user fails the \fBusers\fR may be a work around.
 .br
 Default: only the mounting user is allowed to unmount the file system.
 
