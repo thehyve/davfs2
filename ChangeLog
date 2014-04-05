@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2014-04-05 Werner Baumann (werner.baumann@onlinehome.de)
+    * umount_davfs.c:
+      Allways try 'umount -i'.
+
+2014-04-05 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac, src/Makefile.am, defaults.h,
       mount_davfs.h, mount_davfs.c:
       Use utab if mtab is a symbolic link.

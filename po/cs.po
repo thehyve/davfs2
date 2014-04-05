@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2014-04-05 20:04+0200\n"
+"POT-Creation-Date: 2014-04-05 22:16+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -667,11 +667,20 @@ msgstr ""
 "    umount <mountpoint> : odpojit zdroj WebDAV tak, jak je určeno\n"
 "                          v /etc/fstab.\n"
 
-#: src/umount_davfs.c:130
-msgid "can't determine mount point"
-msgstr "nemohu určit přípojný bod"
+#: src/umount_davfs.c:134
+#, fuzzy, c-format
+msgid ""
+"\n"
+"  can't evaluate PID file name;\n"
+"  trying to unmount anyway;\n"
+"  please wait for %s to terminate"
+msgstr ""
+"\n"
+"  nemohu číst PID ze souboru %s;\n"
+"  přesto se pokouším odpojit;\n"
+"  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:150
+#: src/umount_davfs.c:157
 #, c-format
 msgid ""
 "\n"
@@ -684,7 +693,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:162
+#: src/umount_davfs.c:169
 #, c-format
 msgid ""
 "\n"
@@ -697,7 +706,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až  %s skončí"
 
-#: src/umount_davfs.c:178
+#: src/umount_davfs.c:185
 #, c-format
 msgid ""
 "\n"
@@ -710,12 +719,12 @@ msgstr ""
 "  přesto se pokouším odpojit.\n"
 "  pravděpodobně budete muset odstranit %s ručně"
 
-#: src/umount_davfs.c:189
+#: src/umount_davfs.c:196
 #, c-format
 msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
 msgstr "%s: čekám, než si  %s (pid %s) sesynchronizuje vyrovnávací paměť."
 
-#: src/umount_davfs.c:202
+#: src/umount_davfs.c:209
 #, c-format
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr "při čekání došlo k chybě; čekejte prosím až %s skončí"
@@ -852,6 +861,9 @@ msgstr "  identita: %s"
 #: src/webdav.c:1983
 msgid "  accepted by user"
 msgstr "  přijat uživatelem"
+
+#~ msgid "can't determine mount point"
+#~ msgstr "nemohu určit přípojný bod"
 
 #, fuzzy
 #~ msgid "different option `user' in %s"
