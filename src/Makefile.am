@@ -35,6 +35,7 @@ umount_davfs_SOURCES = umount_davfs.c defaults.h
 AM_CFLAGS = -Wall
 DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_SYS_CONF_DIR=\"$(pkgsysconfdir)\" \
+       -DDAV_LOCALSTATE_DIR=\"$(dav_localstatedir)\" \
        -DDAV_SYS_RUN=\"$(pkglocalstatedir)\" \
        -DDAV_SYS_CACHE=\"$(pkgsyscachedir)\" \
        -DDAV_SECRETS=\"secrets\" \

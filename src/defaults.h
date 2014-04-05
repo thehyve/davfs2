@@ -51,6 +51,20 @@
 /* Directories and Files */
 /*=======================*/
 
+/* If _PATH_MOUNTED (the mtab file) is a symbolic link (to /proc/mounts)
+   some information required for umount is missing (e.g. the option
+   user=<name of the mounting user|) and in the case of davfs2 the file
+   system type will not be davfs but that of the kernel file system
+   (fuse or coda). Newer versions of the mount program will store this
+   information in the utab-file /var/run/mount/utab or /run/mount/utab.
+   davfs2 will do the same. */
+
+/* The subdirectory of DAV_LOCALSTATE_DIR where the utab-file is placed. */
+#define DAV_UTAB_DIR "mount"
+
+/* The name of the utab-file. */
+#define DAV_UTAB "utab"
+
 /* The device directory. */
 #define DAV_DEV_DIR "/dev"
 

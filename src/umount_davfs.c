@@ -72,6 +72,9 @@ main(int argc, char *argv[])
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
 
+int i;
+for (i = 0; i < argc; i++)
+printf("%s\n", argv[i]);
     char *short_options = "Vhflnrv";
     static const struct option options[] = {
         {"version", no_argument, NULL, 'V'},
@@ -124,7 +127,7 @@ main(int argc, char *argv[])
     if (!mpoint)
         mpoint = argv[optind];
     if (!mpoint || *mpoint != '/')
-        error(EXIT_FAILURE, 0, _("can't determine mount point"));
+        error(EXIT_FAILURE, errno, _("can't determine mount point"));
 
     char *m = mpoint;
     while (*m == '/')
