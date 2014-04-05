@@ -125,10 +125,19 @@ main(int argc, char *argv[])
         error(EXIT_FAILURE, 0, _("too many arguments"));
 
     char *mpoint = canonicalize_file_name(argv[optind]);
-    if (!mpoint)
-        mpoint = argv[optind];
-    if (!mpoint || *mpoint != '/')
-        error(EXIT_FAILURE, errno, _("can't determine mount point"));
+
+    char *umount_command = NULL;
+    if (mpoint) {
+        umount_command = ne_concat("umount -i '", mpoint, "'", NULL);
+    } else {
+        umount_command = ne_concat("umount -i '", argv[optind], "'", NULL);
+        error(0, 0,
+              _("\n"
+                "  can't evaluate PID file name;\n"
+                "  trying to unmount anyway;\n"
+                "  please wait for %s to terminate"), PROGRAM_NAME);
+        return system(umount_command);
+    }
 
     char *m = mpoint;
     while (*m == '/')
@@ -141,8 +150,6 @@ main(int argc, char *argv[])
     }
     char *pidfile = xasprintf("%s/%s.pid", DAV_SYS_RUN, mp);
     free(mp);
-
-    char *umount_command = xasprintf("umount -i '%s'", mpoint);
 
     char pid[32];
     FILE *file = fopen(pidfile, "r");

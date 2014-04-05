@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2014-04-05 20:13+0200\n"
+"POT-Creation-Date: 2014-04-05 22:21+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -636,12 +636,20 @@ msgstr ""
 "    umount <mountpoint> : odpojit zdroj WebDAV tak, jak je určeno\n"
 "                          v /etc/fstab.\n"
 
-#: src/umount_davfs.c:131
-#, c-format
-msgid "can't determine mount point"
-msgstr "nemohu určit přípojný bod"
+#: src/umount_davfs.c:135
+#, fuzzy, c-format
+msgid ""
+"\n"
+"  can't evaluate PID file name;\n"
+"  trying to unmount anyway;\n"
+"  please wait for %s to terminate"
+msgstr ""
+"\n"
+"  nemohu číst PID ze souboru %s;\n"
+"  přesto se pokouším odpojit;\n"
+"  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:151
+#: src/umount_davfs.c:158
 #, c-format
 msgid ""
 "\n"
@@ -654,7 +662,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:163
+#: src/umount_davfs.c:170
 #, c-format
 msgid ""
 "\n"
@@ -667,7 +675,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až  %s skončí"
 
-#: src/umount_davfs.c:179
+#: src/umount_davfs.c:186
 #, c-format
 msgid ""
 "\n"
@@ -680,12 +688,12 @@ msgstr ""
 "  přesto se pokouším odpojit.\n"
 "  pravděpodobně budete muset odstranit %s ručně"
 
-#: src/umount_davfs.c:190
+#: src/umount_davfs.c:197
 #, c-format
 msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
 msgstr "%s: čekám, než si  %s (pid %s) sesynchronizuje vyrovnávací paměť."
 
-#: src/umount_davfs.c:203
+#: src/umount_davfs.c:210
 #, c-format
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr "při čekání došlo k chybě; čekejte prosím až %s skončí"
@@ -813,6 +821,9 @@ msgstr "  identita: %s"
 #: src/webdav.c:1816
 msgid "  accepted by user"
 msgstr "  přijat uživatelem"
+
+#~ msgid "can't determine mount point"
+#~ msgstr "nemohu určit přípojný bod"
 
 #~ msgid "trying fuse kernel file system"
 #~ msgstr "zkouším jaderný souborový systém fuse"
