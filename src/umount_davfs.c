@@ -128,7 +128,7 @@ main(int argc, char *argv[])
     if (!mpoint)
         mpoint = argv[optind];
     if (!mpoint || *mpoint != '/')
-        error(EXIT_FAILURE, 0, _("can't determine mount point"));
+        error(EXIT_FAILURE, errno, _("can't determine mount point"));
 
     char *m = mpoint;
     while (*m == '/')

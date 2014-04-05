@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2014-04-05 Werner Baumann (werner.baumann@onlinehome.de)
+    * configure.ac, src/Makefile.am, defaults.h,
+      mount_davfs.h, mount_davfs.c:
+      Use utab if mtab is a symbolic link.
+
 2014-03-22 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, webdav.c, webdav.h:
       Remove property creationdate.

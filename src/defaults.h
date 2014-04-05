@@ -28,10 +28,15 @@
 /* These Macros will be defined by the command line option -D of the
    preprocessor:
 
-   The name of the program.
+   The name of the program, usually mount.davfs.
    DPROGRAM_NAME
 
-   The directory to store the PID-file.
+   The system directory that holds runtime status information, usually
+   /var/run or /run.
+   DAV_LOCALSTATE_DIR
+
+   The directory to store the PID-file, usually /var/run/mount.davfs
+   or /run/mount.davfs.
    DAV_SYS_RUN
 
    The directory for translated messages (gettext).
@@ -45,13 +50,15 @@
 /* These Macros will be defined by the command line option -D of the
    preprocessor:
 
-   The directory where the system wide configuration file is located.
+   The directory where the system wide configuration file is located,
+   usually either /etc/davfs2 or /urs/local/etc/davfs2.
    DAV_SYS_CONF_DIR
 
-   The name of the configuration file.
+   The name of the configuration file, usually davfs2.conf.
    DAV_CONFIG
 
-   The directory where the template of the configuration file is located.
+   The directory where the template of the configuration file is located
+   usually either /usr/share/davfs2 or /usr/local/share/davfs2.
    DAV_DATA_DIR
 
 */
@@ -63,11 +70,11 @@
 /* These Macros will be defined by the command line option -D of the
    preprocessor:
 
-   The program will run as this user if invoked by root.
+   The program will run as this user if invoked by root, usually davfs2.
    May be overridden by system config file.
    DAV_USER
 
-   The program will belong to this group.
+   The program will belong to this group, usually davfs2.
    May be overridden by system config file.
    DAV_GROUP
 */
@@ -78,6 +85,20 @@
 
 /* File system type to be used with 'mount -t' and fstab. */
 #define DAV_FS_TYPE "davfs"
+
+/* If _PATH_MOUNTED (the mtab file) is a symbolic link (to /proc/mounts)
+   some information required for umount is missing (e.g. the option
+   user=<name of the mounting user|) and in the case of davfs2 the file
+   system type will not be davfs but that of the kernel file system
+   (fuse or coda). Newer versions of the mount program will store this
+   information in the utab-file /var/run/mount/utab or /run/mount/utab.
+   davfs2 will do the same. */
+
+/* The subdirectory of DAV_LOCALSTATE_DIR where the utab-file is placed. */
+#define DAV_UTAB_DIR "mount"
+
+/* The name of the utab-file. */
+#define DAV_UTAB "utab"
 
 /* The file davfs reads mtab entries from. If not available it will
    use _PATH_MOUNTED. */

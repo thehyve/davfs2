@@ -59,6 +59,9 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_SYS_FILE_H
+#include <sys/file.h>
+#endif
 #ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>
 #endif
@@ -455,13 +458,35 @@ check_dirs(dav_args *args)
     struct stat st;
     char *fname;
 
+    if (lstat(_PATH_MOUNTED, &st) != 0)
+        error(EXIT_FAILURE, errno, _("can't access file %s"), _PATH_MOUNTED);
+    int mtab_is_link = S_ISLNK(st.st_mode);
+
     if (stat(DAV_MOUNTS, &st) == 0) {
         mounts = DAV_MOUNTS;
+        args->use_utab = mtab_is_link;
     } else {
         mounts = _PATH_MOUNTED;
     }
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "mounts in: %s", mounts);
+
+    if (!args->use_utab) {
+        char *utab_dir = xasprintf("%s/%s", DAV_LOCALSTATE_DIR, DAV_UTAB_DIR);
+        if (stat(utab_dir, &st) != 0) {
+            gain_privileges(args);
+            if (mkdir(utab_dir, S_IRWXU | S_IRGRP | S_IXGRP
+                                        | S_IROTH | S_IXOTH) != 0) {
+                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  and %s/%s",
+                       utab_dir, DAV_UTAB);
+            }else {
+                error(0, errno, _("can't create directory %s"),
+                      utab_dir);
+            }
+            release_privileges(args);
+        }
+        free(utab_dir);
+    }
 
     gain_privileges(args);
     if (stat(DAV_SYS_RUN, &st) != 0) {
@@ -1171,42 +1196,101 @@ termination_handler(int signo)
 
 
 /* Adds an entry to _PATH_MOUNTED for the mounted file system.
+   If _PATH_MOUNTED is a symbolic link to /proc/mounts it will write an
+   entry into /var/run/mount/utab instead.
    If this fails a warning will be printed, but this will not stop mounting. */
 static void
 write_mtab_entry(const dav_args *args)
 {
     struct mntent mntent;
-    mntent.mnt_fsname = url;
-    mntent.mnt_dir = mpoint;
-    mntent.mnt_type = DAV_FS_TYPE;
-    mntent.mnt_opts = xasprintf("%s%s%s%s%s%s",
-                            (args->mopts & MS_RDONLY) ? "ro" : "rw",
-                            (args->mopts & MS_NOSUID) ? ",nosuid" : "",
-                            (args->mopts & MS_NOEXEC) ? ",noexec" : "",
-                            (args->mopts & MS_NODEV) ? ",nodev" : "",
-                            (args->netdev) ? ",_netdev" : "",
-                            (args->add_mopts != NULL) ? args->add_mopts : "");
-    mntent. mnt_freq = 0;
-    mntent. mnt_passno = 0;
+    mntent.mnt_opts = NULL;
+    char *utab_line = NULL;
+    char *tab_file = NULL;
+    char *lock_file = NULL;
 
-    if (!args->privileged) {
-        char *opts = mntent.mnt_opts;
-        mntent.mnt_opts = xasprintf("%s,user=%s", opts, args->uid_name);
-        free(opts);
+    if (args->use_utab) {
+        utab_line = xasprintf("SRC=%s TARGET=%s ROOT=/ OPTS=%s%s%shelper=%s\n",
+                              url, mpoint,
+                              (!args->privileged) ? "user=" : "",
+                              (!args->privileged) ? args->uid_name : "",
+                              (!args->privileged) ? "," : "",
+                              DAV_FS_TYPE);
+        tab_file = xasprintf("%s/%s/%s", DAV_LOCALSTATE_DIR, DAV_UTAB_DIR,
+                             DAV_UTAB);
+        lock_file = xasprintf("%s,lock", tab_file);
+
+    } else {
+        mntent.mnt_fsname = url;
+        mntent.mnt_dir = mpoint;
+        mntent.mnt_type = DAV_FS_TYPE;
+        mntent.mnt_opts = xasprintf("%s%s%s%s%s%s%s%s",
+                              (args->mopts & MS_RDONLY) ? "ro" : "rw",
+                              (args->mopts & MS_NOSUID) ? ",nosuid" : "",
+                              (args->mopts & MS_NOEXEC) ? ",noexec" : "",
+                              (args->mopts & MS_NODEV) ? ",nodev" : "",
+                              (args->netdev) ? ",_netdev" : "",
+                              (args->add_mopts != NULL) ? args->add_mopts : "",
+                              (!args->privileged) ? ",user=" : "",
+                              (!args->privileged) ? args->uid_name : "");
+        mntent. mnt_freq = 0;
+        mntent. mnt_passno = 0;
+        tab_file = xstrdup(_PATH_MOUNTED);
+        lock_file = xasprintf("%s~", tab_file);
     }
+
+    sigset_t oldset;
+    sigemptyset(&oldset);
+    sigset_t newset;
+    sigfillset(&newset);
+    sigprocmask(SIG_BLOCK, &newset, &oldset);
 
     gain_privileges(args);
-    FILE *mtab = setmntent(_PATH_MOUNTED, "a");
-    if (mtab) {
-        addmntent(mtab, &mntent);
-        endmntent(mtab);
-    } else {
-        error(0, 0, _("Warning: can't write entry into mtab, but will mount "
-                      "the file system anyway"));
+
+    int ld = open(lock_file, O_RDONLY | O_CREAT,
+                  S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+    if (!ld)
+        error(EXIT_FAILURE, errno, _("can't create file %s"), lock_file);
+    while (flock(ld, LOCK_EX) != 0) {
+        if (errno == EAGAIN || errno == EINTR)
+            continue;
+        error(EXIT_FAILURE, errno, _("can't lock file %s"), lock_file);
     }
+
+    FILE *tab = NULL;
+    if (args->use_utab) {
+        tab = fopen(tab_file, "a");
+    } else {
+        tab = setmntent(tab_file, "a");
+    }
+    int err = 0;
+    if (tab) {
+        if (args->use_utab) {
+            if (fputs(utab_line, tab) == EOF)
+                err = 1;
+            fclose(tab);
+        } else {
+            if (addmntent(tab, &mntent) != 0)
+                err = 1;
+            endmntent(tab);
+        }
+    }
+    if (!tab || err)
+        error(0, 0, _("Warning: can't write entry into %s, but will mount "
+                      "the file system anyway"), tab_file);
+
+    close(ld);
+    remove(lock_file);
     release_privileges(args);
 
-    free(mntent.mnt_opts);
+    sigprocmask(SIG_SETMASK, &oldset, NULL);
+    if (lock_file)
+        free(lock_file);
+    if (tab_file)
+        free(tab_file);
+    if (utab_line)
+        free(utab_line);
+    if (mntent.mnt_opts)
+        free(mntent.mnt_opts);
 }
 
 

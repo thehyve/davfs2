@@ -47,7 +47,7 @@ AC_HEADER_DIRENT
 AC_HEADER_MAJOR
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS([fcntl.h langinfo.h libintl.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
+AC_CHECK_HEADERS([fcntl.h langinfo.h libintl.h limits.h locale.h mntent.h stddef.h stdint.h stdlib.h string.h sys/file.h sys/mount.h sys/time.h syslog.h termios.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

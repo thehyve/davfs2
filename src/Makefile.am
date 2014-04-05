@@ -37,6 +37,7 @@ AM_CFLAGS = -Wall -Werror=format-security \
             -fstack-protector --param=ssp-buffer-size=4
 DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_SYS_CONF_DIR=\"$(pkgsysconfdir)\" \
+       -DDAV_LOCALSTATE_DIR=\"$(dav_localstatedir)\" \
        -DDAV_SYS_RUN=\"$(pkglocalstatedir)\" \
        -DDAV_SYS_CACHE=\"$(pkgsyscachedir)\" \
        -DDAV_SECRETS=\"secrets\" \

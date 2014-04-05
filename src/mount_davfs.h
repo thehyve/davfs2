@@ -52,6 +52,7 @@ typedef struct {
     int netdev;               /* Command line */
     unsigned long int mopts;  /* Command line */
     char *add_mopts;
+    int use_utab;
     size_t buf_size;          /* User config file, system config file */
     /* File mode */
     uid_t fsuid;              /* Command line */
