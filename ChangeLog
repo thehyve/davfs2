@@ -4,6 +4,8 @@ ChangeLog for davfs2
 2014-04-05 Werner Baumann (werner.baumann@onlinehome.de)
     * umount_davfs.c:
       Allways try 'umount -i'.
+    * umount_davfs.c:
+      Use xasprintf.
 
 2014-04-05 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac, src/Makefile.am, defaults.h,

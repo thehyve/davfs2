@@ -128,9 +128,9 @@ main(int argc, char *argv[])
 
     char *umount_command = NULL;
     if (mpoint) {
-        umount_command = ne_concat("umount -i '", mpoint, "'", NULL);
+        umount_command = xasprintf("umount -i '%s'", mpoint);
     } else {
-        umount_command = ne_concat("umount -i '", argv[optind], "'", NULL);
+        umount_command = xasprintf("umount -i '%s'", argv[optind]);
         error(0, 0,
               _("\n"
                 "  can't evaluate PID file name;\n"
