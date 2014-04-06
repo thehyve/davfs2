@@ -179,6 +179,9 @@ static char *password;
 static char *p_username;
 static char *p_password;
 
+/* If this is not NULL the server must present exactly this certificate. */
+static ne_ssl_certificate *server_cert;
+
 /* Whether to send expect 100-continue header in PUT requests. */
 static int use_expect100;
 
@@ -390,20 +393,25 @@ dav_init_webdav(const dav_args *args)
         ne_add_proxy_auth(session, NE_AUTH_ALL, auth, "proxy");
     }
 
+
     if (strcmp(args->scheme, "https") == 0) {
         if (!ne_has_support(NE_FEATURE_SSL))
             error(EXIT_FAILURE, 0, _("neon library does not support TLS/SSL"));
-        ne_ssl_set_verify(session, ssl_verify, NULL);
-        ne_ssl_trust_default_ca(session);
 
-        if (args->servercert) {
-            ne_ssl_certificate *server_cert
-                    = ne_ssl_cert_read(args->servercert);
+        ne_ssl_set_verify(session, ssl_verify, NULL);
+        if (args->trust_server_cert) {
+            server_cert = ne_ssl_cert_read(args->trust_server_cert);
             if (!server_cert)
                 error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
-                      args->servercert);
-            ne_ssl_trust_cert(session, server_cert);
-            ne_ssl_cert_free(server_cert);
+                      args->trust_server_cert);
+        } else if (args->trust_ca_cert) {
+            ne_ssl_certificate *ca_cert = ne_ssl_cert_read(args->trust_ca_cert);
+            if (!ca_cert)
+                error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
+                      args->trust_ca_cert);
+            ne_ssl_trust_cert(session, ca_cert);
+        } else {
+            ne_ssl_trust_default_ca(session);
         }
 
         if (args->clicert) {
@@ -1909,6 +1917,14 @@ quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 static int
 ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
 {
+    if (server_cert) {
+        if (ne_ssl_cert_cmp(cert, server_cert) == 0)
+            return 0;
+        if (have_terminal)
+            error(0, 0, _("the server certificate is not trusted"));
+        return -1;
+    }
+
     char *issuer = ne_ssl_readable_dname(ne_ssl_cert_issuer(cert));
     char *subject = ne_ssl_readable_dname(ne_ssl_cert_subject(cert));
     char *digest = ne_calloc(NE_SSL_DIGESTLEN);

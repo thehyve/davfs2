@@ -1014,29 +1014,55 @@ parse_config(dav_args *args)
     args->file_mode |= S_IFREG;
 
     struct stat st;
-    if (args->servercert && *args->servercert == '~') {
+    if (args->trust_ca_cert && *args->trust_ca_cert == '~') {
         int p = 1;
-        if (*(args->servercert + p) == '/')
+        if (*(args->trust_ca_cert + p) == '/')
             p++;
-        char *f = ne_concat(pw->pw_dir, "/", args->servercert + p, NULL);
-        free(args->servercert);
-        args->servercert = f;
+        char *f = ne_concat(pw->pw_dir, "/", args->trust_ca_cert + p, NULL);
+        free(args->trust_ca_cert);
+        args->trust_ca_cert = f;
     }
-    if (args->servercert && *args->servercert != '/' && getuid() != 0) {
+    if (args->trust_ca_cert && *args->trust_ca_cert != '/' && getuid() != 0) {
         char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
-                            args->servercert, NULL);
+                            args->trust_ca_cert, NULL);
         if (stat(f, &st) == 0) {
-            free(args->servercert);
-            args->servercert = f;
+            free(args->trust_ca_cert);
+            args->trust_ca_cert = f;
         } else {
             free(f);
         }
     }
-    if (args->servercert && *args->servercert != '/') {
+    if (args->trust_ca_cert && *args->trust_ca_cert != '/') {
         char *f = ne_concat(DAV_SYS_CONF_DIR, "/", DAV_CERTS_DIR, "/",
-                            args->servercert, NULL);
-        free(args->servercert);
-        args->servercert = f;
+                            args->trust_ca_cert, NULL);
+        free(args->trust_ca_cert);
+        args->trust_ca_cert = f;
+    }
+
+    if (args->trust_server_cert && *args->trust_server_cert == '~') {
+        int p = 1;
+        if (*(args->trust_server_cert + p) == '/')
+            p++;
+        char *f = ne_concat(pw->pw_dir, "/", args->trust_server_cert + p, NULL);
+        free(args->trust_server_cert);
+        args->trust_server_cert = f;
+    }
+    if (args->trust_server_cert && *args->trust_server_cert != '/'
+                                && getuid() != 0) {
+        char *f = ne_concat(pw->pw_dir, "/.", PACKAGE, "/", DAV_CERTS_DIR, "/",
+                            args->trust_server_cert, NULL);
+        if (stat(f, &st) == 0) {
+            free(args->trust_server_cert);
+            args->trust_server_cert = f;
+        } else {
+            free(f);
+        }
+    }
+    if (args->trust_server_cert && *args->trust_server_cert != '/') {
+        char *f = ne_concat(DAV_SYS_CONF_DIR, "/", DAV_CERTS_DIR, "/",
+                            args->trust_server_cert, NULL);
+        free(args->trust_server_cert);
+        args->trust_server_cert = f;
     }
 
     if (args->secrets && *args->secrets == '~') {
@@ -1466,8 +1492,10 @@ delete_args(dav_args *args)
         free(args->host);
     if (args->path)
         free(args->path);
-    if (args->servercert)
-        free(args->servercert);
+    if (args->trust_ca_cert)
+        free(args->trust_ca_cert);
+    if (args->trust_server_cert)
+        free(args->trust_server_cert);
     if (args->secrets)
         free(args->secrets);
     if (args->username) {
@@ -1738,7 +1766,8 @@ new_args(void)
     args->host = NULL;
     args->port = 0;
     args->path = NULL;
-    args->servercert = NULL;
+    args->trust_ca_cert = NULL;
+    args->trust_server_cert = NULL;
 
     if (getuid() != 0) {
         args->secrets = ne_concat(user_dir, "/", DAV_SECRETS, NULL);
@@ -1848,7 +1877,9 @@ log_dbg_config(dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  path: %s", args->path);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  servercert: %s", args->servercert);
+           "  trust_ca_cert: %s", args->trust_ca_cert);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  trust_server_cert: %s", args->trust_server_cert);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  secrets: %s", args->secrets);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2140,10 +2171,15 @@ read_config(dav_args *args, const char * filename, int system)
                 args->kernel_fs = ne_strdup(parmv[1]); 
             } else if (strcmp(parmv[0], "buf_size") == 0) {
                 args->buf_size = arg_to_int(parmv[1], 10, parmv[0]);
-            } else if (strcmp(parmv[0], "servercert") == 0) {
-                if (args->servercert)
-                    free(args->servercert);
-                args->servercert = ne_strdup(parmv[1]);
+            } else if (strcmp(parmv[0], "trust_ca_cert") == 0
+                       || strcmp(parmv[0], "servercert") == 0) {
+                if (args->trust_ca_cert)
+                    free(args->trust_ca_cert);
+                args->trust_ca_cert = ne_strdup(parmv[1]);
+            } else if (strcmp(parmv[0], "trust_server_cert") == 0) {
+                if (args->trust_server_cert)
+                    free(args->trust_server_cert);
+                args->trust_server_cert = ne_strdup(parmv[1]);
             } else if (!system && strcmp(parmv[0], "secrets") == 0) {
                 if (args->secrets)
                     free(args->secrets);
