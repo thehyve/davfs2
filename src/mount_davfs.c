@@ -2125,8 +2125,7 @@ read_config(dav_args *args, const char * filename, int system)
                 args->dav_group = xstrdup(parmv[1]); 
             } else if (strcmp(parmv[0], "buf_size") == 0) {
                 args->buf_size = arg_to_int(parmv[1], 10, parmv[0]);
-            } else if (strcmp(parmv[0], "trust_ca_cert") == 0
-                       || strcmp(parmv[0], "servercert") == 0) {
+            } else if (strcmp(parmv[0], "trust_ca_cert") == 0) {
                 if (args->trust_ca_cert)
                     free(args->trust_ca_cert);
                 args->trust_ca_cert = xstrdup(parmv[1]);

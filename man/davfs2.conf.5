@@ -147,17 +147,12 @@ cannot be verified using the system's data base of trusted certificate
 authorities (CA). The certificate file must contain the self-signed
 certificate of the top level CA in the chain of trust. It may be a
 self-signed server certificate (but see also \fBtrust_server_cert\fR).
+With this option the system's CA data base is ignored.
 .br
 \fBNote:\fR Even if the server's certificate is trusted that does not mean
 it is accepted. Additionally the certificate's date must be valid and
 either the CommonName or the SubjectAltName must match the host name
 of the server.
-
-.TP
-.B servercert
-Same as \fBtrust_ca_cert\fR but badly named.
-.br
-\fBDeprecated\fR
 
 .TP
 .B trust_server_cert

@@ -384,10 +384,10 @@ dav_init_webdav(dav_args *args)
         if (args->server_cert) {
             server_cert = args->server_cert;
             args->server_cert = NULL;
+        } else if (args->ca_cert) {
+            ne_ssl_trust_cert(session, args->ca_cert);
         } else {
             ne_ssl_trust_default_ca(session);
-            if (args->ca_cert)
-                ne_ssl_trust_cert(session, args->ca_cert);
         }
 
         if (args->client_cert)
