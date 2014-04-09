@@ -40,7 +40,6 @@ typedef struct {
     int users;                 /* Command line */
     int netdev;               /* Command line */
     unsigned long int mopts;  /* Command line */
-    char *add_mopts;
     char *kernel_fs;          /* User config file, system config file */
     int use_utab;
     size_t buf_size;          /* User config file, system config file */
