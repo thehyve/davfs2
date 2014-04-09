@@ -1209,11 +1209,11 @@ write_mtab_entry(const dav_args *args)
     char *lock_file = NULL;
 
     if (args->use_utab) {
-        utab_line = xasprintf("SRC=%s TARGET=%s ROOT=/ OPTS=%s%s%shelper=%s\n",
-                              url, mpoint,
-                              (!args->privileged) ? "user=" : "",
+        utab_line = xasprintf("SRC=%s TARGET=%s ROOT=/ "
+                              "OPTS=uid=%i,gid=%i%s%s,helper=%s\n",
+                              url, mpoint, args->fsuid, args->fsgid,
+                              (!args->privileged) ? ",user=" : "",
                               (!args->privileged) ? args->uid_name : "",
-                              (!args->privileged) ? "," : "",
                               DAV_FS_TYPE);
         tab_file = xasprintf("%s/%s/%s", DAV_LOCALSTATE_DIR, DAV_UTAB_DIR,
                              DAV_UTAB);
@@ -1223,13 +1223,13 @@ write_mtab_entry(const dav_args *args)
         mntent.mnt_fsname = url;
         mntent.mnt_dir = mpoint;
         mntent.mnt_type = DAV_FS_TYPE;
-        mntent.mnt_opts = xasprintf("%s%s%s%s%s%s%s%s",
+        mntent.mnt_opts = xasprintf("%s%s%s%s%s,uid=%i,gid=%i%s%s",
                               (args->mopts & MS_RDONLY) ? "ro" : "rw",
                               (args->mopts & MS_NOSUID) ? ",nosuid" : "",
                               (args->mopts & MS_NOEXEC) ? ",noexec" : "",
                               (args->mopts & MS_NODEV) ? ",nodev" : "",
                               (args->netdev) ? ",_netdev" : "",
-                              (args->add_mopts != NULL) ? args->add_mopts : "",
+                              args->fsuid, args->fsgid,
                               (!args->privileged) ? ",user=" : "",
                               (!args->privileged) ? args->uid_name : "");
         mntent. mnt_freq = 0;
@@ -1389,8 +1389,6 @@ delete_args(dav_args *args)
         free(args->dav_user);
     if (args->dav_group)
         free(args->dav_group);
-    if (args->add_mopts)
-        free(args->add_mopts);
 
     if (args->scheme)
         free(args->scheme);
@@ -1553,7 +1551,6 @@ get_options(dav_args *args, char *option)
     char *argument = NULL;
     struct passwd *pwd;
     struct group *grp;
-    char *add_mopts = NULL;
 
     while (*option != 0) {
         so = getsubopt(&option, suboptions, &argument);
@@ -1578,12 +1575,6 @@ get_options(dav_args *args, char *option)
             } else {
                 args->fsuid = pwd->pw_uid;
             }
-            add_mopts = xasprintf("%s,uid=%i",
-                        (args->add_mopts) ? args->add_mopts : "", args->fsuid);
-            if (args->add_mopts)
-                free(args->add_mopts);
-            args->add_mopts = add_mopts;
-            add_mopts = NULL;
             break;
         case GID:
             grp = getgrnam(argument);
@@ -1592,12 +1583,6 @@ get_options(dav_args *args, char *option)
             } else {
                 args->fsgid = grp->gr_gid;
             }
-            add_mopts = xasprintf("%s,gid=%i",
-                        (args->add_mopts) ? args->add_mopts : "", args->fsgid);
-            if (args->add_mopts)
-                free(args->add_mopts);
-            args->add_mopts = add_mopts;
-            add_mopts = NULL;
             break;
         case FILE_MODE:
             args->file_mode = arg_to_int(argument, 8, suboptions[so]);
@@ -1732,8 +1717,6 @@ log_dbg_config(dav_args *args)
            "  netdev: %i", args->netdev);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  mopts: %#lx", args->mopts);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  add_mopts: %s", args->add_mopts);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  buf_size: %llu KiB", (unsigned long long) args->buf_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
