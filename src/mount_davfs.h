@@ -37,8 +37,9 @@ typedef struct {
     char *conf;               /* Command line */
     /* Mount options */
     int user;                 /* Command line */
-    int users;                 /* Command line */
+    int users;                /* Command line */
     int netdev;               /* Command line */
+    int grpid;                /* Command line */
     unsigned long int mopts;  /* Command line */
     char *kernel_fs;          /* User config file, system config file */
     int use_utab;

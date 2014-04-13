@@ -188,6 +188,10 @@ static gid_t default_gid;
 static mode_t default_file_mode;
 static mode_t default_dir_mode;
 
+/* New files get the group id of the directory in which they are created
+   if this variable is set to 1. */
+static int grpid;
+
 /* Directory for cached files and directories. */
 static char *cache_dir;
 
@@ -590,6 +594,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
 
     default_file_mode = args->file_mode;
     default_dir_mode = args->dir_mode;
+    grpid = args->grpid;
 
     table_size = args->table_size;
     table = ne_calloc(sizeof(*table) * table_size);
@@ -924,7 +929,11 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     (*nodep)->path = path;
     (*nodep)->name = ne_strdup(name);
     (*nodep)->uid = uid;
-    (*nodep)->gid = pw->pw_gid;
+    if (grpid && parent->gid != 0) {
+        (*nodep)->gid = parent->gid;
+    } else {
+        (*nodep)->gid = pw->pw_gid;
+    }
     int ret = create_cache_file(*nodep);
 
     if (!ret)
@@ -1050,7 +1059,11 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
         (*nodep)->path = path;
         (*nodep)->name = ne_strdup(name);
         (*nodep)->uid = uid;
-        (*nodep)->gid = pw->pw_gid;
+        if (grpid && parent->gid != 0) {
+            (*nodep)->gid = parent->gid;
+        } else {
+            (*nodep)->gid = pw->pw_gid;
+        }
         (*nodep)->smtime = (*nodep)->mtime;
         (*nodep)->utime = (*nodep)->mtime;
         delete_cache_file(parent);
@@ -1583,6 +1596,9 @@ add_node(dav_node *parent, dav_props *props)
             node->mode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);
         }
     }
+
+    if (grpid && parent->gid != 0)
+        node->gid = parent->gid;
 
     parent->mtime = node->mtime;
     parent->ctime = node->mtime;
