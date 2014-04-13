@@ -732,7 +732,7 @@ check_fstab(const dav_args *args)
         error(EXIT_FAILURE, 0,
               _("neither option `user' nor option `users' set in %s"),
               _PATH_MNTTAB);
-    if (args->mopts != n_args->mopts)
+    if (args->mopts != n_args->mopts || args->grpid != n_args->grpid)
         error(EXIT_FAILURE, 0, _("different mount options in %s"),
               _PATH_MNTTAB);
     if (args->uid != n_args->uid)
@@ -1278,8 +1278,9 @@ write_mtab_entry(const dav_args *args)
     if (args->use_utab) {
         if (asprintf(&utab_line,
                      "SRC=%s TARGET=%s ROOT=/ "
-                     "OPTS=uid=%i,gid=%i%s%s,helper=%s\n",
+                     "OPTS=uid=%i,gid=%i%s%s%s,helper=%s\n",
                      url, mpoint, args->uid, args->gid,
+                     (args->grpid) ? ",grpid" : "",
                      (!privileged) ? ",user=" : "",
                      (!privileged) ? uid_name : "",
                      DAV_FS_TYPE) < 0)
@@ -1293,11 +1294,12 @@ write_mtab_entry(const dav_args *args)
         mntent.mnt_fsname = url;
         mntent.mnt_dir = mpoint;
         mntent.mnt_type = DAV_FS_TYPE;
-        if (asprintf(&mntent.mnt_opts, "%s%s%s%s%s,uid=%i,gid=%i%s%s",
+        if (asprintf(&mntent.mnt_opts, "%s%s%s%s%s%s,uid=%i,gid=%i%s%s",
                      (args->mopts & MS_RDONLY) ? "ro" : "rw",
                      (args->mopts & MS_NOSUID) ? ",nosuid" : "",
                      (args->mopts & MS_NOEXEC) ? ",noexec" : "",
                      (args->mopts & MS_NODEV) ? ",nodev" : "",
+                     (args->grpid) ? ",grpid" : "",
                      (args->netdev) ? ",_netdev" : "",
                      args->uid, args->gid,
                      (!privileged) ? ",user=" : "",
@@ -1563,6 +1565,8 @@ get_options(dav_args *args, char *option)
         USERS,
         NETDEV,
         NONETDEV,
+        GRPID,
+        NOGRPID,
         RW,
         RO,
         SUID,
@@ -1590,6 +1594,8 @@ get_options(dav_args *args, char *option)
         [USERS] = "users",
         [NETDEV] = "_netdev",
         [NONETDEV] = "no_netdev",
+        [GRPID] = "grpid",
+        [NOGRPID] = "nogrpid",
         [RW] = "rw",
         [RO] = "ro",
         [SUID] = "suid",
@@ -1664,6 +1670,12 @@ get_options(dav_args *args, char *option)
         case NONETDEV:
             args->netdev = 0;
             break;
+        case GRPID:
+            args->grpid = 1;
+            break;
+        case NOGRPID:
+            args->grpid = 0;
+            break;
         case RW:
             args->mopts &= ~MS_RDONLY;
             break;
@@ -1735,6 +1747,7 @@ new_args(void)
     args->user = 0;
     args->users = 0;
     args->netdev = 1;
+    args->grpid = 0;
     args->mopts = DAV_MOPTS;
     args->kernel_fs = NULL;
     args->buf_size = 0;
@@ -1834,6 +1847,8 @@ log_dbg_config(dav_args *args)
            "  user: %i", args->user);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  netdev: %i", args->netdev);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  grpid: %i", args->grpid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  mopts: %#lx", args->mopts);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2590,6 +2605,8 @@ usage(void)
              "    rw           : mount read-write\n"
              "    [no]exec     : (don't) allow execution of binaries\n"
              "    [no]suid     : (don't) allow suid and sgid bits to take effect\n"
+             "    [no]grpid    : new files (don't) get the group id of the directory\n"
+             "                   in which they are created.\n"
              "    [no]_netdev  : (no) network connection needed\n"));
 }
 

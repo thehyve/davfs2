@@ -1,4 +1,4 @@
-.TH @PROGRAM_NAME@ 8 "2014\-03\-09" @PACKAGE_STRING@
+.TH @PROGRAM_NAME@ 8 "2014\-04\-13" @PACKAGE_STRING@
 
 .SH NAME
 
@@ -134,6 +134,17 @@ The group the mounted file system belongs to. It may be a numeric ID or a
 group name. The mounting user, if not root, must be member of this group.
 .br
 Default: the primary group of the mounting user.
+
+.TP
+.B [no]grpid
+When this option is set a newly created file will take the group id
+of the directory in which it is created. This will also apply to all files
+that are on the server and not in the local cache. (That is because the
+group id is not stored on the server.)
+.TP
+If the group id of the directory is \fIroot\fP this option is ignored.
+.br
+Default: \fBnogrpid\fR.
 
 .TP
 .B [no]_netdev
