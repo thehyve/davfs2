@@ -136,6 +136,17 @@ group name. The mounting user, if not root, must be member of this group.
 Default: the primary group of the mounting user.
 
 .TP
+.B [no]grpid
+When this option is set a newly created file will take the group id
+of the directory in which it is created. This will also apply to all files
+that are on the server and not in the local cache. (That is because the
+group id is not stored on the server.)
+.TP
+If the group id of the directory is \fIroot\fP this option is ignored.
+.br
+Default: \fBnogrpid\fR.
+
+.TP
 .B [no]_netdev
 The file system needs a (no) network connection for operation. This information
 allows the operating system to handle the file system properly at system start

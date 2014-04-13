@@ -107,6 +107,10 @@
 /* The device directory. */
 #define DAV_DEV_DIR "/dev"
 
+/* Whether new files will automatically have the group id of the parent
+   directory. */
+#define DAV_GRPID 0
+
 /* By default add option "_netdev" to mtab entry.
    May be overridden by command line or fstab. */
 #define DAV_NETDEV 1

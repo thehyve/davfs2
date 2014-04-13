@@ -49,6 +49,7 @@ typedef struct {
     /* Mount options */
     int user;                 /* Command line */
     int users;                /* Command line */
+    int grpid;                /* Command line */
     int netdev;               /* Command line */
     unsigned long int mopts;  /* Command line */
     int use_utab;
