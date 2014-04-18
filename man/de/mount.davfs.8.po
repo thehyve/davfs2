@@ -470,6 +470,7 @@ msgstr ""
 
 #. type: TP
 #: mount.davfs.8:144
+#, no-wrap
 msgid "If the group id of the directory is I<root> this option is ignored."
 msgstr "Wenn das Verzeichnis die Gruppe I<root> hat, wird diese Option ignoriert."
 
