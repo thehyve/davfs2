@@ -89,7 +89,7 @@ typedef struct {
     int expect100;            /* User config file, system config file */
     int if_match_bug;         /* User config file, system config file */
     int drop_weak_etags;      /* User config file, system config file */
-    int allow_cookie;         /* User config file, system config file */
+    int n_cookies;            /* User config file, system config file */
     int precheck;             /* User config file, system config file */
     int ignore_dav_header;    /* User config file, system config file */
     int use_compression;      /* User config file, system config file */

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2.conf.5\n"
-"POT-Creation-Date: 2014-04-06 18:16+0300\n"
+"POT-Creation-Date: 2014-04-18 18:25+0300\n"
 "PO-Revision-Date: 2007-04-26 01:24-0300\n"
 "Last-Translator: Luciano Bello <luciano@linux.org.ar>\n"
 "Language-Team: Español <es@li.org>\n"
@@ -24,11 +24,13 @@ msgstr ""
 msgid "@CONFIGFILE@"
 msgstr "@CONFIGFILE@"
 
+# type: TH
 #. type: TH
 #: davfs2.conf.5:1
-#, no-wrap
-msgid "2012-02-01"
-msgstr ""
+#, fuzzy, no-wrap
+#| msgid "2011-04-03"
+msgid "2014-04-18"
+msgstr "2011-04-03"
 
 # type: TH
 #. type: TH
@@ -712,18 +714,19 @@ msgstr "0 = no, 1 = sí."
 # type: TP
 #. type: TP
 #: davfs2.conf.5:266
-#, no-wrap
-msgid "B<allow_cookie>"
+#, fuzzy, no-wrap
+#| msgid "B<allow_cookie>"
+msgid "B<n_cookies>"
 msgstr "B<allow_cookie>"
 
-# type: Plain text
 #. type: Plain text
 #: davfs2.conf.5:273
 msgid ""
 "Some servers will only work when they are allowed to set a cookie and this "
-"cookie is returned in subsequent requests. This option adds very simple "
-"cookie support. It supports just one cookie which should usually be a "
-"session ID.  0 = no, 1 = yes."
+"cookie is returned in subsequent requests. This option sets the number of "
+"cookies you are willing to accept and include in subsequent requests. davfs2 "
+"will only care for the name and the value of the cookie and ignore all of "
+"the possible attributes."
 msgstr ""
 
 # type: TP
@@ -1388,7 +1391,7 @@ msgstr ""
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:513 mount.davfs.8:536 umount.davfs.8:79
+#: davfs2.conf.5:513 mount.davfs.8:547 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTORES"
@@ -1405,20 +1408,20 @@ msgstr ""
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:519 mount.davfs.8:553 umount.davfs.8:84
+#: davfs2.conf.5:519 mount.davfs.8:564 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
 #. type: Plain text
-#: davfs2.conf.5:522 mount.davfs.8:556 umount.davfs.8:87
+#: davfs2.conf.5:522 mount.davfs.8:567 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:524 mount.davfs.8:558 umount.davfs.8:89
+#: davfs2.conf.5:524 mount.davfs.8:569 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "VER TAMBIÉN"

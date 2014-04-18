@@ -185,9 +185,9 @@
    May be overridden by system config file and user config file. */
 #define DAV_DROP_WEAK_ETAGS 0
 
-/* Wether to allow a cookie to be set and included in requests.
+/* How many cookies to store and include in requests.
    May be overridden by system config file and user config file. */
-#define DAV_ALLOW_COOKIE 0
+#define DAV_N_COOKIES 0
 
 /* Check on server whether a file exists or has been modified before
    locking a new file or changing an existant one.

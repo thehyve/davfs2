@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-04-18 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, mount_davfs.h, mount_davfs.c, webdav.c:
+      Improve cookie support (sr #107907, bug #41438).
+
 2014-04-13 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, defaults.h, mount_davfs.c, mount_davfs.h:
       Add mount option grpid (sr #108432, Thanks to

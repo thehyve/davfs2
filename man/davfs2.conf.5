@@ -1,4 +1,4 @@
-.TH @CONFIGFILE@ 5 2012\-02\-01 @PACKAGE_STRING@
+.TH @CONFIGFILE@ 5 2014\-04\-18 @PACKAGE_STRING@
 
 
 .SH NAME
@@ -264,12 +264,12 @@ etag is not used at all and the resource cannot be cached.
 Default: 0
 
 .TP
-.B allow_cookie
+.B n_cookies
 Some servers will only work when they are allowed to set a cookie and this
-cookie is returned in subsequent requests. This option adds very simple
-cookie support. It supports just one cookie which should usually be
-a session ID.
-0 = no, 1 = yes.
+cookie is returned in subsequent requests. This option sets the number of
+cookies you are willing to accept and include in subsequent requests. davfs2
+will only care for the name and the value of the cookie and ignore all of
+the possible attributes.
 .br
 Default: 0
 

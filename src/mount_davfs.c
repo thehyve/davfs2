@@ -1686,7 +1686,7 @@ new_args(void)
     args->expect100 = DAV_EXPECT100;
     args->if_match_bug = DAV_IF_MATCH_BUG;
     args->drop_weak_etags = DAV_DROP_WEAK_ETAGS;
-    args->allow_cookie = DAV_ALLOW_COOKIE;
+    args->n_cookies = DAV_N_COOKIES;
     args->precheck = DAV_PRECHECK;
     args->ignore_dav_header = DAV_IGNORE_DAV_HEADER;
     args->use_compression = DAV_USE_COMPRESSION;
@@ -1783,7 +1783,7 @@ log_dbg_config(dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  drop_weak_etags: %i", args->drop_weak_etags);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  allow_cookie: %i", args->allow_cookie);
+           "  n_cookies: %i", args->n_cookies);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  precheck: %i", args->precheck);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2168,8 +2168,8 @@ read_config(dav_args *args, const char * filename, int system)
                 args->if_match_bug = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "drop_weak_etags") == 0) {
                 args->drop_weak_etags = arg_to_int(parmv[1], 10, parmv[0]);
-            } else if (strcmp(parmv[0], "allow_cookie") == 0) {
-                args->allow_cookie = arg_to_int(parmv[1], 10, parmv[0]);
+            } else if (strcmp(parmv[0], "n_cookies") == 0) {
+                args->n_cookies = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "precheck") == 0) {
                 args->precheck = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "ignore_dav_header") == 0) {

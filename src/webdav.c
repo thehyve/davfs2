@@ -231,8 +231,10 @@ static FILE *log_stream;
 /* A user defined header that is added to all requests. */
 char *custom_header;
 
-/* Session cookie. */
-static char *cookie;
+/* Array of max. n_cookies cookie strings. NULL if configuration option
+   allow_cookies is 0. The array must be allocated by dav_init_webdav. */
+static int n_cookies;
+static char **cookie_list;
 
 
 /* Private function prototypes and inline functions */
@@ -279,6 +281,9 @@ static int
 file_reader(void *userdata, const char *block, size_t length);
 
 static void
+get_cookies(ne_request *req, void *userdata, const ne_status *status);
+
+static void
 lock_result(void *userdata, const struct ne_lock *lock, const ne_uri *uri,
             const ne_status *status);
 
@@ -293,9 +298,6 @@ quota_reader(void *userdata, const char *block, size_t length);
 
 static int
 ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert);
-
-static int
-update_cookie(ne_request *req, void *userdata, const ne_status *status);
 
 
 /* Public functions */
@@ -412,11 +414,16 @@ dav_init_webdav(dav_args *args)
 
     if (args->header) {
         custom_header = xstrdup(args->header);
-        ne_hook_pre_send(session, add_header, custom_header);
     }
 
-    if (args->allow_cookie)
-        ne_hook_post_send(session, update_cookie, NULL);
+    if (args->n_cookies) {
+        n_cookies = args->n_cookies;
+        cookie_list = (char **) xcalloc(n_cookies, sizeof(char *));
+        ne_hook_post_headers(session, get_cookies, NULL);
+    }
+
+    if (custom_header || cookie_list)
+        ne_hook_pre_send(session, add_header, NULL);
 
     use_expect100 = args->expect100;
     has_if_match_bug = args->if_match_bug;
@@ -1440,7 +1447,20 @@ replace_slashes(char **name)
 static void
 add_header(ne_request *req, void *userdata, ne_buffer *header)
 {
-    ne_buffer_zappend(header, (char *) userdata);
+    if (custom_header)
+        ne_buffer_zappend(header, custom_header);
+
+    if (cookie_list && cookie_list[0]) {
+        ne_buffer_zappend(header, "Cookie: ");
+        ne_buffer_zappend(header, cookie_list[0]);
+        int i = 1;
+        while (i < n_cookies && cookie_list[i]) {
+            ne_buffer_zappend(header, ", ");
+            ne_buffer_zappend(header, cookie_list[i]);
+            i++;
+        }
+        ne_buffer_zappend(header, "\r\n");
+    }
 }
 
 
@@ -1516,6 +1536,71 @@ file_reader(void *userdata, const char *block, size_t length)
     }
 
     return ctx->error;
+}
+
+
+/* A ne_post_header_fn to read cookies from the Set-Cookie header and
+   store them in the global arrray of strings cookie_list. The cookies
+   will be send in the Cookie header of subsequent requests.
+   Only the "name=value" part of the cookie is stored. All attributes
+   are completely ignored.
+   When a cookie with the same name as an already stored cookie, but with
+   a different value is received, it's value is updated if necessary.
+   Only n_cookies cookies will be stored. If the server sends more
+   different cookies these will be ignored.
+   status must be of class 2XX or 3XX, otherwise the cookie is ignored. */
+static void
+get_cookies(ne_request *req, void *userdata, const ne_status *status)
+{
+    if (status->klass != 2 && status->klass != 3)
+        return;
+
+    const char *cookie_hdr = ne_get_response_header(req, "Set-Cookie");
+    if (!cookie_hdr)
+        return;
+
+    const char *next = cookie_hdr;
+    while (next) {
+        const char *start = next;
+        next = strchr(start, ',');
+        const char *end = strchr(start, ';');
+        if (next) {
+            if (!end || end > next)
+                end = next;
+            next++;
+        } else if (!end) {
+            end = start + strlen(start);
+        }
+
+        while (start < end && *start == ' ')
+            start++;
+        while (end > start && *(end - 1) == ' ')
+            end--;
+
+        if ((start + 4) > end || *start == '=' || *(end - 1) == '=')
+            continue;
+
+        char *es = strchr(start, '=');
+        if (!es)
+            continue;
+        size_t nl = es - start;
+        size_t vl = end - es - 1;
+
+        int i = 0;
+        for (i = 0; i < n_cookies; i++) {
+            if (!cookie_list[i]) {
+                cookie_list[i] = xstrndup(start, end - start);
+                break;
+            }
+            if (strncmp(cookie_list[i], start, nl) == 0) {
+                if (strncmp(cookie_list[i] + nl + 1, es + 1, vl) != 0) {
+                    free(cookie_list[i]);
+                    cookie_list[i] = xstrndup(start, end - start);
+                }
+                break;
+            }
+        }
+    }
 }
 
 
@@ -1820,44 +1905,5 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
     if (subject) free(subject);
     if (digest) free(digest);
     return ret;
-}
-
-
-static int
-update_cookie(ne_request *req, void *userdata, const ne_status *status)
-{
-    if (status->klass != 2)
-        return NE_OK;
-
-    const char *cookie_hdr = ne_get_response_header(req, "Set-Cookie2");
-    if (!cookie_hdr) {
-        cookie_hdr = ne_get_response_header(req, "Set-Cookie");
-    }
-    if (!cookie_hdr)
-        return NE_OK;
-
-    if (cookie && strstr(cookie_hdr, cookie) == cookie_hdr)
-        return NE_OK;
-
-    char *sep = strpbrk(cookie_hdr, "\",; \n\r\0");
-    if (!sep)
-        return NE_OK;
-    if (*sep == '\"')
-        sep = strpbrk(sep + 1, "\"");
-    if (!sep)
-        return NE_OK;
-
-    if (cookie) {
-        ne_unhook_pre_send(session, add_header, cookie);
-        free(cookie);
-        cookie = NULL;
-    }
-
-    char *value = xstrndup(cookie_hdr, sep - cookie_hdr + 1);
-    cookie = xasprintf("Cookie: $Version=1;%s\r\n", value);
-    free(value);
-
-    ne_hook_pre_send(session, add_header, cookie);
-    return NE_OK;
 }
 
