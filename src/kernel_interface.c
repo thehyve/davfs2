@@ -58,6 +58,7 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+#include <sys/wait.h>
 
 #include "xalloc.h"
 #include "xvasprintf.h"
@@ -228,16 +229,31 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
     char *path = xasprintf("%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME);
 
     fuse_device = open(path, O_RDWR | O_NONBLOCK);
-    if (fuse_device <= 0 && system("/sbin/modprobe fuse &>/dev/null") == 0) {
-        fuse_device = open(path, O_RDWR | O_NONBLOCK);
-    }
+
     if (fuse_device <= 0) {
-        if (mknod(path, S_IFCHR, makedev(MISC_MAJOR, FUSE_MINOR)) == 0) {
-            if (chown(path, 0, 0) == 0 && chmod(path, S_IRUSR | S_IWUSR) == 0) {
-                fuse_device = open(path, O_RDWR | O_NONBLOCK);
-            } else {
-                remove(path);
-            }
+        error(0, 0, _("loading kernel module fuse"));
+        int ret;
+        pid_t pid = fork();
+        if (pid == 0) {
+            execl("/sbin/modprobe", "modprobe", "fuse", NULL);
+            _exit(EXIT_FAILURE);
+        } else if (pid < 0) {
+            ret = -1;
+        } else {
+            if (waitpid(pid, &ret, 0) != pid)
+                ret = -1;
+        }
+
+        if (ret) {
+            error(0, 0, _("loading kernel module fuse failed"));
+        } else {
+            fuse_device = open(path, O_RDWR | O_NONBLOCK);
+        }
+
+        if (fuse_device <= 0) {
+            error(0, 0, _("waiting for %s to be created"), path);
+            sleep(2); 
+            fuse_device = open(path, O_RDWR | O_NONBLOCK);
         }
     }
 
