@@ -551,6 +551,7 @@ check_dirs(dav_args *args)
                 char *template = ne_concat(DAV_DATA_DIR, "/", DAV_SECRETS,
                                            NULL);
                 cp_file(template, file_name);
+                chmod(file_name, S_IRUSR | S_IWUSR);
                 free(template);
             }
             free(file_name);
