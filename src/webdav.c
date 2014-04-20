@@ -1933,7 +1933,7 @@ quota_reader(void *userdata, const char *block, size_t length)
     if (length < 1) return 0;
     quota_context *ctx = (quota_context *) userdata;
 
-    char *quota = strndup(block, length);
+    char *quota = ne_strndup(block, length);
     if (!quota) {
         ctx->error = 1;
         return 0;
