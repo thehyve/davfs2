@@ -51,6 +51,7 @@
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
+#include <sys/wait.h>
 
 #include "defaults.h"
 #include "mount_davfs.h"
@@ -202,6 +203,34 @@ init_fuse(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
             abort();
 
     *dev = open(path, O_RDWR | O_NONBLOCK);
+
+    if (*dev <= 0) {
+        error(0, 0, _("loading kernel module fuse"));
+        int ret;
+        pid_t pid = fork();
+        if (pid == 0) {
+            execl("/sbin/modprobe", "modprobe", "fuse", NULL);
+            _exit(EXIT_FAILURE);
+        } else if (pid < 0) {
+            ret = -1;
+        } else {
+            if (waitpid(pid, &ret, 0) != pid)
+                ret = -1;
+        }
+
+        if (ret) {
+            error(0, 0, _("loading kernel module fuse failed"));
+        } else {
+            *dev = open(path, O_RDWR | O_NONBLOCK);
+        }
+
+        if (*dev <= 0) {
+            error(0, 0, _("waiting for /dev/fuse to be created"));
+            sleep(2); 
+            *dev = open(path, O_RDWR | O_NONBLOCK);
+        }
+    }
+
     free(path);
     if (*dev <= 0) {
         error(0, 0, _("can't open fuse device"));
