@@ -2,12 +2,16 @@ ChangeLog for davfs2
 --------------------
 
 2014-04-20 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, mount_davfs.h, mount_davfs.c, cache.c:
+      Add option minimize_mem (sr #108158).
+
+2014-04-20 Werner Baumann (werner.baumann@onlinehome.de)
     * kernel_interface.c:
       Try loading kernel module fuse.
     * mount_davfs.c, check_dirs:
       Set mode of secrets file.
     * webdav.c, quota_reader:
-      Replace nstrdup by ne_nstrdup.
+      Replace strndup with ne_strndup.
 
 2014-04-18 Werner Baumann (werner.baumann@onlinehome.de)
     * defaults.h, mount_davfs.h, mount_davfs.c, webdav.c:
