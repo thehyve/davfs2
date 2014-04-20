@@ -4,6 +4,8 @@ ChangeLog for davfs2
 2014-04-20 Werner Baumann (werner.baumann@onlinehome.de)
     * kernel_interface.c:
       Replace system() with execl().
+    * mount_davfs.c:
+      Add function cp_file to replace system.
 
 2014-04-18 Werner Baumann (werner.baumann@onlinehome.de)
     * defaults.h, mount_davfs.h, mount_davfs.c, webdav.c:

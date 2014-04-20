@@ -176,6 +176,9 @@ write_mtab_entry(const dav_args *args);
 static int
 arg_to_int(const char *arg, int base, const char *opt);
 
+static void
+cp_file(const char *src, const char *dest);
+
 static int
 debug_opts(const char *s);
 
@@ -548,9 +551,7 @@ check_dirs(dav_args *args)
             fname = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_CONFIG);
             if (stat(fname, &st) != 0) {
                 char *template = xasprintf("%s/%s", DAV_DATA_DIR, DAV_CONFIG);
-                char *command = xasprintf("cp %s %s", template, fname);
-                if (system(command) != 0);
-                free(command);
+                cp_file(template, fname);
                 free(template);
             }
             free(fname);
@@ -558,10 +559,8 @@ check_dirs(dav_args *args)
             fname = xasprintf("%s/.%s/%s", args->home, PACKAGE, DAV_SECRETS);
             if (stat(fname, &st) != 0) {
                 char *template = xasprintf("%s/%s", DAV_DATA_DIR, DAV_SECRETS);
-                char *command = xasprintf("cp %s %s", template, fname);
-                if (system(command) == 0)
-                    chmod(fname, S_IRUSR | S_IWUSR);
-                free(command);
+                cp_file(template, fname);
+                chmod(fname, S_IRUSR | S_IWUSR);
                 free(template);
             }
             free(fname);
@@ -1325,6 +1324,34 @@ arg_to_int(const char *arg, int base, const char *opt)
     }
 
     return n;
+}
+
+
+/* Creates a copy of src with name dest. */
+static void
+cp_file(const char *src, const char *dest)
+{
+    FILE *in = fopen(src, "r");
+    if (!in)
+        error(EXIT_FAILURE, errno, _("can't open file %s"), src);
+
+    FILE *out = fopen(dest, "w");
+    if (!out)
+        error(EXIT_FAILURE, errno, _("can't open file %s"), dest);
+
+    size_t n = 0;
+    char *line = NULL;
+    int length = getline(&line, &n, in);
+    while (length > 0) {
+        if (fputs(line, out) == EOF) 
+            error(EXIT_FAILURE, errno, _("error writing to file %s"), dest);
+        length = getline(&line, &n, in);
+    }
+
+    if (line)
+        free(line);
+    fclose(out);
+    fclose(in);
 }
 
 
