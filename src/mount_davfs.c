@@ -1729,6 +1729,7 @@ new_args(void)
     args->file_refresh = DAV_FILE_REFRESH;
     args->delay_upload = DAV_DELAY_UPLOAD;
     args->gui_optimize = DAV_GUI_OPTIMIZE;
+    args->minimize_mem = DAV_MINIMIZE_MEM;
 
     return args;
 }
@@ -1845,6 +1846,8 @@ log_dbg_config(dav_args *args)
            "  delay_upload: %i", args->delay_upload);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  gui_optimize: %i", args->gui_optimize);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  minimize_mem: %i", args->minimize_mem);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  debug: %#x", args->debug);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2241,6 +2244,8 @@ read_config(dav_args *args, const char * filename, int system)
                 args->delay_upload = arg_to_int(parmv[1], 10, parmv[0]); 
             } else if (strcmp(parmv[0], "gui_optimize") == 0) {
                 args->gui_optimize = arg_to_int(parmv[1], 10, parmv[0]); 
+            } else if (strcmp(parmv[0], "minimize_mem") == 0) {
+                args->minimize_mem = arg_to_int(parmv[1], 10, parmv[0]); 
             } else if (strcmp(parmv[0], "debug") == 0) {
                 args->debug |= debug_opts(parmv[1]);
                 args->neon_debug |= debug_opts_neon(parmv[1]);

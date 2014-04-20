@@ -171,6 +171,13 @@ static time_t delay_upload;
    GET If-Modified-Since for single files. */
 static int gui_optimize;
 
+/* Remove nodes that are currently not needed to minimize memory usage. */
+static int minimize_mem;
+
+/* When to next run minimize_tree. 0 means to not run minimize_tree.
+   Must be updated when a node is created. */
+static time_t next_minimize;
+
 /* Time interval to wait, before a directory is updated. Usually equal to
    dir_refresh, but will be varied in case the connection timed out.*/
 static time_t retry;
@@ -275,6 +282,9 @@ get_upload_time(dav_node *node)
     if (!item) return 0;
     return item->save_at;
 }
+
+static void
+minimize_tree(dav_node *node);
 
 static int
 move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
@@ -602,6 +612,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     file_refresh = args->file_refresh;
     delay_upload = args->delay_upload;
     gui_optimize = args->gui_optimize;
+    minimize_mem = args->minimize_mem;
     retry = dir_refresh;
     min_retry = args->retry;
     max_retry = args->max_retry;
@@ -645,6 +656,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     backup->mode = S_IFDIR | S_IRWXU;
 
     clean_cache();
+    next_minimize = 0;
 
     int ret = update_directory(root, 0);
     if (ret == EAGAIN) {
@@ -739,6 +751,16 @@ dav_tidy_cache(void)
 
     if (cache_size > max_cache_size)
         resize_cache();
+
+    if (minimize_mem && next_minimize && time(NULL) > next_minimize) {
+        if (debug)
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "minimize_tree");
+        next_minimize = 0;
+        minimize_tree(root);
+        if (debug)
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                    "minimize_tree: %llu nodes remaining", fs_stat->files);
+    }
 
     static dav_node_list_item *item = NULL;
 
@@ -1713,6 +1735,43 @@ delete_tree(dav_node *node)
 }
 
 
+/* Removes file nodes that are currently not needed to minimize
+   memory usage. */
+static void
+minimize_tree(dav_node *node)
+{
+    if (node == backup) return;
+
+    if (is_dir(node)) {
+
+        int rm = !is_open(node)
+                    && (time(NULL) > (node->utime + 2 * file_refresh))
+                    && (time(NULL) > (node->atime + 2 * file_refresh));
+        dav_node *child = node->childs;
+        while (child) {
+            dav_node *next = child->next;
+            if (rm || is_dir(child)) {
+                minimize_tree(child);
+            } else if (next_minimize == 0) {
+                next_minimize = time(NULL) + 2 * file_refresh;
+            }
+            child = next;
+        }
+
+    } else if (!is_cached(node) && !is_locked(node) && !is_created(node)) {
+
+        remove_from_tree(node);
+        remove_from_table(node);
+        delete_node(node);
+
+    } else if (next_minimize == 0) {
+
+        next_minimize = time(NULL) + file_refresh;
+
+    }
+}
+
+
 /* Moves directory src to dst using WebDAV method MOVE. */
 static int
 move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
@@ -1932,6 +1991,9 @@ new_node(dav_node *parent, mode_t mode)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "new node: %p->%p",
                node->parent, node);
     fs_stat->files++;
+    if (next_minimize == 0)
+        next_minimize = node->atime + file_refresh;
+
     return node;
 }
 

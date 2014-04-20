@@ -451,6 +451,22 @@ from all files in a directory with one PROPFIND request. 0 = no, 1 = yes.
 .br
 Default: 0
 
+.TP
+.B minimize_mem
+davfs2 holds information about files and directories in the working
+memory. It will stay there as long as the file system is mounted and the 
+file is not deleted. By this memory usage by davfs2 will grow over time
+and may slow down davfs2. With this option set to 1 davfs2 will regularly
+clean the memory from information that has not be used for some time.
+0 = no, 1 = yes.
+.br
+\fBWarning:\fR Most file attributes are only maintained locally because
+there is no corresponding WebDAV property. So if users change attributes
+(owner, group, access bits) locally this changes will be lost and
+attribute values will be reset to the default values.
+.br
+Default: 0
+
 
 .SH Debugging Options
 
