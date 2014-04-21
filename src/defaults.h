@@ -178,7 +178,7 @@
 #define DAV_IGNORE_DAV_HEADER 0
 
 /* Use "Content-Encoding: gzip" for GET requests. */
-#define DAV_USE_COMPRESSION 1
+#define DAV_USE_COMPRESSION 0
 
 /* Follow redirect responses on GET requests. */
 #define DAV_FOLLOW_REDIRECT 0

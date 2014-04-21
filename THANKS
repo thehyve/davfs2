@@ -1,92 +1,22 @@
-davfs2 THANKS 2010-04-30
+davfs2 THANKS 2014-04-21
 ------------------------
 
-Thanks to all the people that contributed by sending patches
-and bug reports, patiently testing and hunting bugs,
-and giving good advise.
-============================================================
+This file used to contain a list of contributers. But this list never was
+complete and I am not able to keep track of contributions.
 
-Dirk Arend <d.arend@avm.de>
-Reto Bachmann-Gmuer <rebach@users.sourceforge.net>
-Adrian Bridgett
-Anthony Baxter <anthonybaxter@users.sourceforge.net>
-Dan Armbrust <daniel.armbrust.list@gmail.com>
-Luciano Bello <lbello@users.sourceforge.net>
-Vladimir Bormotov <bormotov@users.sourceforge.net>
-butchie55 <butchie55@users.sourceforge.net>
-Grahame Bowland <grahame@fugro-fsi.com.au>
-Ross Campbell <ross@users.sourceforge.net>
-Laurent Cottereau <lcottereau@users.sourceforge.net>
-Stephen Coursen <scoursen@users.sourceforge.net>
-DeltaPiSF <deltapisf@users.sourceforge.net>
-Daniel Drucker <placain@users.sourceforge.net>
-Paul eater <eater@users.sourceforge.net>
-Andrei Emeltchenko andrei.emeltchenko.news@gmail.com
-Jan Engelhardt <jengelh@users.sourceforge.net>
-Joe Feise <jfeise@users.sourceforge.net>
-Peter Fern <savannah@obfusc8.org>
-Toralf Förster <toralf_foerster@users.sourceforge.net>
-Justin Gombos <jgombos@users.sourceforge.net>
-Bob Glickstein <bglickstein@users.sourceforge.net>
-Joao Gouveia <jgouveia@users.sourceforge.net>
-Yeon Gyoung <mips942@users.sourceforge.net>
-Jason Haar <jhaar@trimble.co.nz>
-Philipp Hahn <pmhahn@users.sourceforge.net>
-Jan Harkes <jaharkes@cs.cmu.edu>
-Martin Higham <martin@ocasta.co.uk>
-Lauri Kaila <laurikaila@users.sourceforge.net>
-Hyunsop Kim <hskim@taegu.ac.kr>
-Vítězslav Kotrla <vitko@post.cz>
-Alexander Jenisch <enti@users.sourceforge.net>
-joe <josephb@users.sourceforge.net>
-Simon Kainz <simon@familiekainz.at>
-Doug Kelly <dougk@dougk-ff7.net>
-Thomas Kemmer <tkemmer@users.sourceforge.net>
-SungHun Kim <hunkim@users.sourceforge.net>
-Alan Knowles <alan_k@users.sourceforge.net>
-Moriyoshi Koizumi <moriyoshi@users.sourceforge.net>
-Martin F. Krafft <madduck@debian.org>
-Masar <masarlabs@users.sourceforge.net>
-monstruooo <monstruooo@users.sourceforge.net>
-Muthu Kumar <kmkumar@users.sourceforge.net>
-Scott Lamb <slamb@users.sourceforge.net>
-Erik Lat <erik.lat@htbindustries.org>
-Andreas Lauser <andlaus@users.sourceforge.net>
-Holger Librenz <me@holger-librenz.de>
-Reddy T. Mahesh <tmahesh@users.sourceforge.net>
-Juergen P. Messerer <messi@users.sourceforge.net>
-Arkadiusz Miskiewicz <arekm@users.sourceforge.net>
-Johannes Müller <s9186231@mail.zih.tu-dresden.de>
-Andre Naujoks <nautsch2@googlemail.com>
-Maik Nijhuis <manyac@users.sourceforge.net>
-Joseph Wayne Norton <natsukashi@users.sourceforge.net>
-Tim Olsen <tim@brooklynpenguin.com>
-Jan Ortgies <design@mediaworldgmbh.de>
-Joe Orton <joe@manyfish.co.uk>
-Panu Outinen <poutinen@users.sourceforge.net>
-Tero Pelander <tpeland2@users.sourceforge.net>
-Ruediger Pluem <ruediger.pluem@vodafone.com>
-Gauvain Pocentek <gauvain@ulteo.com>
-David Popeck <dpopeck@users.sourceforge.net>
-Sean Reifschneider <jafo@users.sourceforge.net>
-Sebastian Reitenbach <buzzdee@users.sourceforge.net>
-Daniel Roche <danroche@users.sourceforge.net>
-Carl D. Roth <carlroth@users.sourceforge.net>
-James Russell <russej@users.sourceforge.net>
-Martin Samuelsson <cosis@users.sourceforge.net>
-Enrico Scelsa <enrichicco@users.sourceforge.net>
-Patrick Schipper <pqschipper@users.sourceforge.net>
-Hans Schulz <hans@vega.demon.nl>
-Tim Skirvin <tim_skirvin@users.sourceforge.net>
-Ville Skyttä <scop@users.sourceforge.net>
-Robert Spier <robrt@users.sourceforge.net>
-Steven Stanek <sstanek@covariable.com>
-Geoffroy Stévenne <geoffroys@users.sourceforge.net>
-Greg Stein <gstein@lyra.org>
-Tomi <farago1@zonnet.nl>
-Lars Uffmann <lu@cachescrubber.org>
-Björn Voigt <bjoernv@users.sourceforge.net>
-Dag Wieers <dag@wieers.com>
-Jim Whitehead <ejw@cse.ucsc.edu> 
-Will Woods <wwoods@redhat.com>
-Marcin Zajączkowski <mszpak@wp.pl>
+So I wand to thank all the people who helped in one or another way:
+
+ - By sending reports about problems.
+
+ - By running debug sessions.
+
+ - By sending patches for bug fixes or new teatures.
+
+ - By providing all the libraries that davfs2 uses directly or indirectly.
+
+ - By providing all the tools used to create this program.
+
+ - By providing the free GNU/Linux operating system.
+ 
+ Werner Baumann
+ 

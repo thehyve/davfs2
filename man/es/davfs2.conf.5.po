@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2.conf.5\n"
-"POT-Creation-Date: 2014-04-20 18:28+0300\n"
+"POT-Creation-Date: 2014-04-21 16:54+0300\n"
 "PO-Revision-Date: 2007-04-26 01:24-0300\n"
 "Last-Translator: Luciano Bello <luciano@linux.org.ar>\n"
 "Language-Team: Español <es@li.org>\n"
@@ -24,11 +24,13 @@ msgstr ""
 msgid "@CONFIGFILE@"
 msgstr "@CONFIGFILE@"
 
+# type: TH
 #. type: TH
 #: davfs2.conf.5:1
-#, no-wrap
-msgid "2012-07-19"
-msgstr ""
+#, fuzzy, no-wrap
+#| msgid "2009-04-13"
+msgid "2014-04-21"
+msgstr "2009-04-13"
 
 # type: TH
 #. type: TH
@@ -389,7 +391,7 @@ msgstr ""
 # type: Plain text
 #. type: Plain text
 #: davfs2.conf.5:133 davfs2.conf.5:213 davfs2.conf.5:220 davfs2.conf.5:298
-#: davfs2.conf.5:312 davfs2.conf.5:326 davfs2.conf.5:460
+#: davfs2.conf.5:460
 msgid "Default: 1"
 msgstr "Predeterminado: 1"
 
@@ -698,7 +700,8 @@ msgstr ""
 # type: Plain text
 #. type: Plain text
 #: davfs2.conf.5:252 davfs2.conf.5:260 davfs2.conf.5:278 davfs2.conf.5:288
-#: davfs2.conf.5:305 davfs2.conf.5:480 davfs2.conf.5:496
+#: davfs2.conf.5:305 davfs2.conf.5:312 davfs2.conf.5:326 davfs2.conf.5:480
+#: davfs2.conf.5:496
 msgid "Default: 0"
 msgstr "Predeterminado: 0"
 

@@ -72,9 +72,6 @@ main(int argc, char *argv[])
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
 
-int i;
-for (i = 0; i < argc; i++)
-printf("%s\n", argv[i]);
     char *short_options = "Vhflnrv";
     static const struct option options[] = {
         {"version", no_argument, NULL, 'V'},

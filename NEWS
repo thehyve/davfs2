@@ -1,7 +1,56 @@
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012 Werner Baumann
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014 Werner Baumann
 
 # Copying and distribution of this file, with or without modification, are
 # permitted in any medium without royalty.
+
+
+What is new in davfs2 1.5.0
+===========================
+
+Bug fixes and Improvements:
+
+- Fixed security risk caused by insecure use of function system.
+  (bug #40034)
+
+- umount will now properly work with system where mtab is a symbolic link
+  to /proc/mounts. for this davfs2 uses the new /var/mount/utab file.
+  Fixes sr #108528.
+
+- Symbolic links in fstab will no longer break davfs2 (sr #108377).
+
+- Fixed bugs with setting access bits and evaluating access permissions
+  (bug #33644 and bug #33644).
+
+- Support Neon version 0.30 (sr #108392).
+
+- Improved configuration for certificate validation with new options
+  trust_ca_cert and trust_server_cert.
+
+- New option minimize_mem to reduce memory consumption by davfs2 (sr #108158).
+
+- Allow mount option comment= (bug #41354).
+
+- New mount option grpid (sr #108432).
+
+- Improved cookie support allows for more than one cookie
+  (sr #107907, bug #41438).
+
+- Honor configure parameter --manfile (sr #108173).
+
+- Fixed DESTDIR bug (sr #108104).
+
+Experimental new features:
+
+- Support temporary redirects for downloading of files (bug #35428).
+
+- Support compression for downloading (bug #41355) (not necessarily RFC-
+  compliant, but what is used by browsers).
+
+Removed features:
+
+- Support for extended attributes was more then rudimentary and is now
+  removed for the sake of performance and clarity.
+
 
 
 What is new in davfs2 1.4.7
