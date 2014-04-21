@@ -1,38 +1,9 @@
-davfs2 TODO 2009-10-23
+davfs2 TODO 2014-04-21
 ----------------------
 
 - write a GNU-style manual
 
-- use HTTP transport compression
-
-- remove unecessary calls to delete_cache_file(dir) in cache.c
-
-- calculate size of directories from number of files (not from
-  the size of the dir-cache-file
-
-- revisit setting and updating of file times
-
-- add code to tidy_cache to remove nodes from node-cache that
-  have not been used for a long time
-
-- do not use Last-Modified-Time for cache validation if an
-  Etag is available
-
-- object oriented redisign of cache
-
 - multithreading for HTTP-requests and cache maintainance
 
 - restructure file name extraction and href construction
-
-- revisit precedence rules for options (e.g. username)
-
-- create log message in case of errors that seem to be caused
-  by broken server implementations (see Debian bug #551782 - davfs2:
-  improve the output in case of a server with a broken LOCK)
-
-- integrate with gnome-keyring?
-
-- ranged requests for GET (partial download)
-
-- config option for server cert instead of CA cert
 
