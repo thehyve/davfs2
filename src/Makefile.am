@@ -32,7 +32,8 @@ mount_davfs_SOURCES = cache.c dav_coda.c \
         kernel_interface.h mount_davfs.h webdav.h
 umount_davfs_SOURCES = umount_davfs.c defaults.h
 
-AM_CFLAGS = -Wall
+AM_CFLAGS = -Wall -Werror=format-security \
+        -fstack-protector --param=ssp-buffer-size=4
 DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_SYS_CONF_DIR=\"$(pkgsysconfdir)\" \
        -DDAV_LOCALSTATE_DIR=\"$(dav_localstatedir)\" \
@@ -45,7 +46,8 @@ DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_DATA_DIR=\"$(pkgdatadir)\" \
        -DLOCALEDIR=\"$(localedir)\" \
        -DDAV_USER=\"$(dav_user)\" \
-       -DDAV_GROUP=\"$(dav_group)\" @DEFS@
+       -DDAV_GROUP=\"$(dav_group)\" \
+       -D_FORTIFY_SOURCE=2 @DEFS@
 LIBS = $(NEON_LIBS) @LIBS@
 
 install-exec-hook:
