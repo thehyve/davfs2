@@ -2724,6 +2724,7 @@ update_cache_file(dav_node *node)
         ret = dav_get_file(node->path, node->cache_path, &node->size, &etag,
                            &smtime, NULL);
         if (!ret) {
+            if (node->etag) free(node->etag);
             node->etag = etag;
             if (smtime) {
                 node->atime = smtime;
@@ -2741,6 +2742,7 @@ update_cache_file(dav_node *node)
                 remove_node(node);
             }
             delete_cache_file(node);
+            if (etag) free(etag);
         }
     }
 
