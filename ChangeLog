@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-05-04 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, update_cache_file:
+      Fixing memory leak.
+
 2014-04-20 Werner Baumann (werner.baumann@onlinehome.de)
     * defaults.h, mount_davfs.h, mount_davfs.c, cache.c:
       Add option minimize_mem (sr #108158).

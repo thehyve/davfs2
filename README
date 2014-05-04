@@ -1,7 +1,7 @@
 2010-04-30
 ----------
 
-# Copyright (C) 2006, 2007, 2008, 2009, 2010 Werner Baumann
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014 Werner Baumann
 
 # Copying and distribution of this file, with or without modification, are
 # permitted in any medium without royalty.
@@ -132,22 +132,30 @@ Nevertheless davfs2 insists on verification of server certificates. There
 are three ways to do this:
 
 - davfs2 will use the CA-certificates of your system to verify the server
-  certificate.
+  certificate. The server's certificate must be valid and host-name of the
+   server must match the subject-alt-name or the common name of the certificate.
 
-- You may store the server certificate in the certs directory and add a
-  configuration option to davfs2.conf. You will have to verify this certificate
-  by your own, as davfs2 will trust this certificate without further
-  verification. This should be useful with self-made server certificates.
-  If the server certificate is not self-signed, but signed by an unknown
-  CA, the certificate file must contain the server certificate and the
-  certificate of all the involved CA's.
+- You may store a top-level CA-certificate in the certs directory and set
+  option trust_ca_cert in the davfs2.conf directory. This CA-certificate will
+  be used instead of the CA-certificates provided by your system. he server's
+  certificate must be valid and host-name of the server must match the
+  subject-alt-name or the common name of the certificate.
+  This is useful when the service provider uses a private CA or the server
+  certificate is self-signed.
 
-- The host-name of the server must match the subject-alt-name or the common
-  name of the certificate.
+- You may store the certificate of the server and set option trust_server_cert
+  in the davfs2.conf file. In this case the certificate of the server must
+  exactly match this certificate, but it does not matter whether it is valid,
+  outdated or does not match the server's host-name.
 
-- If a certificate can not be verified, mount.davfs will print information
-  about the certificate and ask the user. This will only be done, before
-  mount.davfs changes into daemon mode.
+When you use option trust_ca_cert or trust_server_cert it is your responsibility
+to get the certificate in a reliable way and care for certificate revocation.
+If you can do this it is more secure then relying of well known certificate
+authorities (considering recent events).
+
+If a certificate can not be verified, mount.davfs will print information about
+the certificate and ask the user. This will only be done before mount.davfs
+changes into daemon mode.
 
 
 5 CACHE
@@ -197,8 +205,8 @@ software, to search for the reason:
 - You may set option 'debug most" in the davfs2.conf file. This will print a
   lot of debug messages in one of your log files.
 
-- Wireshark (former Ethereal) will log and analyse the traffic between davfs2
-  and the server. (http://www.wireshark.org/)
+- Wireshark will log and analyse the traffic between davfs2 and the server.
+  (http://www.wireshark.org/)
 
 - If you have access to the server's log files, they contain valuable
   information.
