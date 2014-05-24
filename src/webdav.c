@@ -1865,12 +1865,12 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
         }
     }
 
-    if (strstr(result->path, ctx->path) != result->path) {
+    if (strcasestr(result->path, ctx->path) != result->path) {
         dav_delete_props(result);
         return;
     }
 
-    if (strcmp(result->path, ctx->path) == 0) {
+    if (strcasecmp(result->path, ctx->path) == 0) {
         result->name = ne_strdup("");
     } else {
         if (strlen(result->path) < (strlen(ctx->path) + result->is_dir + 1)) {
