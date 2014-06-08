@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-06-08 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, add_node, update_directory:
+      Fix file times if LastModified is missing.
+
 2014-05-24 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, prop_result:
       Case insensitive test of path (sr #108566).

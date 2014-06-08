@@ -1552,9 +1552,6 @@ add_node(dav_node *parent, dav_props *props)
     if (grpid && parent->gid != 0)
         node->gid = parent->gid;
 
-    parent->mtime = node->mtime;
-    parent->ctime = node->mtime;
-
     node->path = props->path;
     node->name = props->name;
     node->etag = props->etag;
@@ -2156,7 +2153,10 @@ update_directory(dav_node *dir, time_t refresh)
             add_node(dir, props);
             changed = 1;
         } else {
-            dir->mtime = props->mtime;
+            if (props->mtime > dir->smtime) {
+                dir->smtime = props->mtime;
+                dir->mtime = props->mtime;
+            }
             if (dir->mtime > dir->ctime)
                 dir->ctime = dir->mtime;
             if (dir->etag)
