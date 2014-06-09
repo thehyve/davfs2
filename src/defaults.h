@@ -202,6 +202,12 @@
 /* Use "Content-Encoding: gzip" for GET requests. */
 #define DAV_USE_COMPRESSION 1
 
+/* Only request a minimal set or properties (getcontentlength and
+   resourcetype). For read-only filesystems to speed up PROPFIND
+   requests.
+   May be overridden by system config file and user config file. */
+#define DAV_MIN_PROPSET 0
+
 /* Timeout in seconds used when libneon supports non blocking io
    A value of zero means use the TCP default
    May be overriden by system config file and user config file. */

@@ -93,6 +93,7 @@ typedef struct {
     int precheck;             /* User config file, system config file */
     int ignore_dav_header;    /* User config file, system config file */
     int use_compression;      /* User config file, system config file */
+    int min_propset;          /* User config file, system config file */
     time_t connect_timeout;   /* User config file, system config file */
     time_t read_timeout;      /* User config file, system config file */
     time_t retry;             /* User config file, system config file */

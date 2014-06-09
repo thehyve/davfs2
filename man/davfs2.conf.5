@@ -1,4 +1,4 @@
-.TH @CONFIGFILE@ 5 2014\-04\-18 @PACKAGE_STRING@
+.TH @CONFIGFILE@ 5 2014\-06\-09 @PACKAGE_STRING@
 
 
 .SH NAME
@@ -296,6 +296,18 @@ Use gzip-compression for downloading files, if supported by the server.
 Uploads will still be uncompressed.
 .br
 Default: 1
+
+.TP
+.B min_propset
+Some servers are reported to significantly slow down when the Etag and
+Last-Modified properties are requested. This option will reduce the set of
+WebDAV-properties requested from the server to the minimal set. Don't use it if
+your file system is used for reading and writing. Without Etag or Last-Modified
+davfs2 will not be able to check for changes on the server which may result
+in unnecessary downloads and lost updates. This option will also effectively
+disable caching of files because files in the cache can't be reused.
+.br
+Default: 0
 
 .TP
 .B server_charset
