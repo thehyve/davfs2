@@ -180,6 +180,12 @@
 /* Use "Content-Encoding: gzip" for GET requests. */
 #define DAV_USE_COMPRESSION 0
 
+/* Only request a minimal set or properties (getcontentlength and
+   resourcetype). For read-only filesystems to speed up PROPFIND
+   requests.
+   May be overridden by system config file and user config file. */
+#define DAV_MIN_PROPSET 0
+
 /* Follow redirect responses on GET requests. */
 #define DAV_FOLLOW_REDIRECT 0
 

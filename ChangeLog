@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-06-09 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, mount_davfs.h, mount_davfs.c webdav.c:
+      Add option min_propset.
+
 2014-06-08 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, add_node, update_directory:
       Fix file times if LastModified is missing.

@@ -110,30 +110,41 @@ typedef struct {
 /* Properties to be retrieved from the server. This constants
    are used by dav_get_collection(). */
 enum {
-    ETAG = 0,
+    TYPE = 0,
     LENGTH,
+    ETAG,
     MODIFIED,
-    TYPE,
-    EXECUTE,
-    END
+    EXECUTE
 };
 
-static const ne_propname prop_names[] = {
-    [ETAG] = {"DAV:", "getetag"},
-    [LENGTH] = {"DAV:", "getcontentlength"},
-    [MODIFIED] = {"DAV:", "getlastmodified"},
+static const ne_propname full_prop_names[] = {
     [TYPE] = {"DAV:", "resourcetype"},
+    [LENGTH] = {"DAV:", "getcontentlength"},
+    [ETAG] = {"DAV:", "getetag"},
+    [MODIFIED] = {"DAV:", "getlastmodified"},
     [EXECUTE] = {"http://apache.org/dav/props/", "executable"},
-    [END] = {NULL, NULL}
+    {NULL, NULL}
 };
 
-static const ne_propname anonymous_prop_names[] = {
-    [ETAG] = {NULL, "getetag"},
-    [LENGTH] = {NULL, "getcontentlength"},
-    [MODIFIED] = {NULL, "getlastmodified"},
+static const ne_propname full_anonymous_prop_names[] = {
     [TYPE] = {NULL, "resourcetype"},
+    [LENGTH] = {NULL, "getcontentlength"},
+    [ETAG] = {NULL, "getetag"},
+    [MODIFIED] = {NULL, "getlastmodified"},
     [EXECUTE] = {NULL, "executable"},
-    [END] = {NULL, NULL}
+    {NULL, NULL}
+};
+
+static const ne_propname min_prop_names[] = {
+    [TYPE] = {"DAV:", "resourcetype"},
+    [LENGTH] = {"DAV:", "getcontentlength"},
+    {NULL, NULL}
+};
+
+static const ne_propname min_anonymous_prop_names[] = {
+    [TYPE] = {NULL, "resourcetype"},
+    [LENGTH] = {NULL, "getcontentlength"},
+    {NULL, NULL}
 };
 
 /* Properties to be retrieved from the server. This constants
@@ -203,6 +214,11 @@ static int ignore_dav_header;
 
 /* Use "Content-Encoding: gzip" for GET requests. */
 static int use_compression;
+
+/* Only request a minimal set of properties. */
+static int min_propset;
+static const ne_propname *prop_names;
+static const ne_propname *anonymous_prop_names;
 
 /* Will be set to 1 when dav_init_connection() succeeded. */
 static int initialized;
@@ -488,6 +504,14 @@ dav_init_webdav(const dav_args *args)
     precheck = args->precheck;
     ignore_dav_header = args->ignore_dav_header;
     use_compression = args->use_compression & ne_has_support(NE_FEATURE_ZLIB);
+    min_propset = args->min_propset;
+    if (min_propset) {
+        prop_names = min_prop_names;
+        anonymous_prop_names = min_anonymous_prop_names;
+    } else {
+        prop_names = full_prop_names;
+        anonymous_prop_names = full_anonymous_prop_names;
+    }
 }
 
 
@@ -1887,11 +1911,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 #endif
     }
 
-    data = ne_propset_value(set, &prop_names[ETAG]);
-    if (!data)
-        data = ne_propset_value(set, &anonymous_prop_names[ETAG]);
-    result->etag = normalize_etag(data);
-
     data = ne_propset_value(set, &prop_names[LENGTH]);
     if (!data)
         data = ne_propset_value(set, &anonymous_prop_names[LENGTH]);
@@ -1902,24 +1921,31 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
          result->size = strtol(data, NULL, 10);
 #endif /* _FILE_OFFSET_BITS != 64 */
 
-    data = ne_propset_value(set, &prop_names[MODIFIED]);
-    if (!data)
-        data = ne_propset_value(set, &anonymous_prop_names[MODIFIED]);
-    if (data) {
-        result->mtime = ne_httpdate_parse(data);
-        if (result->mtime == (time_t) -1)
-            result->mtime = ne_iso8601_parse(data);
-        if (result->mtime == (time_t) -1)
-            result->mtime = 0;
-    }
+    if (!min_propset) {
+        data = ne_propset_value(set, &prop_names[ETAG]);
+        if (!data)
+            data = ne_propset_value(set, &anonymous_prop_names[ETAG]);
+        result->etag = normalize_etag(data);
 
-    data = ne_propset_value(set, &prop_names[EXECUTE]);
-    if (!data)
-        data = ne_propset_value(set, &anonymous_prop_names[EXECUTE]);
-    if (!data) {
-        result->is_exec = -1;
-    } else if (*data == 'T') {
-        result->is_exec = 1;
+        data = ne_propset_value(set, &prop_names[MODIFIED]);
+        if (!data)
+            data = ne_propset_value(set, &anonymous_prop_names[MODIFIED]);
+        if (data) {
+            result->mtime = ne_httpdate_parse(data);
+            if (result->mtime == (time_t) -1)
+                result->mtime = ne_iso8601_parse(data);
+            if (result->mtime == (time_t) -1)
+                result->mtime = 0;
+        }
+
+        data = ne_propset_value(set, &prop_names[EXECUTE]);
+        if (!data)
+            data = ne_propset_value(set, &anonymous_prop_names[EXECUTE]);
+        if (!data) {
+            result->is_exec = -1;
+        } else if (*data == 'T') {
+            result->is_exec = 1;
+        }
     }
 
     result->next = ctx->results;
