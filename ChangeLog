@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-06-19 Werner Baumann (werner.baumann@onlinehome.de)
+    * Mount_davfs.c, main:
+      Only log error if still is mounted.
+
 2014-06-09 Werner Baumann (werner.baumann@onlinehome.de)
     * defaults.h, mount_davfs.h, mount_davfs.c webdav.c:
       Add option min_propset.
