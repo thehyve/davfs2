@@ -367,7 +367,7 @@ main(int argc, char *argv[])
     if (is_mounted()) {
         char *prog = ne_concat("/bin/umount -il ", mpoint, NULL);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"), mpoint);
-        if (system(prog) != 0)
+        if (system(prog) != 0 && is_mounted())
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting failed"));
     }
     if (debug & DAV_DBG_CONFIG)
