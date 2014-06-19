@@ -363,7 +363,7 @@ main(int argc, char *argv[])
     if (dav_is_mounted()) {
         char *prog = xasprintf("/bin/umount -il %s", mpoint);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"), mpoint);
-        if (system(prog) != 0)
+        if (system(prog) != 0 && dav_is_mounted())
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting failed"));
     }
     if (debug)
