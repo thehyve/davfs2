@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-06-20 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, cache.h, mount_davfs.c:
+      Pass parameter got_sigterm by reference.
+
 2014-06-19 Werner Baumann (werner.baumann@onlinehome.de)
     * Mount_davfs.c, main:
       Only log error if still is mounted.
