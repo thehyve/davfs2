@@ -192,10 +192,10 @@ dav_init_cache(const dav_args *args, const char *mpoint);
    a local backup file is created. All local copies of files and the necessary
    directories are stored in the permanent cache. A new index file of the
    permanent cache is created.
-   If got_sigterm is 1, dirty files will not be stored back to the server.
+   If *got_sigterm is 1, dirty files will not be stored back to the server.
    Finally it frees all nodes. */
 void
-dav_close_cache(int got_sigterm);
+dav_close_cache(volatile int *got_sigterm);
 
 
 /* Registers the kernel_interface.
