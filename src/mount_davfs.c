@@ -362,7 +362,7 @@ main(int argc, char *argv[])
 
     if (debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Closing");
-    dav_close_cache(got_sigterm);
+    dav_close_cache(&got_sigterm);
     dav_close_webdav();
     if (is_mounted()) {
         char *prog = ne_concat("/bin/umount -il ", mpoint, NULL);

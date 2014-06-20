@@ -265,7 +265,7 @@ static void
 backup_node(dav_node *orig);
 
 static void
-clean_tree(dav_node *node, int upload);
+clean_tree(dav_node *node, volatile int *got_sigterm);
 
 static void
 delete_node(dav_node *node);
@@ -686,7 +686,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
 
 
 void
-dav_close_cache(int got_sigterm)
+dav_close_cache(volatile int *got_sigterm)
 {
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Closing cache");
@@ -694,7 +694,7 @@ dav_close_cache(int got_sigterm)
     write_dir_entry = &write_dir_entry_dummy;
     flush = &flush_dummy;
 
-    clean_tree(root, !got_sigterm);
+    clean_tree(root, got_sigterm);
 
     char *new_index = ne_concat(cache_dir, "/", DAV_INDEX, ".new", NULL);
     if (debug)
@@ -1689,7 +1689,7 @@ backup_node(dav_node *orig)
 
 
 /* Scans the directory tree starting from node and
-   - if upload == 1: saves dirty files to the server and unlocks them.
+   - if *got_sigterm == 1: saves dirty files to the server and unlocks them.
      If it can not be safed, a local backup is created and the node is deleted. 
    - removes any file nodes without cached file
    - removes all dir nodes that have not at least one file node below.
@@ -1700,7 +1700,7 @@ backup_node(dav_node *orig)
    Kernel will *not* be notified about changes.
    Member nref of directories will be adjusted. */
 static void
-clean_tree(dav_node *node, int upload)
+clean_tree(dav_node *node, volatile int *got_sigterm)
 {
     if (node == backup) {
         delete_cache_file(backup);
@@ -1712,7 +1712,7 @@ clean_tree(dav_node *node, int upload)
         dav_node *child = node->childs;
         while (child) {
             dav_node *next = child->next;
-            clean_tree(child, upload);
+            clean_tree(child, got_sigterm);
             child = next;
         }
         if (!node->childs && node != root && node != backup) {
@@ -1725,13 +1725,13 @@ clean_tree(dav_node *node, int upload)
 
     } else if (!is_cached(node) || access(node->cache_path, F_OK) != 0) {
 
-        if (is_locked(node) && upload)
+        if (is_locked(node) && !*got_sigterm)
             dav_unlock(node->path, &node->lock_expire);
         remove_from_tree(node);
         remove_from_table(node);
         delete_node(node);
 
-    } else if ((is_dirty(node) || is_created(node)) && upload) {
+    } else if ((is_dirty(node) || is_created(node)) && !*got_sigterm) {
 
         int set_execute = -1;
         if (is_created(node)
