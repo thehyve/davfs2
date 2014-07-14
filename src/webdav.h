@@ -236,12 +236,11 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
         char **etag, time_t *mtime);
 
 /* Makes a PROPFIND request for path to get quota information (RFC 4331)
-   and places them in total and used.
-   toatal is the sum of quota-available-bytes and quota-used-bytes.
-   If quota information is not
-   available, an error is returned and available and used are not changed. */ 
+   and places them in available and used.
+   If quota information is not available, an error is returned and
+   available and used are not changed. */ 
 int
-dav_quota(const char *path, off_t *total, off_t *used);
+dav_quota(const char *path, uint64_t *available, uint64_t *used);
 
 
 /* Tells webdav that no more terminal is available, so errors can only

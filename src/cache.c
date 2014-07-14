@@ -33,6 +33,9 @@
 #include <libintl.h>
 #endif
 #include <pwd.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
@@ -346,15 +349,6 @@ update_node(dav_node *node, dav_props *props);
 static void
 update_path(dav_node *node, const char *src_path, const char *dst_path);
 
-static inline void
-update_stat(off_t size, int sign)
-{
-    if (!fs_stat->utime) return;
-    fs_stat->bfree += sign * (size / fs_stat->bsize);
-    fs_stat->bavail = fs_stat->bfree;
-    fs_stat->ffree = fs_stat->bfree;
-}
-
 /* Get information about node. */
 
 static int
@@ -622,16 +616,10 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     fs_stat = (dav_stat *) xmalloc(sizeof(dav_stat));
 
     fs_stat->blocks = 0x65B9AA;
-    fs_stat->bfree = 0x32DCD5;
     fs_stat->bavail = 0x32DCD5;
-    fs_stat->files = 0;
-    fs_stat->ffree = 666666;
-    struct stat cache_st;
-    if (stat(cache_dir, &cache_st) == 0) {
-        fs_stat->bsize = cache_st.st_blksize;
-    } else {
-        fs_stat->bsize = 4096;
-    }
+    fs_stat->n_nodes = 0;
+    fs_stat->ffree = fs_stat->bavail / 4;
+    fs_stat->bsize = 4096;
     fs_stat->namelen = 256;
     fs_stat->utime = 0;
 
@@ -744,7 +732,7 @@ dav_tidy_cache(void)
     if (debug) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "tidy: %i of %lli nodes changed", nchanged,
-               (long long int) fs_stat->files);
+               (long long int) fs_stat->n_nodes);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "cache-size: %llu MiBytes.",
                (unsigned long long int) (cache_size + 0x80000) / 0x100000);
     }
@@ -759,7 +747,7 @@ dav_tidy_cache(void)
         minimize_tree(root);
         if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-                    "minimize_tree: %llu nodes remaining", fs_stat->files);
+                    "minimize_tree: %llu nodes remaining", fs_stat->n_nodes);
     }
 
     static dav_node_list_item *item = NULL;
@@ -862,10 +850,9 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
         return 0;
     }
 
-    update_stat(node->size, 1);
     attr_from_cache_file(node);
     set_upload_time(node);
-    update_stat(node->size, -1);
+    fs_stat->utime = 0;
 
     if (delay_upload == 0 && (is_dirty(node) || is_created(node))
             && !is_open_write(node) && !is_backup(node)) {
@@ -1208,7 +1195,7 @@ dav_remove(dav_node *parent, const char *name, uid_t uid)
     if (ret)
         return ret;
 
-    update_stat(node->size, 1);
+    fs_stat->utime = 0;
     remove_from_tree(node);
     remove_from_changed(node);
     if (is_open(node)) {
@@ -1458,16 +1445,20 @@ dav_stat *
 dav_statfs(void)
 {
     if (time(NULL) > (fs_stat->utime + retry)) {
-        off64_t total = 0;
-        off64_t used = 0;
-        if (dav_quota(root->path, &total, &used) == 0) {
-            fs_stat->blocks = total / fs_stat->bsize;
-            fs_stat->bfree = fs_stat->blocks - (used / fs_stat->bsize) - 1;
-            fs_stat->bavail = fs_stat->bfree;
-            fs_stat->ffree = fs_stat->bfree;
+        uint64_t available = 0;
+        uint64_t used = 0;
+        if (dav_quota(root->path, &available, &used) == 0) {
+            fs_stat->bavail = available / fs_stat->bsize;
+            fs_stat->ffree = fs_stat->bavail / 4;
+            if (used > 0) {
+                fs_stat->blocks = fs_stat->bavail + (used / fs_stat->bsize);
+            } else {
+                fs_stat->blocks = fs_stat->bavail + (fs_stat->n_nodes * 4);
+            }
             fs_stat->utime = time(NULL);
         }
     }
+    fs_stat->files = fs_stat->ffree + fs_stat->n_nodes;
 
     return fs_stat;
 }
@@ -1708,7 +1699,7 @@ delete_node(dav_node *node)
         free(tofree);
     }
     free(node);
-    fs_stat->files--;
+    fs_stat->n_nodes--;
 }
 
 
@@ -1987,7 +1978,7 @@ new_node(dav_node *parent, mode_t mode)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "new node: %p->%p",
                node->parent, node);
-    fs_stat->files++;
+    fs_stat->n_nodes++;
     if (next_minimize == 0)
         next_minimize = node->atime + file_refresh;
 

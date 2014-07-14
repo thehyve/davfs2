@@ -37,6 +37,9 @@
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
 #endif
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
@@ -103,8 +106,8 @@ typedef struct {
 
 typedef struct {
     int error;
-    off64_t total;              /* Total amount of available bytes. */
-    off64_t used;               /* Used bytes. */
+    uint64_t available;          /* Amount of available bytes (quota - used. */
+    uint64_t used;               /* Used bytes. */
 } quota_context;
 
 
@@ -308,9 +311,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set);
 
 static void
 quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set);
-
-static int
-quota_reader(void *userdata, const char *block, size_t length);
 
 static int
 ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert);
@@ -1056,7 +1056,7 @@ dav_put(const char *path, const char *cache_path, int *exists, time_t *expire,
 
 
 int
-dav_quota(const char *path, off64_t *total, off64_t *used)
+dav_quota(const char *path, uint64_t *available, uint64_t *used)
 {
     int ret;
     if (!initialized) {
@@ -1065,14 +1065,13 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
     }
 
     static int use_rfc = 1;
-    static int use_userinfo = 1;
 
-    if (!use_rfc && !use_userinfo)
+    if (!use_rfc)
         return EIO;
 
     quota_context ctx;
     ctx.error = 0;
-    ctx.total = 0;
+    ctx.available = 0;
     ctx.used = 0;
     ret = EIO;
     char *spath = ne_path_escape(path);
@@ -1091,24 +1090,8 @@ dav_quota(const char *path, off64_t *total, off64_t *used)
         }
     }
 
-    if (ret && use_userinfo) {
-        ctx.error = 0;
-        ne_request *req = ne_request_create(session, "USERINFO", spath);
-        ne_add_response_body_reader(req, ne_accept_2xx, quota_reader, &ctx);
-        ret = ne_request_dispatch(req);
-        ret = get_error(ret, "USERINFO");
-        ne_request_destroy(req);
-
-        if (!ret) {
-            if (ctx.error)
-                ret = EIO;
-        } else if (ret != EAGAIN) {
-            use_userinfo = 0;
-        }
-    }
-
     if (!ret) {
-        *total = ctx.total;
+        *available = ctx.available;
         *used = ctx.used;
     }
 
@@ -1771,36 +1754,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 }
 
 
-static int
-quota_reader(void *userdata, const char *block, size_t length)
-{
-    if (length < 1) return 0;
-    quota_context *ctx = (quota_context *) userdata;
-
-    char *quota = strndup(block, length);
-    if (!quota) {
-        ctx->error = 1;
-        return 0;
-    }
-
-    char *number = strtok(quota, ",");
-    if (number) {
-        ctx->total = strtoull(number, NULL, 10);
-    } else {
-        ctx->error = 1;
-        free(quota);
-        return 0;
-    }
-
-    number = strtok(NULL, ",");
-    if (number)
-        ctx->used = strtoull(number, NULL, 10);
-
-    free(quota);
-    return 0;
-}
-
-
 /* Reads available and used bytes from set and stores them in
    userdata. */
 static void
@@ -1812,7 +1765,7 @@ quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
 
     const char *data = ne_propset_value(set, &quota_names[AVAILABLE]);
     if (data) {
-        ctx->total = strtoull(data, NULL, 10);
+        ctx->available = strtoull(data, NULL, 10);
     } else {
         const ne_status *st = ne_propset_status(set, &quota_names[AVAILABLE]);
         if (st && st->klass == 4) {
@@ -1826,8 +1779,6 @@ quota_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     data = ne_propset_value(set, &quota_names[USED]);
     if (data)
         ctx->used = strtoull(data, NULL, 10);
-
-    ctx->total += ctx->used;
 }
 
 

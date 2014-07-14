@@ -141,17 +141,14 @@ struct dav_node_item {
 /* Returned by dav_statfs(). */
 typedef struct dav_stat dav_stat;
 struct dav_stat {
-    off64_t     blocks;
-    off64_t     bfree;
-    off64_t     bavail;
-    off64_t     files;
-    off64_t     ffree;
+    uint64_t    blocks;
+    uint64_t    bavail;
+    uint64_t    files;
+    uint64_t    ffree;
+    uint64_t    n_nodes;
     off_t       bsize;
     off_t       namelen;
-    time_t      utime;      /* Time when last updated with data from the server.
-                               must When 0 this structure contains fake data,
-                               that not be changed when a file is changed or
-                               deleted. */
+    time_t      utime;
 };
 
 

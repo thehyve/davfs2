@@ -1063,19 +1063,10 @@ fuse_stat(void)
         return sizeof(struct fuse_out_header);
     }
 
-    int nblocks = (buf_size - sizeof(struct fuse_in_header)
-                     - sizeof(struct fuse_write_in) - 4095) / st->bsize;
-    if (nblocks > 1) {
-        out->st.blocks = st->blocks / nblocks;
-        out->st.bfree = st->bfree / nblocks;
-        out->st.bavail = st->bavail / nblocks;
-        out->st.bsize = st->bsize * nblocks;
-    } else {
-        out->st.blocks = st->blocks;
-        out->st.bfree = st->bfree;
-        out->st.bavail = st->bavail;
-        out->st.bsize = st->bsize;
-    }
+    out->st.blocks = st->blocks;
+    out->st.bfree = st->bavail;
+    out->st.bavail = st->bavail;
+    out->st.bsize = st->bsize;
     out->st.files = st->files;
     out->st.ffree = st->ffree;
     out->st.namelen = st->namelen;
@@ -1216,7 +1207,6 @@ set_attr(struct fuse_attr *attr, const dav_node *node)
     attr->uid = node->uid;
     attr->gid = node->gid;
     attr->rdev = 0;
-/* TODO: set blocksize */
-    attr->blksize = 0;
+    attr->blksize = buf_size - 1024;
     attr->padding = 0;
 }

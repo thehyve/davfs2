@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2014-06-22 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, webdav.h, kernel_interface.c,
+      mount_davfs.c, cache.c, cache.h:
+      Remove USERINFO, fix stat, remove update_stat.
+
 2014-06-20 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, cache.h, mount_davfs.c:
       Pass parameter got_sigterm by reference.
