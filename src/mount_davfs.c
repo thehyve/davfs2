@@ -42,6 +42,9 @@
 #endif
 #include <pwd.h>
 #include <signal.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>

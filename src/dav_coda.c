@@ -695,7 +695,7 @@ coda_statfs(void)
     }
 
     out->stat.f_blocks = st->blocks;
-    out->stat.f_bfree = st->bfree;
+    out->stat.f_bfree = st->bavail;
     out->stat.f_bavail = st->bavail;
     out->stat.f_files = st->files;
     out->stat.f_ffree = st->ffree;
