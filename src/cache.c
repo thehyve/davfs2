@@ -617,8 +617,8 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     fs_stat = (dav_stat *) malloc(sizeof(dav_stat));
     if (!fs_stat) abort();
 
-    fs_stat->blocks = 0x65B9AA;
-    fs_stat->bavail = 0x32DCD5;
+    fs_stat->blocks = 333333333;
+    fs_stat->bavail = 133333333;
     fs_stat->n_nodes = 0;
     fs_stat->ffree = fs_stat->bavail / 4;
     fs_stat->bsize = 4096;

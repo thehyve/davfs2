@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-08-09 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, dav_init_cache:
+      Increase faked free space.
+
 2014-07-16 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, webdav.h, dav_fuse.c, dav_coda.c,
       mount_davfs.c, cache.c, cache.h:
