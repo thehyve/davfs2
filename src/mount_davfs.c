@@ -326,6 +326,8 @@ main(int argc, char *argv[])
     time_t idle_time = args->delay_upload;
     if (!idle_time)
         idle_time = DAV_DELAY_UPLOAD;
+    if (idle_time > args->lock_refresh / 2)
+        idle_time = args->lock_refresh / 2;
     int debug = args->debug;
     delete_args(args);
     setsid();
