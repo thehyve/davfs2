@@ -225,6 +225,8 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
     reply = buf + sizeof(struct fuse_out_header);
 
     idle_time = args->delay_upload;
+    if (idle_time > args->lock_refresh / 2)
+        idle_time = args->lock_refresh / 2;
 
     char *path = xasprintf("%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME);
 

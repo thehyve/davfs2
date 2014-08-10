@@ -737,35 +737,33 @@ dav_tidy_cache(void)
                (unsigned long long int) (cache_size + 0x80000) / 0x100000);
     }
 
-    if (cache_size > max_cache_size)
-        resize_cache();
-
-    if (minimize_mem && next_minimize && time(NULL) > next_minimize) {
-        if (debug)
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "minimize_tree");
-        next_minimize = 0;
-        minimize_tree(root);
-        if (debug)
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-                    "minimize_tree: %llu nodes remaining", fs_stat->n_nodes);
-    }
-
     static dav_node_list_item *item = NULL;
 
     dav_node_list_item *next_item = changed;
-    while (next_item && next_item != item)
+    dav_node *node = NULL;
+    int found = 0;
+    while (next_item) {
+        node = next_item->node;
+        if (is_locked(node) && node->lock_expire < time(NULL) + lock_refresh)
+            dav_lock_refresh(node->path, &node->lock_expire);
+        if (next_item == item)
+            found = 1;
         next_item = next_item->next;
-    if (!next_item) {
-        item = changed;
-        if (!item)
-            return 0;
     }
-    next_item = item->next;
-    dav_node *node = item->node;
+    if (!found)
+        item = changed;
 
-    if ((is_dirty(node) || is_created(node)) && !is_open_write(node)
-            && !is_backup(node) && item->save_at
-            && item-> save_at <= time(NULL)) {
+    time_t save_at = 0;
+    if (item) {
+        node = item->node;
+        save_at = item->save_at;
+        item = item->next;
+    } else {
+        node = NULL;
+    }
+
+    if (node && (is_dirty(node) || is_created(node)) && !is_open_write(node)
+            && !is_backup(node) && save_at && save_at <= time(NULL)) {
         if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "tidy: %s", node->path);
         int ret = dav_put(node->path, node->cache_path, &node->remote_exists,
@@ -790,20 +788,27 @@ dav_tidy_cache(void)
                 remove_node(node);
             }
         }
-    } else if (is_locked(node) && !is_dirty(node) && !is_created(node)
+    } else if (node && is_locked(node) && !is_dirty(node) && !is_created(node)
             && !is_open_write(node)) {
         if (dav_unlock(node->path, &node->lock_expire) == 0)
             remove_from_changed(node);
-    } else if (is_locked(node)
-            && node->lock_expire < (time(NULL) + lock_refresh)) {
-        dav_lock_refresh(node->path, &node->lock_expire);
     }
 
-    item = next_item;
+    if (cache_size > max_cache_size)
+        resize_cache();
+
+    if (minimize_mem && next_minimize && time(NULL) > next_minimize) {
+        if (debug)
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "minimize_tree");
+        next_minimize = 0;
+        minimize_tree(root);
+        if (debug)
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+                    "minimize_tree: %llu nodes remaining", fs_stat->n_nodes);
+    }
+
     if (item)
         return 1;
-
-    item = changed;
     return 0;
 }
 
