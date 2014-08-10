@@ -1,5 +1,5 @@
 /*  cache.c: directory and file cache.
-    Copyright (C) 2006, 2007, 2008, 2009 Werner Baumann
+    Copyright (C) 2006, 2007, 2008, 2009, 2014 Werner Baumann
 
     This file is part of davfs2.
 
