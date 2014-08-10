@@ -1,5 +1,5 @@
 /*  dav_fuse.c: interface to the fuse kernel module FUSE_KERNEL_VERSION 7.
-    Copyright (C) 2006, 2007, 2008. 2009 Werner Baumann
+    Copyright (C) 2006, 2007, 2008. 2009, 2014 Werner Baumann
 
     This file is part of davfs2.
 
