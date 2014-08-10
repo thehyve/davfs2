@@ -883,6 +883,7 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
                 remove_node(node);
             }
         }
+        return ret;
     }
 
     return 0;
