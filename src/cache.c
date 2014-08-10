@@ -906,6 +906,7 @@ dav_close(dav_node *node, int fd, int flags, pid_t pid, pid_t pgid)
                 *flush = 1;
             }
         }
+        return ret;
     }
 
     return 0;
