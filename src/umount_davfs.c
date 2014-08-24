@@ -76,7 +76,7 @@ main(int argc, char *argv[])
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
 
-    char *short_options = "Vhflnrv";
+    char *short_options = "Vhflnrt:v";
     static const struct option options[] = {
         {"version", no_argument, NULL, 'V'},
         {"help", no_argument, NULL, 'h'},
@@ -111,6 +111,7 @@ main(int argc, char *argv[])
         case 'n':
         case 'r':
         case 'v':
+        case 't':
         case '?':
             break;
         default:

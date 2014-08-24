@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2014-08-24 Werner Baumann (werner.baumann@onlinehome.de)
+    * umount_davfs.c:
+      Add (and ignore) option t (sr #108638).
+
 2014-08-10 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c:
       Return error on close (sr #108597).
