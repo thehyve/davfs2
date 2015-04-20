@@ -552,8 +552,8 @@ msgid ""
 "program. It will allways be set to B<nosuid>."
 msgstr ""
 "In @PACKAGE@-Dateisystemen sind grundsätzlich keine s-Bits für den Besitzer "
-"und die Gruppe erlaubt. Die Option ist nur zwecks Kompatibilität mit B<mount>"
-"(8) vorhanden und wird immer auf B<nosuid> gesetzt."
+"und die Gruppe erlaubt. Die Option ist nur zwecks Kompatibilität mit "
+"B<mount>(8) vorhanden und wird immer auf B<nosuid> gesetzt."
 
 # type: TP
 #. type: TP

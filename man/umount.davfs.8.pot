@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-04-03 10:20+0300\n"
+"POT-Creation-Date: 2015-03-21 11:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,24 +35,24 @@ msgid "DESCRIPTION"
 msgstr ""
 
 #. type: SH
-#: davfs2.conf.5:504 mount.davfs.8:533 umount.davfs.8:79
+#: davfs2.conf.5:541 mount.davfs.8:547 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr ""
 
 #. type: SH
-#: davfs2.conf.5:510 mount.davfs.8:550 umount.davfs.8:84
+#: davfs2.conf.5:547 mount.davfs.8:564 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr ""
 
 #. type: Plain text
-#: davfs2.conf.5:513 mount.davfs.8:553 umount.davfs.8:87
+#: davfs2.conf.5:550 mount.davfs.8:567 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr ""
 
 #. type: SH
-#: davfs2.conf.5:515 mount.davfs.8:555 umount.davfs.8:89
+#: davfs2.conf.5:552 mount.davfs.8:569 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr ""
@@ -105,19 +105,19 @@ msgid "Print a help message."
 msgstr ""
 
 #. type: SH
-#: mount.davfs.8:362 umount.davfs.8:67
+#: mount.davfs.8:376 umount.davfs.8:67
 #, no-wrap
 msgid "FILES"
 msgstr ""
 
 #. type: TP
-#: mount.davfs.8:423 umount.davfs.8:69
+#: mount.davfs.8:437 umount.davfs.8:69
 #, no-wrap
 msgid "I<@SYS_RUN@>"
 msgstr ""
 
 #. type: SH
-#: mount.davfs.8:526 umount.davfs.8:74
+#: mount.davfs.8:540 umount.davfs.8:74
 #, no-wrap
 msgid "BUGS"
 msgstr ""
@@ -157,10 +157,10 @@ msgstr ""
 #. type: Plain text
 #: umount.davfs.8:26
 msgid ""
-"B<u@PROGRAM_NAME@> is a umount helper program. It is called by the B<umount>"
-"(8) command. Its purpose is to prevent the umount command from returning "
-"unless B<@PROGRAM_NAME@> has synchronized all its cached files with the "
-"webdav server."
+"B<u@PROGRAM_NAME@> is a umount helper program. It is called by the "
+"B<umount>(8) command. Its purpose is to prevent the umount command from "
+"returning unless B<@PROGRAM_NAME@> has synchronized all its cached files "
+"with the webdav server."
 msgstr ""
 
 #. type: Plain text

@@ -50,7 +50,7 @@ DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_GROUP=\"$(dav_group)\" \
        -D_FORTIFY_SOURCE=2 @DEFS@
 LIBS = $(NEON_LIBS) @LIBS@
-mount_davfs_LDADD = $(LIBINTL) $(LIBICONV) ../gl/libgnu.a
+mount_davfs_LDADD = $(LIBINTL) $(LIBICONV) $(LIBTHREAD) ../gl/libgnu.a
 umount_davfs_LDADD = $(LIBINTL) ../gl/libgnu.a
 
 install-exec-hook:

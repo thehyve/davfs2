@@ -1,5 +1,5 @@
 /*  cache.c: directory and file cache.
-    Copyright (C) 2006, 2007, 2008, 2009 Werner Baumann
+    Copyright (C) 2006, 2007, 2008, 2009, 2015 Werner Baumann
 
     This file is part of davfs2.
 
@@ -33,6 +33,7 @@
 #include <libintl.h>
 #endif
 #include <pwd.h>
+#include <stdalign.h>
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -571,11 +572,6 @@ static int
 xml_start_string(void *userdata, int parent, const char *nspace,
                  const char *name, const char **atts);
 
-/* Auxiliary. */
-
-static size_t
-test_alignment();
-
 
 /* Public functions */
 /*==================*/
@@ -587,7 +583,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Initializing cache");
 
-    alignment = test_alignment();
+    alignment = alignof(dav_node);
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Alignment of dav_node: %i",
                (int) alignment);
@@ -3618,40 +3614,5 @@ xml_start_string(void *userdata, int parent, const char *nspace,
         return -1;
 
     return ret;
-}
-
-
-/* Auxiliary. */
-
-/* Tries to evaluate the alignment of structure dav_node. It allocates
-   dav_node structures and random length strings alternatively and inspects the
-   address.
-   return value : the alignment (e.g. alignment = 4 means addresses
-                  are always multiples of 4 */
-static size_t
-test_alignment()
-{
-    srand(time(0));
-    size_t align = 64;
-    size_t trials = 100;
-    char *s[trials];
-    dav_node *n[trials];
-
-    size_t j = 0;
-    while (align > 0 && j < trials) {
-        s[j] = (char *) xmalloc((rand() / (RAND_MAX / 1024)) % (4 *align));
-        n[j] = (dav_node *) xmalloc(sizeof(dav_node));
-        while (align > 0 && ((size_t) n[j] % align) > 0)
-            align /= 2;
-        ++j;
-    }
-
-    for (j = 0; j < trials; j++) {
-        if (n[j])
-            free(n[j]);
-        if (s[j])
-            free(s[j]);
-    }
-    return align;
 }
 
