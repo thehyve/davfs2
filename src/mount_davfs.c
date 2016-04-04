@@ -315,7 +315,8 @@ main(int argc, char *argv[])
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Releasing root privileges");
     uid_t daemon_id = geteuid();
-    seteuid(0);
+    if (seteuid(0) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
     ret = setuid(daemon_id);
     if (ret) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
@@ -424,7 +425,8 @@ change_persona(dav_args *args)
     if (!grp)
         error(EXIT_FAILURE, errno, _("group %s does not exist"),
               args->dav_group);
-    seteuid(0);
+    if (seteuid(0) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
     if (setgid(grp->gr_gid) != 0)
         error(EXIT_FAILURE, errno, _("can't change group id"));
 
@@ -477,7 +479,8 @@ check_dirs(dav_args *args)
         if (asprintf(&utab_dir,"%s/%s", DAV_LOCALSTATE_DIR, DAV_UTAB_DIR) < 0)
             abort();
         if (stat(utab_dir, &st) != 0) {
-            seteuid(0);
+            if (seteuid(0) != 0)
+                error(EXIT_FAILURE, errno, _("can't change effective user id"));
             if (mkdir(utab_dir, S_IRWXU | S_IRGRP | S_IXGRP
                                         | S_IROTH | S_IXOTH) == 0) {
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  and %s/%s",
@@ -485,12 +488,14 @@ check_dirs(dav_args *args)
             } else {
                 error(0, errno, _("can't create directory %s"), utab_dir);
             }
-            seteuid(getuid());
+            if (seteuid(getuid()) != 0)
+                error(EXIT_FAILURE, errno, _("can't change effective user id"));
         }
         free(utab_dir);
     }
 
-    seteuid(0);
+    if (seteuid(0) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
     if (stat(DAV_SYS_RUN, &st) != 0) {
         if (mkdir(DAV_SYS_RUN, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_ISVTX)
                 != 0)
@@ -515,7 +520,8 @@ check_dirs(dav_args *args)
             error(EXIT_FAILURE, errno,
                   _("can't change group of directory %s"), DAV_SYS_RUN);
     }
-    seteuid(getuid());
+    if (seteuid(getuid()) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
 
     if (getuid() != 0) {
 
@@ -566,7 +572,8 @@ check_dirs(dav_args *args)
 
     if (strcmp(args->cache_dir, args->sys_cache) == 0) {
 
-        seteuid(0);
+        if (seteuid(0) != 0)
+            error(EXIT_FAILURE, errno, _("can't change effective user id"));
         if (stat(args->sys_cache, &st) != 0) {
             if (mkdir(args->sys_cache, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
@@ -593,7 +600,8 @@ check_dirs(dav_args *args)
                       _("can't change group of directory %s"),
                       args->sys_cache);
         }
-        seteuid(getuid());
+        if (seteuid(getuid()) != 0)
+            error(EXIT_FAILURE, errno, _("can't change effective user id"));
 
     } else {
 
@@ -837,9 +845,11 @@ static int
 do_mount(unsigned long int mopts, void *mdata)
 {
     uid_t orig = geteuid();
-    seteuid(0);
+    if (seteuid(0) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
     int ret = mount(url, mpoint, kernel_fs,  mopts, mdata);
-    seteuid(orig);
+    if (seteuid(orig) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
 
     if (ret) {
         error(0, errno, _("can't mount %s on %s"), url, mpoint);
@@ -1104,11 +1114,13 @@ parse_config(dav_args *args)
     }
     if (args->clicert) {
         struct stat st;
-        seteuid(0);
+        if (seteuid(0) != 0)
+            error(EXIT_FAILURE, errno, _("can't change effective user id"));
         if (stat(args->clicert, &st) < 0)
             error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
                   args->clicert);
-        seteuid(getuid());
+        if (seteuid(getuid()) != 0)
+            error(EXIT_FAILURE, errno, _("can't change effective user id"));
         if (st.st_uid != getuid() && st.st_uid != 0)
             error(EXIT_FAILURE, 0,
                   _("client certificate file %s has wrong owner"),
@@ -1151,9 +1163,11 @@ parse_config(dav_args *args)
 static void
 parse_secrets(dav_args *args)
 {
-    seteuid(0);
+    if (seteuid(0) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
     read_secrets(args, DAV_SYS_CONF_DIR "/" DAV_SECRETS);
-    seteuid(getuid());
+    if (seteuid(getuid()) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
 
     if (args->secrets) {
         read_secrets(args, args->secrets);
@@ -1325,7 +1339,8 @@ write_mtab_entry(const dav_args *args)
     sigprocmask(SIG_BLOCK, &newset, &oldset);
 
     uid_t orig = geteuid();
-    seteuid(0);
+    if (seteuid(0) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
 
     int ld = open(lock_file, O_RDONLY | O_CREAT,
                   S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
@@ -1361,7 +1376,8 @@ write_mtab_entry(const dav_args *args)
 
     close(ld);
     remove(lock_file);
-    seteuid(orig);
+    if (seteuid(orig) != 0)
+        error(EXIT_FAILURE, errno, _("can't change effective user id"));
 
     sigprocmask(SIG_SETMASK, &oldset, NULL);
     if (lock_file)
@@ -2002,16 +2018,31 @@ parse_line(char *line, int parmc, char *parmv[])
                     || *p == '\r' || *p == '\v') {
                 state = END;
             } else if (*p == '\"') {
-                state = PARM_QUO;
+                if (parm_no < parmc) {
+                    parmv[parm_no] = pos;
+                    state = PARM_QUO;
+                } else {
+                    return -1;
+                }
             } else if (*p == '\\') {
+                if (parm_no < parmc) {
+                    parmv[parm_no] = pos;
+                    state = PARM_ESC;
+                } else {
+                    return -1;
+                }
                 state = PARM_ESC;
             } else if (isspace(*p)) {
                 ;
             } else {
-                *pos++ = *p;
-                state = PARM;
+                if (parm_no < parmc) {
+                    parmv[parm_no] = pos;
+                    *pos++ = *p;
+                    state = PARM;
+                } else {
+                    return -1;
+                }
             }
-            if (parm_no >= parmc) return -1;
             break;
         case SPACE_EXP:
             if (*p == ' ' || *p == '\t') {
@@ -2030,7 +2061,7 @@ parse_line(char *line, int parmc, char *parmv[])
                 state = PARM_ESC;
             } else if (*p == ' ' || *p == '\t') {
                 *pos++ = '\0';
-                parmv[++parm_no] = pos;
+                parm_no++;
                 state = SPACE;
             } else if (isspace(*p) || *p == '\0' || *p == '#') {
                 *pos = '\0';
@@ -2054,7 +2085,7 @@ parse_line(char *line, int parmc, char *parmv[])
                 state = PARM_QUO_ESC;
             } else if (*p == '\"') {
                 *pos++ = '\0';
-                parmv[++parm_no] = pos;
+                parm_no++;
                 state = SPACE_EXP;
             } else if (*p == '\0' || *p == '\f' || *p == '\n'
                        || *p == '\r' || *p == '\v') {
