@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2016-04-04 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, parse_line:
+      Fix stack smashing error.
+
 2015-04-20 Werner Baumann (werner.baumann@onlinehome.de)
     * Add gnulib module alignof
       cache.c:

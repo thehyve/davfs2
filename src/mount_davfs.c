@@ -1903,16 +1903,31 @@ parse_line(char *line, int parmc, char *parmv[])
                     || *p == '\r' || *p == '\v') {
                 state = END;
             } else if (*p == '\"') {
-                state = PARM_QUO;
+                if (parm_no < parmc) {
+                    parmv[parm_no] = pos;
+                    state = PARM_QUO;
+                } else {
+                    return -1;
+                }
             } else if (*p == '\\') {
+                if (parm_no < parmc) {
+                    parmv[parm_no] = pos;
+                    state = PARM_ESC;
+                } else {
+                    return -1;
+                }
                 state = PARM_ESC;
             } else if (isspace(*p)) {
                 ;
             } else {
-                *pos++ = *p;
-                state = PARM;
+                if (parm_no < parmc) {
+                    parmv[parm_no] = pos;
+                    *pos++ = *p;
+                    state = PARM;
+                } else {
+                    return -1;
+                }
             }
-            if (parm_no >= parmc) return -1;
             break;
         case SPACE_EXP:
             if (*p == ' ' || *p == '\t') {
@@ -1931,7 +1946,7 @@ parse_line(char *line, int parmc, char *parmv[])
                 state = PARM_ESC;
             } else if (*p == ' ' || *p == '\t') {
                 *pos++ = '\0';
-                parmv[++parm_no] = pos;
+                parm_no++;
                 state = SPACE;
             } else if (isspace(*p) || *p == '\0' || *p == '#') {
                 *pos = '\0';
@@ -1955,7 +1970,7 @@ parse_line(char *line, int parmc, char *parmv[])
                 state = PARM_QUO_ESC;
             } else if (*p == '\"') {
                 *pos++ = '\0';
-                parmv[++parm_no] = pos;
+                parm_no++;
                 state = SPACE_EXP;
             } else if (*p == '\0' || *p == '\f' || *p == '\n'
                        || *p == '\r' || *p == '\v') {
