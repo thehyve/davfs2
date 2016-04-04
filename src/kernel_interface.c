@@ -652,7 +652,7 @@ fuse_getattr(void)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  u=%u g=%u p=%u",
                ih->uid, ih->gid, ih->pid);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  f=0x%x fh=%llu",
-               in->getattr_flags, in->fh);
+               in->getattr_flags, (unsigned long long int) in->fh);
     }
 
     oh->error = dav_getattr((dav_node *) ((size_t) ih->nodeid), ih->uid);

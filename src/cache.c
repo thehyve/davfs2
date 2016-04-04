@@ -800,7 +800,8 @@ dav_tidy_cache(void)
         minimize_tree(root);
         if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-                    "minimize_tree: %llu nodes remaining", fs_stat->n_nodes);
+                    "minimize_tree: %llu nodes remaining",
+                    (unsigned long long int) fs_stat->n_nodes);
     }
 
     if (item)
