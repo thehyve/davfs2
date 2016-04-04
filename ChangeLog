@@ -1,6 +1,17 @@
 ChangeLog for davfs2
 --------------------
 
+2016-04-04 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, parse_line:
+      Fix stack smashing error (Debian bug #812456).
+    * mount_davfs.c, kernel_interface.c, webdav.c:
+      Check result of seteuid.
+    * cache.c, dav_tidy_cache:
+      Fix format parameter.  
+
+2014-08-23 Werner Baumann (werner.baumann@onlinehome.de)
+    * Release version 1.5.2
+
 2014-08-23 Werner Baumann (werner.baumann@onlinehome.de)
     * umount_davfs.c:
       Add (and ignore) option t (sr #108638).
