@@ -437,9 +437,11 @@ dav_init_webdav(const dav_args *args)
                     = ne_ssl_clicert_read(args->clicert);
             if (!client_cert) {
                 uid_t orig = geteuid();
-                seteuid(0);
+                if (seteuid(0) != 0)
+                    error(EXIT_FAILURE, errno, _("can't change effective user id"));
                 client_cert = ne_ssl_clicert_read(args->clicert);
-                seteuid(orig);
+                if (seteuid(orig) != 0)
+                    error(EXIT_FAILURE, errno, _("can't change effective user id"));
             }
             if (!client_cert)
                 error(EXIT_FAILURE, 0, _("can't read client certificate %s"),

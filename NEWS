@@ -4,6 +4,14 @@
 # permitted in any medium without royalty.
 
 
+
+What is new in davfs2 1.5.2
+===========================
+
+Fixes a problem when unmounting, caused by an backward incompatible
+change of util-linux.
+
+
 What is new in davfs2 1.5.1
 ===========================
 

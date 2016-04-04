@@ -33,7 +33,7 @@ mount_davfs_SOURCES = cache.c dav_coda.c \
 umount_davfs_SOURCES = umount_davfs.c defaults.h
 
 AM_CFLAGS = -Wall -Werror=format-security \
-        -fstack-protector --param=ssp-buffer-size=4
+        -fstack-protector-all --param=ssp-buffer-size=4
 DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_SYS_CONF_DIR=\"$(pkgsysconfdir)\" \
        -DDAV_LOCALSTATE_DIR=\"$(dav_localstatedir)\" \
