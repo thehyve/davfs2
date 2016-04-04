@@ -99,7 +99,8 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
                           const char *mpoint, const dav_args *args)
 {
     uid_t orig = geteuid();
-    seteuid(0);
+    if (seteuid(0) != 0)
+        error(EXIT_FAILURE, 0, _("can't change effective user id"));
 
     if (!*kernel_fs)
         *kernel_fs = strdup("fuse");
@@ -146,7 +147,8 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
         error(EXIT_FAILURE, 0, _("unknown kernel file system %s"), *kernel_fs);
     }
 
-    seteuid(orig);
+    if (seteuid(orig) != 0)
+        error(EXIT_FAILURE, 0, _("can't change effective user id"));
     return mounted;
 }
 

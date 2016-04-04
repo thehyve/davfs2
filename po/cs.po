@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2014-08-10 18:37+0200\n"
+"POT-Creation-Date: 2014-08-23 20:17+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -382,11 +382,11 @@ msgstr ""
 "Program je poskytován BEZ JAKÉKOLIV záruky, včetně záruky PRODEJNOSTI či "
 "VHODNOSTI K URČITÉMU ÚČELU.\n"
 
-#: src/mount_davfs.c:940 src/umount_davfs.c:113
+#: src/mount_davfs.c:940 src/umount_davfs.c:114
 msgid "unknown error parsing arguments"
 msgstr "neznámá chyba při zpracování argumentů"
 
-#: src/mount_davfs.c:949 src/umount_davfs.c:119
+#: src/mount_davfs.c:949 src/umount_davfs.c:120
 msgid "missing argument"
 msgstr "chybějící argument"
 
@@ -395,7 +395,7 @@ msgstr "chybějící argument"
 msgid "can't evaluate path of mount point %s"
 msgstr "nemohu vyhodnotit cestu k přípojnému bodu %s"
 
-#: src/mount_davfs.c:965 src/umount_davfs.c:121
+#: src/mount_davfs.c:965 src/umount_davfs.c:122
 msgid "too many arguments"
 msgstr "příliš mnoho argumentů"
 
@@ -683,7 +683,7 @@ msgstr ""
 "    umount <mountpoint> : odpojit zdroj WebDAV tak, jak je určeno\n"
 "                          v /etc/fstab.\n"
 
-#: src/umount_davfs.c:131
+#: src/umount_davfs.c:132
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -696,7 +696,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:154
+#: src/umount_davfs.c:155
 #, c-format
 msgid ""
 "\n"
@@ -709,7 +709,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:166
+#: src/umount_davfs.c:167
 #, c-format
 msgid ""
 "\n"
@@ -722,7 +722,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až  %s skončí"
 
-#: src/umount_davfs.c:182
+#: src/umount_davfs.c:183
 #, c-format
 msgid ""
 "\n"
@@ -735,12 +735,12 @@ msgstr ""
 "  přesto se pokouším odpojit.\n"
 "  pravděpodobně budete muset odstranit %s ručně"
 
-#: src/umount_davfs.c:193
+#: src/umount_davfs.c:194
 #, c-format
 msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
 msgstr "%s: čekám, než si  %s (pid %s) sesynchronizuje vyrovnávací paměť."
 
-#: src/umount_davfs.c:206
+#: src/umount_davfs.c:207
 #, c-format
 msgid "an error occured while waiting; please wait for %s to terminate"
 msgstr "při čekání došlo k chybě; čekejte prosím až %s skončí"
