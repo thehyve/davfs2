@@ -1,13 +1,18 @@
 ChangeLog for davfs2
 --------------------
 
+2016-04-05 Werner Baumann (werner.baumann@onlinehome.de)
+    * Release version 1.5.3
+
 2016-04-04 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, parse_line:
       Fix stack smashing error (Debian bug #812456).
     * mount_davfs.c, kernel_interface.c, webdav.c:
       Check result of seteuid.
     * cache.c, dav_tidy_cache:
-      Fix format parameter.  
+      Fix format parameter.
+    * src/Makefile.am:
+      Use compiler flag -fstack-protector-all.
 
 2014-08-23 Werner Baumann (werner.baumann@onlinehome.de)
     * Release version 1.5.2
