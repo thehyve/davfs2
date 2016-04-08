@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2016-04-08 Werner Baumann (werner.baumann@onlinehome.de)
+    * dav_fuse.c, dav_fuse_loop:
+      Remove useless call of is_mounted.
+
 2016-04-05 Werner Baumann (werner.baumann@onlinehome.de)
     * Release version 1.5.3
 
