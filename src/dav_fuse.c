@@ -197,8 +197,6 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
                 break;
             }
         } else if (ret == 0) {
-            if (!is_mounted())
-                break;
             if (dav_tidy_cache() == 0) {
                 tv.tv_sec = idle_time;
                 last_tidy_cache = time(NULL);
