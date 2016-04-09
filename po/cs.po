@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2016-04-05 12:53+0200\n"
+"POT-Creation-Date: 2016-04-08 20:57+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -130,9 +130,14 @@ msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
 "otevřené soubory přesahují limit velikosti vyrovnávací paměti o %llu MiB"
 
-#: src/dav_coda.c:167 src/dav_fuse.c:162
+#: src/dav_coda.c:167 src/dav_fuse.c:164
 msgid "can't allocate message buffer"
 msgstr "nemohu alokovat buffer pro zprávu"
+
+#: src/dav_fuse.c:185 src/mount_davfs.c:375
+#, c-format
+msgid "unmounting %s"
+msgstr "odpojuji %s"
 
 #: src/kernel_interface.c:103 src/kernel_interface.c:151 src/mount_davfs.c:235
 #: src/mount_davfs.c:319 src/mount_davfs.c:429 src/mount_davfs.c:439
@@ -217,11 +222,6 @@ msgstr ""
 #, c-format
 msgid "can't write pid file %s"
 msgstr "nemohu zapsat pid souboru %s"
-
-#: src/mount_davfs.c:375
-#, c-format
-msgid "unmounting %s"
-msgstr "odpojuji %s"
 
 #: src/mount_davfs.c:377
 msgid "unmounting failed"

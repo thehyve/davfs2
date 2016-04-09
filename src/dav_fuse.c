@@ -147,11 +147,13 @@ set_attr(struct fuse_attr *attr, const dav_node *node);
 /*==================*/
 
 void
-dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
+dav_fuse_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
               dav_is_mounted_fn is_mounted, volatile int *keep_on_running,
               int dbg)
 {
     debug = dbg;
+    char *mountpoint = mpoint;
+    int unmounting = 0;
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "fuse kernel version 7");
 
@@ -170,7 +172,7 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
     tv.tv_usec = 0;
     time_t last_tidy_cache = time(NULL);
 
-    while (*keep_on_running) {
+    while (1) {
 
         fd_set fds;
         FD_ZERO(&fds);
@@ -178,6 +180,17 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
         int ret = select(device + 1, &fds, NULL, NULL, &tv);
         if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "SELECT: %i", ret);
+
+        if (!*keep_on_running && !unmounting) {
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"),
+                   mountpoint);
+            unmounting = 1;
+            pid_t pid = fork();
+            if (pid == 0) {
+                execl("/bin/umount", "umount", "-il", mountpoint, NULL);
+                _exit(EXIT_FAILURE);
+            }
+        }
 
         if (ret > 0) {
             ssize_t bytes_read = read(device, buf, buf_size);
@@ -205,6 +218,8 @@ dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
             }
             continue;
         } else {
+            if (errno == EINTR)
+                continue;
             break;
         }
 

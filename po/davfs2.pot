@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.5.3\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2016-04-05 12:53+0200\n"
+"POT-Creation-Date: 2016-04-08 20:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,8 +124,13 @@ msgstr ""
 msgid "open files exceed max cache size by %llu MiBytes"
 msgstr ""
 
-#: src/dav_coda.c:167 src/dav_fuse.c:162
+#: src/dav_coda.c:167 src/dav_fuse.c:164
 msgid "can't allocate message buffer"
+msgstr ""
+
+#: src/dav_fuse.c:185 src/mount_davfs.c:375
+#, c-format
+msgid "unmounting %s"
 msgstr ""
 
 #: src/kernel_interface.c:103 src/kernel_interface.c:151 src/mount_davfs.c:235
@@ -208,11 +213,6 @@ msgstr ""
 #: src/mount_davfs.c:357
 #, c-format
 msgid "can't write pid file %s"
-msgstr ""
-
-#: src/mount_davfs.c:375
-#, c-format
-msgid "unmounting %s"
 msgstr ""
 
 #: src/mount_davfs.c:377
