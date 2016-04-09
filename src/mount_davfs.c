@@ -363,12 +363,8 @@ main(int argc, char *argv[])
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Closing");
     dav_close_cache(&got_sigterm);
     dav_close_webdav();
-    if (dav_is_mounted()) {
-        char *prog = xasprintf("/bin/umount -il %s", mpoint);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"), mpoint);
-        if (system(prog) != 0 && dav_is_mounted())
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting failed"));
-    }
+    if (dav_is_mounted())
+        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting failed"));
     if (debug)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Removing %s", pidfile);
     remove(pidfile);

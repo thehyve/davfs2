@@ -117,6 +117,9 @@ struct create_out {
 /* File descriptor of the fuse device. */
 static int fuse_device;
 
+/* The mountpoint. */
+const char *mountpoint;
+
 /* Buffer used for communication with the kernel module (in and out). */
 static size_t buf_size;
 static char *buf;
@@ -212,6 +215,8 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                            "Initializing kernel interface");
 
+    mountpoint = mpoint;
+
     buf_size = args->buf_size * 1024;
     if (buf_size < (FUSE_MIN_READ_BUFFER + 1024))
         buf_size = FUSE_MIN_READ_BUFFER + 1024;
@@ -280,12 +285,14 @@ dav_run_msgloop(volatile int *keep_on_running)
 {
     dav_register_kernel_interface(&write_dir_entry);
 
+    int unmounting = 0;
+
     struct timeval tv;
     tv.tv_sec = idle_time;
     tv.tv_usec = 0;
     time_t last_tidy_cache = time(NULL);
 
-    while (*keep_on_running) {
+    while (1) {
 
         fd_set fds;
         FD_ZERO(&fds);
@@ -293,6 +300,17 @@ dav_run_msgloop(volatile int *keep_on_running)
         int ret = select(fuse_device + 1, &fds, NULL, NULL, &tv);
         if (debug)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "SELECT: %i", ret);
+
+        if (!*keep_on_running && !unmounting) {
+            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"),
+                   mountpoint);
+            unmounting = 1;
+            pid_t pid = fork();
+            if (pid == 0) {
+                execl("/bin/umount", "umount", "-il", mountpoint, NULL);
+                _exit(EXIT_FAILURE);
+            }
+        }
 
         if (ret > 0) {
             ssize_t bytes_read = read(fuse_device, buf, buf_size);
@@ -322,6 +340,8 @@ dav_run_msgloop(volatile int *keep_on_running)
             }
             continue;
         } else {
+            if (errno == EINTR)
+                continue;
             break;
         }
 

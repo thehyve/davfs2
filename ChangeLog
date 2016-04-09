@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2016-04-09 Werner Baumann (werner.baumann@onlinehome.de)
+    * kernel_interface.c, mount_davfs.c:
+      Unmount while dav_run_msgloop is still running.
+
 2016-04-04 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, kernel_interface.c:
       Fix compiler warnings.
