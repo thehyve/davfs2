@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.4.6\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2016-04-05 12:53+0200\n"
+"POT-Creation-Date: 2016-04-08 20:57+0200\n"
 "PO-Revision-Date: 2014-04-19 21:32+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
@@ -134,9 +134,14 @@ msgstr ""
 "Die Größe der offenen Dateien überschreitet die maximale Größe des Cache um "
 "%llu MiBytes"
 
-#: src/dav_coda.c:167 src/dav_fuse.c:162
+#: src/dav_coda.c:167 src/dav_fuse.c:164
 msgid "can't allocate message buffer"
 msgstr "kein Speicher für den Nachrichtenpuffer verfügbar"
+
+#: src/dav_fuse.c:185 src/mount_davfs.c:375
+#, c-format
+msgid "unmounting %s"
+msgstr "hänge %s aus"
 
 #: src/kernel_interface.c:103 src/kernel_interface.c:151 src/mount_davfs.c:235
 #: src/mount_davfs.c:319 src/mount_davfs.c:429 src/mount_davfs.c:439
@@ -220,11 +225,6 @@ msgstr "kann das Terminal nicht freigeben"
 #, c-format
 msgid "can't write pid file %s"
 msgstr "kann die PID-Datei %s nicht schreiben"
-
-#: src/mount_davfs.c:375
-#, c-format
-msgid "unmounting %s"
-msgstr "hänge %s aus"
 
 #: src/mount_davfs.c:377
 msgid "unmounting failed"

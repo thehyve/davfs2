@@ -153,9 +153,9 @@ set_attr(struct coda_vattr *attr, const dav_node *node);
 /*==================*/
 
 void
-dav_coda_loop(int device, size_t bufsize, time_t idle_time,
-              dav_is_mounted_fn is_mounted, volatile int *keep_on_running,
-              int dbg)
+dav_coda_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
+                   dav_is_mounted_fn is_mounted,
+                   volatile int *keep_on_running, int dbg)
 {
     debug = dbg;
     if (debug)

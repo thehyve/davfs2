@@ -34,13 +34,15 @@ typedef int (*dav_is_mounted_fn)(void);
 /* Typedef of the message loop of the specific kernel interfaces. The real
    function will be returned by dav_init_kernel_interface().
    device          : File descriptor of the open fuse device.
+   mpoint          : String with the name of the mount point.
    buf_size        : Size of the buffer for communication with the kernel
                      module.
    idle_t          : Time to wait for upcalls before calling dav_tidy_cache().
-   is_mounted_fn   : Call back function to check of still mounted.
+   is_mounted_fn   : Call back function to check if still mounted.
    keep_on_running : Pointer to run flag.
    dbg             : send debug messages to syslog if dbg != 0 */
-typedef void (*dav_run_msgloop_fn)(int device, size_t bufsize, time_t idle_time,
+typedef void (*dav_run_msgloop_fn)(int device, char *mpoint, size_t bufsize,
+                                   time_t idle_time,
                                    dav_is_mounted_fn is_mounted,
                                    volatile int *keep_on_running, int dbg);
 
@@ -80,7 +82,7 @@ dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
 
 /* Message loop for coda kernel module CODA_KERNEL_VERSION 3.
    Parameters see dav_run_msgloop_fn(). */
-void dav_coda_loop(int device, size_t bufsize, time_t idle_time,
+void dav_coda_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
                    dav_is_mounted_fn is_mounted,
                    volatile int *keep_on_running, int dbg);
 
@@ -88,7 +90,7 @@ void dav_coda_loop(int device, size_t bufsize, time_t idle_time,
 /* Message loop for fuse kernel module with major number 7.
    Parameters see dav_run_msgloop_fn(). */
 void
-dav_fuse_loop(int device, size_t bufsize, time_t idle_time,
+dav_fuse_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
               dav_is_mounted_fn is_mounted, volatile int *keep_on_running,
               int dbg);
 

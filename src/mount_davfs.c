@@ -362,15 +362,15 @@ main(int argc, char *argv[])
     if (!ret) {
         if (debug & DAV_DBG_CONFIG)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Starting message loop");
-        run_msgloop(dev, buf_size, idle_time, is_mounted, &keep_on_running,
-                    debug & DAV_DBG_KERNEL);
+        run_msgloop(dev, mpoint, buf_size, idle_time, is_mounted,
+                    &keep_on_running, debug & DAV_DBG_KERNEL);
     }
 
     if (debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Closing");
     dav_close_cache(&got_sigterm);
     dav_close_webdav();
-    if (is_mounted()) {
+    if (is_mounted() && strcmp(kernel_fs, "coda") == 0) {
         char *prog = ne_concat("/bin/umount -il ", mpoint, NULL);
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"), mpoint);
         if (system(prog) != 0 && is_mounted())
