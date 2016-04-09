@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2016-04-09 Werner Baumann (werner.baumann@onlinehome.de)
+    * kernel_interface.c:
+      Remove useless call of is_mounted.
+
+2016-04-09 Werner Baumann (werner.baumann@onlinehome.de)
     * kernel_interface.c, mount_davfs.c:
       Unmount while dav_run_msgloop is still running.
 

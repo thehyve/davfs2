@@ -330,8 +330,6 @@ dav_run_msgloop(volatile int *keep_on_running)
                 break;
             }
         } else if (ret == 0) {
-            if (!dav_is_mounted())
-                break;
             if (dav_tidy_cache() == 0) {
                 tv.tv_sec = idle_time;
                 last_tidy_cache = time(NULL);
