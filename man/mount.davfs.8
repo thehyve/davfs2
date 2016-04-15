@@ -1,8 +1,8 @@
-.TH @PROGRAM_NAME@ 8 "2014\-03\-09" @PACKAGE_STRING@
+.TH @PROGRAM_NAME@ 8 "2016\-04\-15" @PACKAGE_STRING@
 
 .SH NAME
 
-@PROGRAM_NAME@ \- Mount a WebDAV resource in a directory
+@PROGRAM_NAME@ \- Mount a WebDAV resource as @PACKAGE@ file system
 
 
 .SH SYNOPSIS
@@ -141,7 +141,7 @@ When this option is set a newly created file will take the group id
 of the directory in which it is created. This will also apply to all files
 that are on the server and not in the local cache. (That is because the
 group id is not stored on the server.)
-.TP
+.br
 If the group id of the directory is \fIroot\fP this option is ignored.
 .br
 Default: \fBnogrpid\fR.
@@ -286,6 +286,10 @@ On \fIcommand line\fP you must obey the escaping rules of the shell.
 \fB@PROGRAM_NAME@\fR tries to reduce HTTP\-traffic by caching and reusing data.
 Information about directories and files are held in memory, while downloaded
 files are cached on disk.
+
+.PP
+\fB@PROGRAM_NAME@\fR needs to hold a local copy of all open files in the
+cache directory. Please make sure that enough local disk space is available.
 
 .PP
 \fB@PROGRAM_NAME@\fR will consider cached information about directories and file
