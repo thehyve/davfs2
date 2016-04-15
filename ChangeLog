@@ -2,6 +2,10 @@ ChangeLog for davfs2
 --------------------
 
 2016-04-08 Werner Baumann (werner.baumann@onlinehome.de)
+    * README, mount.davfs.8:
+      Add information about required local cache space.
+
+2016-04-08 Werner Baumann (werner.baumann@onlinehome.de)
     * dav_fuse.c, dac_coda.c, kernel_interface.h, mount_davfs.c:
       For kernel_fs fuse: when getting SIGTERM unmount
       while dav_fuse_loop still is running.
