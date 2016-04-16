@@ -2,6 +2,9 @@ ChangeLog for davfs2
 --------------------
 
 2016-04-16 Werner Baumann (werner.baumann@onlinehome.de)
+      Release version 1.5.4
+
+2016-04-16 Werner Baumann (werner.baumann@onlinehome.de)
     * src/Makefile.am:
       Use --fstack-protector-strong.
 
