@@ -1,7 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
-2016-04-08 Werner Baumann (werner.baumann@onlinehome.de)
+2016-04-16 Werner Baumann (werner.baumann@onlinehome.de)
+    * src/Makefile.am:
+      Use --fstack-protector-strong.
+
+2016-04-15 Werner Baumann (werner.baumann@onlinehome.de)
     * README, mount.davfs.8:
       Add information about required local cache space.
 
