@@ -17,7 +17,7 @@ precedence over the system wide configuration.
 
 .PP
 The configuration file consists of lines where each line contains a keyword
-value pair. Keyword and value are seperated by spaces and/or tabs.
+value pair. Keyword and value are separated by spaces and/or tabs.
 
 .PP
 The file may contain sections that are for one specific mount point only.
@@ -107,7 +107,7 @@ Default: @GROUP@
 .TP
 .B buf_size
 Size in KiByte of the buffer used to communicate with the kernel file system.
-Only usefull with \fIfuse\fP, where read and write operations may profit
+Only useful with \fIfuse\fP, where read and write operations may profit
 from a larger buffer.
 .br
 Default: 16
@@ -130,7 +130,7 @@ Default: 1
 .B proxy
 Name of the proxy. The name must be the fully qualified domain name
 (no scheme). If the proxy port differs from the default of 8080, it
-must be appended, seperated by a colon. Examples: \fIfoo.bar:1704\fP or
+must be appended, separated by a colon. Examples: \fIfoo.bar:1704\fP or
 \fIfoo.bar\fP
 .br
 \fBOnly allowed in the system wide configuration file.\fR
@@ -161,7 +161,7 @@ given as absolute path or as file name only. In the latter case the
 directories \fI~/.@PACKAGE@/@CERTS_DIR@\fP and
 \fI@SYS_CONF_DIR@/@CERTS_DIR@\fP will be searched.
 .br
-Usefull when the server's certificate can't be verified or is even invalid,
+Useful when the server's certificate can't be verified or is even invalid,
 but \fByou know\fR that you can trust this certificate.
 When the server presents a certificate that is exactly equal to this one
 and when the server is able to authenticate against the public key contained
@@ -189,7 +189,7 @@ path. The file must be read and writable by the owner only (mode 600).
 Default: ~/.@PACKAGE@/@SECRETSFILE@
 .br
 \fBOnly allowed in the user configuration file.\fR The system wide
-secrets file is allways \fI@SYS_CONF_DIR@/@SECRETSFILE@\fP.
+secrets file is always \fI@SYS_CONF_DIR@/@SECRETSFILE@\fP.
 
 .TP
 .B ask_auth
@@ -209,7 +209,7 @@ Default: 1
 .B lock_owner
 A string send to the server to identify the owner of a lock. If a WebDAV
 resource is used at the same time by different clients using the same
-credentials, different values for lock_owner should be choosen.
+credentials, different values for lock_owner should be chosen.
 .br
 Default: the username from the credentials
 
@@ -437,7 +437,7 @@ Default: 60
 .B file_refresh
 When a file or directory is opened by an application, \fB@PROGRAM_NAME@\fR
 will first check the server for a newer version. But some applications do
-open calls on the same file in short sequence. To avoid unecessary traffic
+open calls on the same file in short sequence. To avoid unnecessary traffic
 \fB@PROGRAM_NAME@\fR will wait that many seconds before it send a new request
 for the same information.
 .br

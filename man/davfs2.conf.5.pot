@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2014-06-09 20:29+0300\n"
+"POT-Creation-Date: 2016-05-16 11:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,7 +66,7 @@ msgstr ""
 #: davfs2.conf.5:21
 msgid ""
 "The configuration file consists of lines where each line contains a keyword "
-"value pair. Keyword and value are seperated by spaces and/or tabs."
+"value pair. Keyword and value are separated by spaces and/or tabs."
 msgstr ""
 
 #. type: Plain text
@@ -245,7 +245,7 @@ msgstr ""
 #: davfs2.conf.5:112
 msgid ""
 "Size in KiByte of the buffer used to communicate with the kernel file "
-"system.  Only usefull with I<fuse>, where read and write operations may "
+"system.  Only useful with I<fuse>, where read and write operations may "
 "profit from a larger buffer."
 msgstr ""
 
@@ -291,7 +291,7 @@ msgstr ""
 msgid ""
 "Name of the proxy. The name must be the fully qualified domain name (no "
 "scheme). If the proxy port differs from the default of 8080, it must be "
-"appended, seperated by a colon. Examples: I<foo.bar:1704> or I<foo.bar>"
+"appended, separated by a colon. Examples: I<foo.bar:1704> or I<foo.bar>"
 msgstr ""
 
 #. type: TP
@@ -337,7 +337,7 @@ msgstr ""
 #. type: Plain text
 #: davfs2.conf.5:169
 msgid ""
-"Usefull when the server's certificate can't be verified or is even invalid, "
+"Useful when the server's certificate can't be verified or is even invalid, "
 "but B<you know> that you can trust this certificate.  When the server "
 "presents a certificate that is exactly equal to this one and when the server "
 "is able to authenticate against the public key contained in this certificate "
@@ -395,7 +395,7 @@ msgstr ""
 #: davfs2.conf.5:193
 msgid ""
 "B<Only allowed in the user configuration file.> The system wide secrets file "
-"is allways I<@SYS_CONF_DIR@/@SECRETSFILE@>."
+"is always I<@SYS_CONF_DIR@/@SECRETSFILE@>."
 msgstr ""
 
 #. type: TP
@@ -436,7 +436,7 @@ msgstr ""
 msgid ""
 "A string send to the server to identify the owner of a lock. If a WebDAV "
 "resource is used at the same time by different clients using the same "
-"credentials, different values for lock_owner should be choosen."
+"credentials, different values for lock_owner should be chosen."
 msgstr ""
 
 #. type: Plain text
@@ -904,7 +904,7 @@ msgstr ""
 msgid ""
 "When a file or directory is opened by an application, B<@PROGRAM_NAME@> will "
 "first check the server for a newer version. But some applications do open "
-"calls on the same file in short sequence. To avoid unecessary traffic "
+"calls on the same file in short sequence. To avoid unnecessary traffic "
 "B<@PROGRAM_NAME@> will wait that many seconds before it send a new request "
 "for the same information."
 msgstr ""
@@ -1133,7 +1133,7 @@ msgid "Includes config, kernel, cache and http."
 msgstr ""
 
 #. type: SH
-#: davfs2.conf.5:541 mount.davfs.8:547 umount.davfs.8:79
+#: davfs2.conf.5:541 mount.davfs.8:551 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr ""
@@ -1146,18 +1146,18 @@ msgid ""
 msgstr ""
 
 #. type: SH
-#: davfs2.conf.5:547 mount.davfs.8:564 umount.davfs.8:84
+#: davfs2.conf.5:547 mount.davfs.8:568 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr ""
 
 #. type: Plain text
-#: davfs2.conf.5:550 mount.davfs.8:567 umount.davfs.8:87
+#: davfs2.conf.5:550 mount.davfs.8:571 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr ""
 
 #. type: SH
-#: davfs2.conf.5:552 mount.davfs.8:569 umount.davfs.8:89
+#: davfs2.conf.5:552 mount.davfs.8:573 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr ""

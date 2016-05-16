@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2016-05-16 Werner Baumann (werner.baumann@onlinehome.de)
+    * Fix some spelling errors.
+
 2016-04-08 Werner Baumann (werner.baumann@onlinehome.de)
     * README, mount.davfs.8:
       Add information about required local cache space.

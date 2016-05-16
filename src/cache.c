@@ -930,7 +930,7 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     if (ret == EEXIST)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                _("File %s exists on the server but should not. "
-                 "Maybe it is an error in the server's LOCK impementation. "
+                 "Maybe it is an error in the server's LOCK implementation. "
                  "You may try option 'use_locks 0' in davfs2.conf."),
                  (*nodep)->path);
 

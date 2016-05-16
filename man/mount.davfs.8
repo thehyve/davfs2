@@ -103,12 +103,12 @@ Default: \fI~/.@PACKAGE@/@CONFIGFILE@\fP
 .B [no]dev
 (Do not) interpret character or block  special  devices  on the file system.
 This option is only included for compatibility with the \fBmount\fR(8)
-program. It will allways be set to \fBnodev\fR
+program. It will always be set to \fBnodev\fR
 
 .TP
 .B dir_mode=\fImode\fP
 The default mode bits for directories in the mounted file system. Value given
-in octal. s\-bits for user and group are allways silently ignored.
+in octal. s\-bits for user and group are always silently ignored.
 .br
 Default: calculated from the umask of the mounting user; an x\-bit is
 associated to every r\-bit in u\-g\-o.
@@ -123,7 +123,7 @@ program will set the default to \fBnoexec\fR.)
 .TP
 .B file_mode=\fImode\fP
 The default mode bits for files in the mounted file system. Value given
-in octal. s\-bits for user and group are allways silently ignored.
+in octal. s\-bits for user and group are always silently ignored.
 .br
 Default: calculated from the umask of the mounting user; no x\-bits
 are set for files.
@@ -170,7 +170,7 @@ Default: \fBrw\fR.
 .B [no]suid
 Do not allow set\-user\-identifier or set\-group\-identifier bits to take effect.
 This option is only included for compatibility with the mount program. It will
-allways be set to \fBnosuid\fR.
+always be set to \fBnosuid\fR.
 
 .TP
 .B [no]user
@@ -310,7 +310,7 @@ this according your needs.
 
 WebDAV introduced locks and \fB@PROGRAM_NAME@\fR uses them by default. This will in
 most cases prevent two people from changing the same file in parallel. But not
-allways:
+always:
 
 .RS
 .PP
@@ -341,11 +341,11 @@ Sometimes locks held by some client on the server will not be released. Maybe
 the client crashes or the network connection fails. When \fB@PROGRAM_NAME@\fR
 finds a file locked on the server, it will check whether the lock is
 held by \fB@PROGRAM_NAME@\fR and the current user, and if so tries to reuse and
-release it. But this will not allways succeed. So servers should automatically
+release it. But this will not always succeed. So servers should automatically
 release locks after some time, when they are not refreshed by the client.
 
 .PP
-WebDAV allows to lock files that don't exist (to protect the name when a client
+WebDAV allows one to lock files that don't exist (to protect the name when a client
 intends to create a new file). This locks will be displayed as files with
 size 0 and last modified date of 1970\-01\-01. If this locks are not released
 properly \fB@PROGRAM_NAME@\fR may not be able to access this files. You can use
@@ -356,7 +356,7 @@ properly \fB@PROGRAM_NAME@\fR may not be able to access this files. You can use
 
 \fB@PACKAGE@\fR implements Unix permissions for access control. But
 changing owner and permissions of a file is only \fBlocal\fR. It is 
-intended as a means for the owner of the file system, to controll whether
+intended as a means for the owner of the file system, to control whether
 other local users may acces this file system.
 
 .PP
@@ -365,7 +365,7 @@ just one user (identified by the credentials) connected. Another WebDAV\-client,
 connected to the same server, is not affected by this local changes.
 
 .PP
-There is one exeption: The \fBexecute bit\fR on files is stored as a
+There is one exception: The \fBexecute bit\fR on files is stored as a
 property on the sever. You may think of this property as an information about
 the type of file rather than a permission. Whether the file is executable
 on the local system is still controlled by mount options and local permissions.

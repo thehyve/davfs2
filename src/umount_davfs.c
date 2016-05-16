@@ -208,7 +208,7 @@ main(int argc, char *argv[])
         ps_in = popen(ps_command, "r");
         if (!ps_in) {
             printf("\n");
-            error(EXIT_FAILURE, 0, _("an error occured while waiting; "
+            error(EXIT_FAILURE, 0, _("an error occurred while waiting; "
                   "please wait for %s to terminate"), PROGRAM_NAME);
         }
 
