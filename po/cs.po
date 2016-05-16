@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2016-04-16 09:08+0200\n"
+"POT-Creation-Date: 2016-05-16 12:14+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -66,7 +66,8 @@ msgstr "nemohu vytvořit nový indexový soubor pro %s"
 #, c-format
 msgid ""
 "File %s exists on the server but should not. Maybe it is an error in the "
-"server's LOCK impementation. You may try option 'use_locks 0' in davfs2.conf."
+"server's LOCK implementation. You may try option 'use_locks 0' in davfs2."
+"conf."
 msgstr ""
 
 #: src/cache.c:2569 src/cache.c:2603
@@ -748,8 +749,8 @@ msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
 msgstr "%s: čekám, než si  %s (pid %s) sesynchronizuje vyrovnávací paměť."
 
 #: src/umount_davfs.c:207
-#, c-format
-msgid "an error occured while waiting; please wait for %s to terminate"
+#, fuzzy, c-format
+msgid "an error occurred while waiting; please wait for %s to terminate"
 msgstr "při čekání došlo k chybě; čekejte prosím až %s skončí"
 
 #: src/webdav.c:368
