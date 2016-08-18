@@ -1554,14 +1554,10 @@ file_reader(void *userdata, const char *block, size_t length)
    When a cookie with the same name as an already stored cookie, but with
    a different value is received, it's value is updated if necessary.
    Only n_cookies cookies will be stored. If the server sends more
-   different cookies these will be ignored.
-   status must be of class 2XX or 3XX, otherwise the cookie is ignored. */
+   different cookies these will be ignored. */
 static void
 get_cookies(ne_request *req, void *userdata, const ne_status *status)
 {
-    if (status->klass != 2 && status->klass != 3)
-        return;
-
     const char *cookie_hdr = ne_get_response_header(req, "Set-Cookie");
     if (!cookie_hdr)
         return;
@@ -1584,14 +1580,13 @@ get_cookies(ne_request *req, void *userdata, const ne_status *status)
         while (end > start && *(end - 1) == ' ')
             end--;
 
-        if ((start + 4) > end || *start == '=' || *(end - 1) == '=')
-            continue;
-
         char *es = strchr(start, '=');
         if (!es)
             continue;
         size_t nl = es - start;
         size_t vl = end - es - 1;
+        if (nl == 0 || vl == 0)
+            continue;
 
         int i = 0;
         for (i = 0; i < n_cookies; i++) {
