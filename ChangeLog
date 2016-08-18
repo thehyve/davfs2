@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2016-08-18 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, get_cookies:
+      Fix cookie parsing error (Debian Bug#834615, Thanks
+      to Harald Braumann).
+
 2016-05-16 Werner Baumann (werner.baumann@onlinehome.de)
     * Fix some spelling errors.
 
