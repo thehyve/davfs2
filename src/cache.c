@@ -2506,6 +2506,7 @@ is_busy(const dav_node *node)
     while (child) {
         if (is_busy(child))
             return 1;
+        child = child->next;
     }
 
     return (is_reg(node) && is_open_write(node));
