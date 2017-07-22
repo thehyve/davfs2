@@ -1601,6 +1601,7 @@ get_options(dav_args *args, char *option)
         AUTO,
         NOAUTO,
         COMMENT,
+        NOFAIL,
         DEFAULTS,
         END
     };
@@ -1630,6 +1631,7 @@ get_options(dav_args *args, char *option)
         [AUTO] = "auto",
         [NOAUTO] = "noauto",
         [COMMENT] = "comment",
+        [NOFAIL] = "nofail",
         [DEFAULTS] = "defaults",
         [END] = NULL
     };
@@ -1726,6 +1728,7 @@ get_options(dav_args *args, char *option)
         case AUTO:
         case NOAUTO:
         case COMMENT:
+        case NOFAIL:
         case DEFAULTS:
             break;
         default:
