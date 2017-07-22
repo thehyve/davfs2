@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2017-07-22 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, get_options:
+      Ignore option "nofail" (fixes bug #51521).
+
 2017-01-21 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, is_busy:
       Fix infinite loop (bug #50083).
