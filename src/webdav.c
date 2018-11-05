@@ -780,9 +780,15 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
 
     if (rd_uri) {
         rd_sess = create_rd_session(rd_uri);
+        char *rd_path = NULL;
+        if (rd_uri->query) {
+            rd_path = ne_concat(rd_uri->path, "?", rd_uri->query, NULL);
+        } else {
+            rd_path = ne_strdup(rd_uri->path);
+        }
 
         ne_request_destroy(req);
-        req = ne_request_create(rd_sess, "GET", rd_uri->path);
+        req = ne_request_create(rd_sess, "GET", rd_path);
 
         if (etag && *etag)
             ne_add_request_header(req, "If-None-Match", *etag);
@@ -799,6 +805,7 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
         if (use_compression)
             ne_decompress_destroy(dc_state);
         ret = get_error(ret, "GET", rd_sess);
+        free(rd_path);
     } else {
         ret = get_error(ret, "GET", session);
     }
