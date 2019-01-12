@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2019-01-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * Fixed typo (sr #109588).
+
 2018-11-05 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, dav_get_file:
       Add query-string to path on redirect (bug #54943).
