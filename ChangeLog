@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2019-01-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * Fixed typo (sr #109588).
+
 2017-07-22 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, get_options:
       Ignore option "nofail" (fixes bug #51521).

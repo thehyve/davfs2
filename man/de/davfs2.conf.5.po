@@ -1,13 +1,13 @@
 # #-#-#-#-#  davfs2.conf.5.po (davfs2)  #-#-#-#-#
 # German translation of davfs2.conf(5) man page.
-# Copyright (C) 2007, 2008, 2014 Werner Baumann
+# Copyright (C) 2007, 2008, 2014, 2019 Werner Baumann
 # Werner Baumann <werner.baumann@onlinehome.de>, 2007.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.5.0\n"
-"POT-Creation-Date: 2016-05-16 11:25+0200\n"
-"PO-Revision-Date: 2016-05-16 11:38+0200\n"
+"POT-Creation-Date: 2019-01-12 11:48+0100\n"
+"PO-Revision-Date: 2019-01-12 11:38+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -157,7 +157,7 @@ msgstr "gui_optimize 1"
 #: davfs2.conf.5:53
 msgid ""
 "All mounted @PACKAGE@ file systems will use the coda kernel file system and "
-"the proxy foo.bar. All @PACKAGE@ file systems expect /media/dav will disable "
+"the proxy foo.bar. All @PACKAGE@ file systems except /media/dav will disable "
 "the use of the locks. /home/otto/mywebspace will use the gui_optimize option."
 msgstr ""
 "Alle @PACKAGE@-Dateisysteme benutzen das Kerneldateisystem fuse und den "

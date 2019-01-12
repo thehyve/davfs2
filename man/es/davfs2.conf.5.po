@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2.conf.5\n"
-"POT-Creation-Date: 2016-05-16 11:25+0200\n"
+"POT-Creation-Date: 2019-01-12 11:48+0100\n"
 "PO-Revision-Date: 2007-04-26 01:24-0300\n"
 "Last-Translator: Luciano Bello <luciano@linux.org.ar>\n"
 "Language-Team: Español <es@li.org>\n"
@@ -164,10 +164,9 @@ msgstr "gui_optimize 1"
 # type: Plain text
 #. type: Plain text
 #: davfs2.conf.5:53
-#, fuzzy
 msgid ""
 "All mounted @PACKAGE@ file systems will use the coda kernel file system and "
-"the proxy foo.bar. All @PACKAGE@ file systems expect /media/dav will disable "
+"the proxy foo.bar. All @PACKAGE@ file systems except /media/dav will disable "
 "the use of the locks. /home/otto/mywebspace will use the gui_optimize option."
 msgstr ""
 "Todos los sistemas de archivos @PACKAGE@ montados usarán el sistema de "
