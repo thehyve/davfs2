@@ -3219,7 +3219,6 @@ xml_end_reg(void *userdata, int state, const char *nspace, const char *name)
     if (!reg->name || !reg->cache_path || stat(reg->cache_path, &st) != 0
             || reg->size != st.st_size || (!reg->path && !is_backup(reg))) {
         if (reg->cache_path) {
-            remove(reg->cache_path);
             free(reg->cache_path);
             reg->cache_path = NULL;
         }
