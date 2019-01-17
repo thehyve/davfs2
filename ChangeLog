@@ -1,6 +1,11 @@
 ChangeLog for davfs2
 --------------------
 
+2019-01-17 Werner Baumann (werner.baumann@onlinehome.de)
+    * cache.c, xml_end_reg:
+      Don't remove cache-files because of inconsistent
+      metadata (sr #109587).
+
 2019-01-12 Werner Baumann (werner.baumann@onlinehome.de)
     * Fixed typo (sr #109588).
 
