@@ -1,6 +1,13 @@
 ChangeLog for davfs2
 --------------------
 
+2019-01-24 Werner Baumann (werner.baumann@onlinehome.de)
+      Release version 1.5.5
+
+2019-01-24 Werner Baumann (werner.baumann@onlinehome.de)
+    * davfs2.conf.5:
+      Warning about intermediary CAs (bug #54699).
+
 2019-01-17 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.c, xml_end_reg:
       Don't remove cache-files because of inconsistent
