@@ -192,6 +192,13 @@ with the server. The name of the file may be given as absolute path or as
 file name only. In the latter case the directories
 \fI~/.@PACKAGE@/@CERTS_DIR@/@CLICERTS_DIR@\fP and
 \fI@SYS_CONF_DIR@/@CERTS_DIR@/@CLICERTS_DIR@\fP will be searched.
+.br
+\fBWarning:\fR If the client certificate is issued by an intermediary CA
+and not by a top level CA then the TLS-specification requires the client
+to send the complete chain of certificates (without the top
+level CA-certificate). davfs2 only sends the client certificate. To work
+around this bug the server must store and trust the complete chain of
+CA-certificates down to the one CA that isssued the client certificate.
 
 .TP
 .B secrets
