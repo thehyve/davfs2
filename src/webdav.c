@@ -231,7 +231,7 @@ static int initialized;
    Needed by  ssl_verify() which may be called at any time. */
 static int have_terminal;
 
-#ifdef HAVE_ICONV_H
+#ifdef HAVE_ICONV
 /* Handle to convert character encoding from utf-8 to LC_CTYPE.
    If NULL no conversion is done. */
 static iconv_t from_utf_8;
@@ -264,7 +264,7 @@ static char **cookie_list;
 /* Private function prototypes and inline functions */
 /*==================================================*/
 
-#ifdef HAVE_ICONV_H
+#ifdef HAVE_ICONV
 static void
 convert(char **s, iconv_t conv);
 #endif
@@ -337,7 +337,7 @@ dav_init_webdav(const dav_args *args)
     if (args->neon_debug & ~NE_DBG_HTTPPLAIN)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Initializing webdav");
 
-#ifdef HAVE_ICONV_H
+#ifdef HAVE_ICONV
     char *lc_charset = nl_langinfo(CODESET);
     if (lc_charset && strcasecmp(lc_charset, "UTF-8") != 0) {
         from_utf_8 = iconv_open(lc_charset, "UTF-8");
