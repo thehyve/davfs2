@@ -150,7 +150,7 @@ main(int argc, char *argv[])
 
     char *pid = NULL;
     FILE *file = fopen(pidfile, "r");
-    if (!file || fscanf(file, "%a[0-9]", &pid) != 1 || !pid) {
+    if (!file || fscanf(file, "%m[0-9]", &pid) != 1 || !pid) {
         error(0, 0,
               _("\n"
                 "  can't read PID from file %s;\n"
