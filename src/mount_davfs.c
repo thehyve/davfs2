@@ -493,7 +493,7 @@ check_dirs(dav_args *args)
     gain_privileges(args);
     if (stat(DAV_SYS_RUN, &st) != 0) {
         if (mkdir(DAV_SYS_RUN, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_ISVTX)
-                != 0)
+                != 0 && errno != EEXIST)
             error(EXIT_FAILURE, errno, _("can't create directory %s"),
                   DAV_SYS_RUN);
     }
