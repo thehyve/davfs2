@@ -69,9 +69,6 @@
 int
 main(int argc, char *argv[])
 {
-    setuid(getuid());
-    setgid(getgid());
-
     setlocale(LC_ALL, "");
     bindtextdomain(PACKAGE, LOCALEDIR);
     textdomain(PACKAGE);
