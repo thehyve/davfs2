@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2019-01-24 18:31+0100\n"
+"POT-Creation-Date: 2019-11-27 17:55+0100\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -379,7 +379,7 @@ msgstr "kernel nezná souborový systém %s"
 msgid "mount point is busy"
 msgstr "přípojný bod je zaneprázdněn"
 
-#: src/mount_davfs.c:934 src/umount_davfs.c:88
+#: src/mount_davfs.c:934 src/umount_davfs.c:85
 #, c-format
 msgid ""
 "This is free software; see the source for copying conditions.  There is NO\n"
@@ -390,11 +390,11 @@ msgstr ""
 "Program je poskytován BEZ JAKÉKOLIV záruky, včetně záruky PRODEJNOSTI či "
 "VHODNOSTI K URČITÉMU ÚČELU.\n"
 
-#: src/mount_davfs.c:950 src/umount_davfs.c:114
+#: src/mount_davfs.c:950 src/umount_davfs.c:111
 msgid "unknown error parsing arguments"
 msgstr "neznámá chyba při zpracování argumentů"
 
-#: src/mount_davfs.c:959 src/umount_davfs.c:120
+#: src/mount_davfs.c:959 src/umount_davfs.c:117
 msgid "missing argument"
 msgstr "chybějící argument"
 
@@ -403,7 +403,7 @@ msgstr "chybějící argument"
 msgid "can't evaluate path of mount point %s"
 msgstr "nemohu vyhodnotit cestu k přípojnému bodu %s"
 
-#: src/mount_davfs.c:975 src/umount_davfs.c:122
+#: src/mount_davfs.c:975 src/umount_davfs.c:119
 msgid "too many arguments"
 msgstr "příliš mnoho argumentů"
 
@@ -660,7 +660,7 @@ msgstr ""
 "    [no]suid     : (ne)povolit účinnost suid a sgid bitů\n"
 "    [no]_netdev  : (není) třeba síťové spojení\n"
 
-#: src/umount_davfs.c:94
+#: src/umount_davfs.c:91
 #, c-format
 msgid ""
 "Usage:\n"
@@ -673,7 +673,7 @@ msgstr ""
 "    u%s -h,--help     : vypsat tuto zprávu\n"
 "\n"
 
-#: src/umount_davfs.c:98
+#: src/umount_davfs.c:95
 #, c-format
 msgid ""
 "To umount a WebDAV-resource don't call u%s directly, but use\n"
@@ -682,7 +682,7 @@ msgstr ""
 "Pro odpojení zdroje WebDAV nevolejte přímo u%s, ale použijte\n"
 "místo toho `umount'.\n"
 
-#: src/umount_davfs.c:101
+#: src/umount_davfs.c:98
 #, c-format
 msgid ""
 "    umount <mountpoint> : umount the WebDAV-resource as specified in\n"
@@ -691,7 +691,7 @@ msgstr ""
 "    umount <mountpoint> : odpojit zdroj WebDAV tak, jak je určeno\n"
 "                          v /etc/fstab.\n"
 
-#: src/umount_davfs.c:132
+#: src/umount_davfs.c:129
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -704,7 +704,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:155
+#: src/umount_davfs.c:152
 #, c-format
 msgid ""
 "\n"
@@ -717,7 +717,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až %s skončí"
 
-#: src/umount_davfs.c:167
+#: src/umount_davfs.c:164
 #, c-format
 msgid ""
 "\n"
@@ -730,7 +730,7 @@ msgstr ""
 "  přesto se pokouším odpojit;\n"
 "  čekejte prosím, až  %s skončí"
 
-#: src/umount_davfs.c:183
+#: src/umount_davfs.c:180
 #, c-format
 msgid ""
 "\n"
@@ -743,12 +743,12 @@ msgstr ""
 "  přesto se pokouším odpojit.\n"
 "  pravděpodobně budete muset odstranit %s ručně"
 
-#: src/umount_davfs.c:194
-#, c-format
-msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
+#: src/umount_davfs.c:191
+#, fuzzy, c-format
+msgid "%s: waiting for %s (pid %s) to terminate gracefully ."
 msgstr "%s: čekám, než si  %s (pid %s) sesynchronizuje vyrovnávací paměť."
 
-#: src/umount_davfs.c:207
+#: src/umount_davfs.c:204
 #, fuzzy, c-format
 msgid "an error occurred while waiting; please wait for %s to terminate"
 msgstr "při čekání došlo k chybě; čekejte prosím až %s skončí"
