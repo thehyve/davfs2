@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.5.5\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2019-01-24 18:31+0100\n"
+"POT-Creation-Date: 2019-11-27 17:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -368,18 +368,18 @@ msgstr ""
 msgid "mount point is busy"
 msgstr ""
 
-#: src/mount_davfs.c:934 src/umount_davfs.c:88
+#: src/mount_davfs.c:934 src/umount_davfs.c:85
 #, c-format
 msgid ""
 "This is free software; see the source for copying conditions.  There is NO\n"
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 msgstr ""
 
-#: src/mount_davfs.c:950 src/umount_davfs.c:114
+#: src/mount_davfs.c:950 src/umount_davfs.c:111
 msgid "unknown error parsing arguments"
 msgstr ""
 
-#: src/mount_davfs.c:959 src/umount_davfs.c:120
+#: src/mount_davfs.c:959 src/umount_davfs.c:117
 msgid "missing argument"
 msgstr ""
 
@@ -388,7 +388,7 @@ msgstr ""
 msgid "can't evaluate path of mount point %s"
 msgstr ""
 
-#: src/mount_davfs.c:975 src/umount_davfs.c:122
+#: src/mount_davfs.c:975 src/umount_davfs.c:119
 msgid "too many arguments"
 msgstr ""
 
@@ -604,7 +604,7 @@ msgid ""
 "    [no]_netdev  : (no) network connection needed\n"
 msgstr ""
 
-#: src/umount_davfs.c:94
+#: src/umount_davfs.c:91
 #, c-format
 msgid ""
 "Usage:\n"
@@ -613,21 +613,21 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/umount_davfs.c:98
+#: src/umount_davfs.c:95
 #, c-format
 msgid ""
 "To umount a WebDAV-resource don't call u%s directly, but use\n"
 "`umount' instead.\n"
 msgstr ""
 
-#: src/umount_davfs.c:101
+#: src/umount_davfs.c:98
 #, c-format
 msgid ""
 "    umount <mountpoint> : umount the WebDAV-resource as specified in\n"
 "                          /etc/fstab.\n"
 msgstr ""
 
-#: src/umount_davfs.c:132
+#: src/umount_davfs.c:129
 #, c-format
 msgid ""
 "\n"
@@ -636,7 +636,7 @@ msgid ""
 "  please wait for %s to terminate"
 msgstr ""
 
-#: src/umount_davfs.c:155
+#: src/umount_davfs.c:152
 #, c-format
 msgid ""
 "\n"
@@ -645,7 +645,7 @@ msgid ""
 "  please wait for %s to terminate"
 msgstr ""
 
-#: src/umount_davfs.c:167
+#: src/umount_davfs.c:164
 #, c-format
 msgid ""
 "\n"
@@ -654,7 +654,7 @@ msgid ""
 "  please wait for %s to terminate"
 msgstr ""
 
-#: src/umount_davfs.c:183
+#: src/umount_davfs.c:180
 #, c-format
 msgid ""
 "\n"
@@ -663,12 +663,12 @@ msgid ""
 "  you propably have to remove %s manually"
 msgstr ""
 
-#: src/umount_davfs.c:194
+#: src/umount_davfs.c:191
 #, c-format
-msgid "%s: waiting while %s (pid %s) synchronizes the cache ."
+msgid "%s: waiting for %s (pid %s) to terminate gracefully ."
 msgstr ""
 
-#: src/umount_davfs.c:207
+#: src/umount_davfs.c:204
 #, c-format
 msgid "an error occurred while waiting; please wait for %s to terminate"
 msgstr ""
