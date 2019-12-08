@@ -192,7 +192,7 @@ main(int argc, char *argv[])
     if (system(umount_command) != 0)
         exit(EXIT_FAILURE);
 
-    printf(_("%s: waiting while %s (pid %s) synchronizes the cache ."),
+    printf(_("%s: waiting for %s (pid %s) to terminate gracefully ."),
            argv[0], PROGRAM_NAME, pid);
     fflush(stdout);
 
