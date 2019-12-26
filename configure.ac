@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014 Werner Baumann
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2014, 2019 Werner Baumann
 #
 # This file is part of davfs2.
 #
@@ -21,7 +21,7 @@
 
 
 AC_PREREQ(2.59)
-AC_INIT(davfs2, 1.5.5, http://savannah.nongnu.org/projects/davfs2)
+AC_INIT(davfs2, 1.5.6, http://savannah.nongnu.org/projects/davfs2)
 AC_CONFIG_SRCDIR([src/cache.c])
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE

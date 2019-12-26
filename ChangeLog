@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2019-12-25 Werner Baumann (werner.baumann@onlinehome.de)
+      Release version 1.5.6
+
 2019-11-27 Werner Baumann (werner.baumann@onlinehome.de)
     * umount_davfs.c:
       Adjust message.
