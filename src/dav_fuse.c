@@ -84,7 +84,7 @@ static char *buf;
 static uint64_t root;
 
 /* Send debug messages to syslog if != 0. */
-int debug;
+static int debug;
 
 
 /* Private function prototypes */
