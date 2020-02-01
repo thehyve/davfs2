@@ -97,7 +97,7 @@ static unsigned int blocksize;
 static size_t alignment;
 
 /* Send debug messages to syslog if != 0. */
-int debug;
+static int debug;
 
 
 /* Private function prototypes */
