@@ -847,8 +847,9 @@ parse_commandline(dav_args *args, int argc, char *argv[])
     }
     strcpy(p, argv[argc - 1]);
 
-    char *short_options = "vwVho:";
+    char *short_options = "nvwVho:";
     static const struct option options[] = {
+        {"no-mtab", no_argument, NULL, 'n'},
         {"version", no_argument, NULL, 'V'},
         {"help", no_argument, NULL, 'h'},
         {"option", required_argument, NULL, 'o'},
@@ -872,6 +873,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
         case 'o':
             get_options(args, optarg);
             break;
+        case 'n':
         case 'v':
         case 'w':
         case '?':
