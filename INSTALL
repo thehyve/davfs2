@@ -1,7 +1,8 @@
-2019-12-25
+2020-03-04
 ----------
 
-# Copyright (C) 2006, 2007, 2008, 2009, 2010. 2012, 2013, 2014, 2019 Werner Baumann
+# Copyright (C) 2006, 2007, 2008, 2009, 2010. 2012, 2013, 2014, 2019, 2020
+# Werner Baumann
 
 # Copying and distribution of this file, with or without modification, are
 # permitted in any medium without royalty.
@@ -41,8 +42,8 @@ the new versions.
 ----------------
 
 davfs2 uses the neon libraries for communication with the server.
-libneon (2.7, 2.8, 2.9 or 3.0) must be installed. Your distribution will most
-likely provide a package.
+libneon (0.27, 0.28, 0.29, 0.30 or 0.31) must be installed. Your distribution
+will most likely provide a package.
 You will also need the neon header files. Distributions usually provide
 development packages for this.
 If your distribution don't come with libneon or it does not support TLS and
@@ -61,9 +62,9 @@ To build davfs2 from the CVS sources you need recent versions of the some
 build tools:
 
 - GNU Autoconf 2.69 or newer
-- GNU Automake 1.11.6 or newer
-- GNU gettext-tools 0.18.1 or newer
-- po4a 0.42 or newer
+- GNU Automake 1.16.1 or newer
+- GNU gettext-tools 0.19.8.1 or newer
+- po4a 0.55 or newer
 
 Change into the top level source directory and run
     $ ./bootstrap

@@ -20,7 +20,7 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)
 AC_INIT(davfs2, 1.5.6, http://savannah.nongnu.org/projects/davfs2)
 AC_CONFIG_SRCDIR([src/cache.c])
 AC_CONFIG_AUX_DIR([config])
@@ -34,9 +34,9 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 
 # Checks for libraries.
-AM_GNU_GETTEXT_VERSION(0.18.1)
+AM_GNU_GETTEXT_VERSION(0.19.8)
 AM_GNU_GETTEXT([external])
-NE_REQUIRE_VERSIONS([0], [27 28 29 30])
+NE_REQUIRE_VERSIONS([0], [27 28 29 30 31])
 DAV_CHECK_NEON
 
 # Checks for header files.
