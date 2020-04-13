@@ -1,6 +1,16 @@
 ChangeLog for davfs2
 --------------------
 
+2020-04-13 Werner Baumann (werner.baumann@onlinehome.de)
+    * defaults.h, etc/davfs2.conf, mount_davfs.h,
+      mount_davfs.c, new_args, read_config,
+      webdav.c, dav_init_wbdav:
+      Add option sharepoint_href_bug.
+
+2020-03-04 Werner Baumann (werner.baumann@onlinehome.de)
+    * configure.ac, INSTALL.davfs2:
+      Update build tools.
+
 2020-02-07 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, parse_commandline:
       Ignore option -n (sr #110191).
