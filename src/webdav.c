@@ -379,6 +379,11 @@ dav_init_webdav(dav_args *args)
     ne_set_useragent(session, useragent);
     free(useragent);
 
+#if NE_VERSION_MAJOR > 0 || NE_VERSION_MINOR > 30
+    if (args->sharepoint_href_bug)
+        ne_set_session_flag(session, NE_SESSFLAG_SHAREPOINT, 1);
+#endif
+
     if (args->username)
         username = xstrdup(args->username);
     if (args->password)

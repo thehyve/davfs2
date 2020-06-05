@@ -1722,6 +1722,7 @@ new_args(void)
     args->ignore_dav_header = DAV_IGNORE_DAV_HEADER;
     args->use_compression = DAV_USE_COMPRESSION;
     args->min_propset = DAV_MIN_PROPSET;
+    args->sharepoint_href_bug = DAV_SHAREPOINT_HREF_BUG;
     args->connect_timeout = DAV_CONNECT_TIMEOUT;
     args->read_timeout = DAV_READ_TIMEOUT;
     args->retry = DAV_RETRY;
@@ -2228,6 +2229,13 @@ read_config(dav_args *args, const char * filename, int system)
                 args->use_compression = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "min_propset") == 0) {
                 args->min_propset = arg_to_int(parmv[1], 10, parmv[0]);
+            } else if (strcmp(parmv[0], "sharepoint_href_bug") == 0) {
+#if NE_VERSION_MAJOR > 0 || NE_VERSION_MINOR > 30
+                args->sharepoint_href_bug = arg_to_int(parmv[1], 10, parmv[0]);
+#else
+                error(EXIT_FAILURE, 0, _("Option sharepoint_href_bug requires "
+                      "Neon version 0.31 or newer"));
+#endif
             } else if (strcmp(parmv[0], "connect_timeout") == 0) {
                 args->connect_timeout = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "read_timeout") == 0) {

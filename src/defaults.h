@@ -208,6 +208,10 @@
    May be overridden by system config file and user config file. */
 #define DAV_MIN_PROPSET 0
 
+/* Use Neon work around for SharePoint href-elements with characters
+   that are not allowed in href-elements. */
+#define DAV_SHAREPOINT_HREF_BUG 0
+
 /* Timeout in seconds used when libneon supports non blocking io
    A value of zero means use the TCP default
    May be overriden by system config file and user config file. */

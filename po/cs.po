@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2019-12-08 17:34+0100\n"
+"POT-Creation-Date: 2020-06-05 11:05+0200\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -82,7 +82,7 @@ msgstr "nemohu vytvořit soubor vyrovnávací paměti %s"
 msgid "error writing directory %s"
 msgstr "chyba při zápisu adresáře %s"
 
-#: src/cache.c:2661 src/mount_davfs.c:1034
+#: src/cache.c:2661 src/mount_davfs.c:1036
 #, c-format
 msgid "can't read user data base"
 msgstr "nemohu přečíst údaje o uživatelích"
@@ -231,8 +231,8 @@ msgstr "soubor %s má chybného vlastníka"
 msgid "file %s has wrong permissions"
 msgstr "soubor %s má chybná oprávnění"
 
-#: src/mount_davfs.c:648 src/mount_davfs.c:700 src/mount_davfs.c:1335
-#: src/mount_davfs.c:1339
+#: src/mount_davfs.c:648 src/mount_davfs.c:700 src/mount_davfs.c:1337
+#: src/mount_davfs.c:1341
 #, c-format
 msgid "can't open file %s"
 msgstr "nemohu otevřít soubor %s"
@@ -323,12 +323,12 @@ msgstr "musíte být členem skupiny souborového systému"
 msgid "user %s must be member of group %s"
 msgstr "uživatel %s musí být členem skupiny %s"
 
-#: src/mount_davfs.c:820 src/mount_davfs.c:1160
+#: src/mount_davfs.c:820 src/mount_davfs.c:1162
 #, c-format
 msgid "can't change effective user id"
 msgstr "nemohu změnit identifikátor efektivního uživatele"
 
-#: src/mount_davfs.c:864 src/umount_davfs.c:89
+#: src/mount_davfs.c:865 src/umount_davfs.c:89
 #, c-format
 msgid ""
 "This is free software; see the source for copying conditions.  There is NO\n"
@@ -339,67 +339,67 @@ msgstr ""
 "Program je poskytován BEZ JAKÉKOLIV záruky, včetně záruky PRODEJNOSTI či "
 "VHODNOSTI K URČITÉMU ÚČELU.\n"
 
-#: src/mount_davfs.c:880 src/umount_davfs.c:115
+#: src/mount_davfs.c:882 src/umount_davfs.c:115
 #, c-format
 msgid "unknown error parsing arguments"
 msgstr "neznámá chyba při zpracování argumentů"
 
-#: src/mount_davfs.c:889 src/umount_davfs.c:121
+#: src/mount_davfs.c:891 src/umount_davfs.c:121
 #, c-format
 msgid "missing argument"
 msgstr "chybějící argument"
 
-#: src/mount_davfs.c:902
+#: src/mount_davfs.c:904
 #, c-format
 msgid "can't evaluate path of mount point %s"
 msgstr "nemohu vyhodnotit cestu k přípojnému bodu %s"
 
-#: src/mount_davfs.c:905 src/umount_davfs.c:123
+#: src/mount_davfs.c:907 src/umount_davfs.c:123
 #, c-format
 msgid "too many arguments"
 msgstr "příliš mnoho argumentů"
 
-#: src/mount_davfs.c:912
+#: src/mount_davfs.c:914
 #, c-format
 msgid "A relative mount point must lie within your home directory"
 msgstr "Relativní přípojný bod musí ležet ve vašem domovském adresáři"
 
-#: src/mount_davfs.c:917
+#: src/mount_davfs.c:919
 #, c-format
 msgid "no WebDAV-server specified"
 msgstr "nebyl zadán žádný WebDAV server"
 
-#: src/mount_davfs.c:920
+#: src/mount_davfs.c:922
 #, c-format
 msgid "invalid URL"
 msgstr "neplatné URL"
 
-#: src/mount_davfs.c:950
+#: src/mount_davfs.c:952
 #, c-format
 msgid "user %s does not exist"
 msgstr "uživatel %s neexistuje"
 
-#: src/mount_davfs.c:958
+#: src/mount_davfs.c:960
 #, c-format
 msgid "group %s does not exist"
 msgstr "skupina %s neexistuje"
 
-#: src/mount_davfs.c:1025
+#: src/mount_davfs.c:1027
 #, c-format
 msgid "program is not setuid root"
 msgstr "program není spuštěn jako setuid root"
 
-#: src/mount_davfs.c:1043
+#: src/mount_davfs.c:1045
 #, c-format
 msgid "can't read group data base"
 msgstr "nemohu přečíst údaje o skupinách"
 
-#: src/mount_davfs.c:1070 src/mount_davfs.c:1083 src/mount_davfs.c:1085
-#: src/mount_davfs.c:1103 src/mount_davfs.c:1105 src/mount_davfs.c:1120
+#: src/mount_davfs.c:1072 src/mount_davfs.c:1085 src/mount_davfs.c:1087
+#: src/mount_davfs.c:1105 src/mount_davfs.c:1107 src/mount_davfs.c:1122
 msgid "Password: "
 msgstr "Heslo: "
 
-#: src/mount_davfs.c:1074
+#: src/mount_davfs.c:1076
 #, fuzzy, c-format
 msgid ""
 "Please enter the username to authenticate with proxy\n"
@@ -409,11 +409,11 @@ msgstr ""
 "%s (pokud žádné zadat nechcete, pouze stiskněte enter).\n"
 "Uživatelské jméno: "
 
-#: src/mount_davfs.c:1076 src/mount_davfs.c:1096
+#: src/mount_davfs.c:1078 src/mount_davfs.c:1098
 msgid "Username:"
 msgstr ""
 
-#: src/mount_davfs.c:1080
+#: src/mount_davfs.c:1082
 #, c-format
 msgid ""
 "Please enter the password to authenticate user %s with proxy\n"
@@ -422,7 +422,7 @@ msgstr ""
 "Zadejte prosím heslo pro autentizaci uživatele %s na proxy\n"
 "%s (pokud žádné zadat nechcete, pouze stiskněte enter).\n"
 
-#: src/mount_davfs.c:1094
+#: src/mount_davfs.c:1096
 #, fuzzy, c-format
 msgid ""
 "Please enter the username to authenticate with server\n"
@@ -432,7 +432,7 @@ msgstr ""
 "%s (nebo pouze stiskně enter, pokud nic zadat nechcete).\n"
 "Uživatelské jméno: "
 
-#: src/mount_davfs.c:1100
+#: src/mount_davfs.c:1102
 #, c-format
 msgid ""
 "Please enter the password to authenticate user %s with server\n"
@@ -441,7 +441,7 @@ msgstr ""
 "Zadejte prosím heslo uživatele %s pro autentizaci na serveru\n"
 "%s (nebo pouze stiskně enter, pokud nic zadat nechcete).\n"
 
-#: src/mount_davfs.c:1118
+#: src/mount_davfs.c:1120
 #, c-format
 msgid ""
 "Please enter the password to decrypt client\n"
@@ -450,100 +450,105 @@ msgstr ""
 "Zadejte prosím heslo pro dešifrování klientského\n"
 "certifikátu %s.\n"
 
-#: src/mount_davfs.c:1125
+#: src/mount_davfs.c:1127
 #, c-format
 msgid "can't decrypt client certificate %s"
 msgstr "nemohu dešifrovat klientský certifikát %s"
 
-#: src/mount_davfs.c:1188
+#: src/mount_davfs.c:1190
 #, c-format
 msgid "pid %i, got signal %i"
 msgstr "pid %i dostal signál %i"
 
-#: src/mount_davfs.c:1252
+#: src/mount_davfs.c:1254
 #, fuzzy, c-format
 msgid "can't create file %s"
 msgstr "nemohu vytvořit soubor vyrovnávací paměti %s"
 
-#: src/mount_davfs.c:1256
+#: src/mount_davfs.c:1258
 #, fuzzy, c-format
 msgid "can't lock file %s"
 msgstr "nemohu otevřít soubor %s"
 
-#: src/mount_davfs.c:1278
+#: src/mount_davfs.c:1280
 #, fuzzy, c-format
 msgid ""
 "Warning: can't write entry into %s, but will mount the file system anyway"
 msgstr ""
 "Varování: nelze zapsat položku do mtab, přesto souborový systém připojím"
 
-#: src/mount_davfs.c:1314
+#: src/mount_davfs.c:1316
 #, c-format
 msgid "option %s has invalid argument;it must be a decimal number"
 msgstr "volba %s má neplatný argument; musí to být číslo v desítkové soustavě"
 
-#: src/mount_davfs.c:1317
+#: src/mount_davfs.c:1319
 #, c-format
 msgid "option %s has invalid argument;it must be an octal number"
 msgstr "volba %s má neplatný argument; musí to být číslo v osmičkové soustavě"
 
-#: src/mount_davfs.c:1320
+#: src/mount_davfs.c:1322
 #, c-format
 msgid "option %s has invalid argument;it must be a number"
 msgstr "volba %s má neplatný argument; musí to být číslo"
 
-#: src/mount_davfs.c:1346
+#: src/mount_davfs.c:1348
 #, fuzzy, c-format
 msgid "error writing to file %s"
 msgstr "chyba při zápisu nového indexového souboru %s"
 
-#: src/mount_davfs.c:1593
+#: src/mount_davfs.c:1595
 #, c-format
 msgid "option %s requires argument"
 msgstr "volba %s vyžaduje argument"
 
-#: src/mount_davfs.c:1681
+#: src/mount_davfs.c:1683
 #, c-format
 msgid "Unknown option %s.\n"
 msgstr "Neznámá volba %s.\n"
 
-#: src/mount_davfs.c:2071
+#: src/mount_davfs.c:2074
 #, fuzzy, c-format
 msgid "can't read certificate %s"
 msgstr "nelze přečíst klientský certifikát %s"
 
-#: src/mount_davfs.c:2103 src/mount_davfs.c:2116
+#: src/mount_davfs.c:2106 src/mount_davfs.c:2119
 #, c-format
 msgid "can't read client certificate %s"
 msgstr "nelze přečíst klientský certifikát %s"
 
-#: src/mount_davfs.c:2107
+#: src/mount_davfs.c:2110
 #, c-format
 msgid "client certificate file %s has wrong owner"
 msgstr "klientský certifikát %s má chybného vlastníka"
 
-#: src/mount_davfs.c:2111
+#: src/mount_davfs.c:2114
 #, c-format
 msgid "client certificate file %s has wrong permissions"
 msgstr "soubor s klientským certifikátem %s má chybná oprávnění"
 
-#: src/mount_davfs.c:2133 src/mount_davfs.c:2366
+#: src/mount_davfs.c:2136 src/mount_davfs.c:2376
 #, fuzzy, c-format
 msgid "opening %s failed"
 msgstr "odpojení selhalo"
 
-#: src/mount_davfs.c:2154 src/mount_davfs.c:2198 src/mount_davfs.c:2296
-#: src/mount_davfs.c:2393 src/mount_davfs.c:2451 src/mount_davfs.c:2464
+#: src/mount_davfs.c:2157 src/mount_davfs.c:2201 src/mount_davfs.c:2306
+#: src/mount_davfs.c:2403 src/mount_davfs.c:2461 src/mount_davfs.c:2474
 #, c-format
 msgid "malformed line"
 msgstr "špatně zapsaný řádek"
 
-#: src/mount_davfs.c:2274 src/mount_davfs.c:2290
+#: src/mount_davfs.c:2236
+#, c-format
+msgid "Option sharepoint_href_bug requires Neon version 0.31 or newer"
+msgstr ""
+
+#: src/mount_davfs.c:2284 src/mount_davfs.c:2300
 #, c-format
 msgid "unknown option"
 msgstr "neznámá volba"
 
-#: src/mount_davfs.c:2596
+#: src/mount_davfs.c:2606
 #, c-format
 msgid ""
 "Usage:\n"
@@ -556,7 +561,7 @@ msgstr ""
 "    %s -h,--help      : vytiskne tuto zprávu\n"
 "\n"
 
-#: src/mount_davfs.c:2600
+#: src/mount_davfs.c:2610
 #, c-format
 msgid ""
 "To mount a WebDAV-resource don't call %s directly, but use\n"
@@ -565,7 +570,7 @@ msgstr ""
 "Pro připojení zdroje WebDAV nevolejte přímo %s, ale\n"
 "použijte místo toho `mount'.\n"
 
-#: src/mount_davfs.c:2602
+#: src/mount_davfs.c:2612
 #, c-format
 msgid ""
 "    mount <mountpoint>  : or\n"
@@ -576,7 +581,7 @@ msgstr ""
 "    mount <url_serveru> : připojí zdroj WebDAV tak, jak je zadáno\n"
 "                          v /etc/fstab.\n"
 
-#: src/mount_davfs.c:2605
+#: src/mount_davfs.c:2615
 #, c-format
 msgid ""
 "    mount -t davfs <server-url> <mountpoint> [-o options]\n"
@@ -593,7 +598,7 @@ msgstr ""
 "                          označuje seznam voleb oddělených čárkou.\n"
 "\n"
 
-#: src/mount_davfs.c:2610
+#: src/mount_davfs.c:2620
 #, c-format
 msgid ""
 "Recognised options:\n"
@@ -612,7 +617,7 @@ msgstr ""
 "    file_mode=   : výchozí mode souboru (v osmičkové soustavě)\n"
 "    dir_mode=    : výchozí mode adresáře (v osmičkové soustavě)\n"
 
-#: src/mount_davfs.c:2616
+#: src/mount_davfs.c:2626
 #, fuzzy, c-format
 msgid ""
 "    ro           : mount read-only\n"
@@ -732,86 +737,86 @@ msgstr "selhala inicializace knihovny socketů"
 msgid "can't open stream to log neon-messages"
 msgstr ""
 
-#: src/webdav.c:399
+#: src/webdav.c:404
 #, c-format
 msgid "neon library does not support TLS/SSL"
 msgstr "knihovna neon nepodporuje TLS/SSL"
 
-#: src/webdav.c:473 src/webdav.c:476
+#: src/webdav.c:478 src/webdav.c:481
 #, c-format
 msgid "mounting failed; the server does not support WebDAV"
 msgstr "připojení selhalo; server nepodporuje WebDAV"
 
-#: src/webdav.c:484
+#: src/webdav.c:489
 #, c-format
 msgid "warning: the server does not support locks"
 msgstr "varování: server nepodporuje zámky"
 
-#: src/webdav.c:1492
+#: src/webdav.c:1497
 msgid "authentication failure:"
 msgstr "selhání autentizace:"
 
-#: src/webdav.c:1530
+#: src/webdav.c:1535
 #, c-format
 msgid "%i can't open cache file"
 msgstr "%i nemůže otevřít soubor vyrovnávací paměti"
 
-#: src/webdav.c:1538
+#: src/webdav.c:1543
 #, c-format
 msgid "%i error writing to cache file"
 msgstr "%i chyba při zápisu do souboru vyrovnávací paměti"
 
-#: src/webdav.c:1799 src/webdav.c:1828 src/webdav.c:1865
+#: src/webdav.c:1804 src/webdav.c:1833 src/webdav.c:1870
 #, c-format
 msgid "the server certificate is not trusted"
 msgstr "certifikát serveru je nedůvěryhodný"
 
-#: src/webdav.c:1808 src/webdav.c:1811
+#: src/webdav.c:1813 src/webdav.c:1816
 #, c-format
 msgid "error processing server certificate"
 msgstr "chyba při zpracování certifikátu serveru"
 
-#: src/webdav.c:1822 src/webdav.c:1856
+#: src/webdav.c:1827 src/webdav.c:1861
 #, c-format
 msgid "the server certificate is not yet valid"
 msgstr "certifikát serveru zatím není platný"
 
-#: src/webdav.c:1824 src/webdav.c:1859
+#: src/webdav.c:1829 src/webdav.c:1864
 #, c-format
 msgid "the server certificate has expired"
 msgstr "platnost certifikátu serveru vypršela"
 
-#: src/webdav.c:1826 src/webdav.c:1862
+#: src/webdav.c:1831 src/webdav.c:1867
 #, c-format
 msgid "the server certificate does not match the server name"
 msgstr "certifikát serveru nedopovídá jménu serveru"
 
-#: src/webdav.c:1830 src/webdav.c:1868
+#: src/webdav.c:1835 src/webdav.c:1873
 #, c-format
 msgid "unknown certificate error"
 msgstr "neznámá chyba certifikátu"
 
-#: src/webdav.c:1831
+#: src/webdav.c:1836
 #, c-format
 msgid "  issuer:      %s"
 msgstr "  vydavatel:      %s"
 
-#: src/webdav.c:1833
+#: src/webdav.c:1838
 #, c-format
 msgid "  subject:     %s"
 msgstr "  subjekt:     %s"
 
-#: src/webdav.c:1835
+#: src/webdav.c:1840
 #, c-format
 msgid "  identity:    %s"
 msgstr "  identita:    %s"
 
-#: src/webdav.c:1837
+#: src/webdav.c:1842
 #, c-format
 msgid "  fingerprint: %s"
 msgstr "  otisk: %s"
 
-#: src/webdav.c:1839
+#: src/webdav.c:1844
 #, c-format
 msgid ""
 "You only should accept this certificate, if you can\n"
@@ -822,27 +827,27 @@ msgstr ""
 "ověřit jeho otisk! Server může být podvržen nebo může\n"
 "dojít k útoku s prostředníkem (man-in-the-middle attack).\n"
 
-#: src/webdav.c:1842
+#: src/webdav.c:1847
 #, c-format
 msgid "Accept certificate for this session? [y,N] "
 msgstr "Přijmout certifikát pro toto sezení? [y,N] "
 
-#: src/webdav.c:1869
+#: src/webdav.c:1874
 #, c-format
 msgid "  issuer: %s"
 msgstr "  vydavatel: %s"
 
-#: src/webdav.c:1870
+#: src/webdav.c:1875
 #, c-format
 msgid "  subject: %s"
 msgstr "  subjekt: %s"
 
-#: src/webdav.c:1871
+#: src/webdav.c:1876
 #, c-format
 msgid "  identity: %s"
 msgstr "  identita: %s"
 
-#: src/webdav.c:1874
+#: src/webdav.c:1879
 msgid "  accepted by user"
 msgstr "  přijat uživatelem"
 
