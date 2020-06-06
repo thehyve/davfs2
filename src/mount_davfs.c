@@ -1823,6 +1823,8 @@ log_dbg_config(dav_args *args)
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  ignore_dav_header: %i", args->ignore_dav_header);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
+           "  sharepoint_href_bug: %i", args->sharepoint_href_bug);
+    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  connect_timeout: %li s", args->connect_timeout);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  read_timeout: %li s", args->read_timeout);
