@@ -1467,7 +1467,7 @@ add_header(ne_request *req, void *userdata, ne_buffer *header)
         ne_buffer_zappend(header, cookie_list[0]);
         int i = 1;
         while (i < n_cookies && cookie_list[i]) {
-            ne_buffer_zappend(header, ", ");
+            ne_buffer_zappend(header, "; ");
             ne_buffer_zappend(header, cookie_list[i]);
             i++;
         }
