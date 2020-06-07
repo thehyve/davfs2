@@ -1563,50 +1563,53 @@ file_reader(void *userdata, const char *block, size_t length)
 static void
 get_cookies(ne_request *req, void *userdata, const ne_status *status)
 {
-    const char *cookie_hdr = ne_get_response_header(req, "Set-Cookie");
-    if (!cookie_hdr)
-        return;
+    void *cursor = NULL;
+    const char *name;
+    const char *value;
 
-    const char *next = cookie_hdr;
-    while (next) {
-        const char *start = next;
-        next = strchr(start, ',');
-        const char *end = strchr(start, ';');
-        if (next) {
-            if (!end || end > next)
-                end = next;
-            next++;
-        } else if (!end) {
-            end = start + strlen(start);
+    cursor = ne_response_header_iterate(req, cursor, &name, &value);
+    while (cursor) {
+        if (strcasecmp(name, "Set-Cookie") != 0) {
+            cursor = ne_response_header_iterate(req, cursor, &name, &value);
+            continue;
         }
 
-        while (start < end && *start == ' ')
-            start++;
-        while (end > start && *(end - 1) == ' ')
-            end--;
+        char *s;
+        const char *end = strchr(value, ';');
+        if (end) {
+            s = xstrndup(value, end - value);
+        } else {
+            s = xstrdup(value);
+        }
+        char *es = strchr(s, '=');
+        if (!es) {
+            free(s);
+            cursor = ne_response_header_iterate(req, cursor, &name, &value);
+            continue;
+        }
 
-        char *es = strchr(start, '=');
-        if (!es)
-            continue;
-        size_t nl = es - start;
-        size_t vl = end - es - 1;
-        if (nl == 0 || vl == 0)
-            continue;
+        char *cookie = s;
+        while (*cookie == ' ')
+            cookie++;
+        while (*(cookie + strlen(cookie) - 1) == ' ')
+            *(cookie + strlen(cookie) - 1) = 0;
+        int nl = es - cookie;
 
         int i = 0;
         for (i = 0; i < n_cookies; i++) {
             if (!cookie_list[i]) {
-                cookie_list[i] = xstrndup(start, end - start);
+                cookie_list[i] = xstrdup(cookie);
                 break;
             }
-            if (strncmp(cookie_list[i], start, nl) == 0) {
-                if (strncmp(cookie_list[i] + nl + 1, es + 1, vl) != 0) {
-                    free(cookie_list[i]);
-                    cookie_list[i] = xstrndup(start, end - start);
-                }
+            if (strncmp(cookie_list[i], cookie, nl) == 0) {
+                free(cookie_list[i]);
+                cookie_list[i] = xstrdup(cookie);
                 break;
             }
         }
+
+        free(s);
+        cursor = ne_response_header_iterate(req, cursor, &name, &value);
     }
 }
 

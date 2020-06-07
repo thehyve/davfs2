@@ -1,11 +1,15 @@
 ChangeLog for davfs2
 --------------------
 
-2020-05-20 Werner Baumann (werner.baumann@onlinehome.de)
+2020-06-07 Werner Baumann (werner.baumann@onlinehome.de)
+    * webdav.c, get_cookies:
+      New parser for cookies (bug #58459).
+
+2020-06-06 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, add_header:
       Use ";" instead of "," as seperator (bug #58459).
 
-2020-05-20 Werner Baumann (werner.baumann@onlinehome.de)
+2020-06-06 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, log_dbg_config:
       Add log message.
 
