@@ -1,5 +1,5 @@
 /*  mount_davfs.c: mount the davfs file system.
-    Copyright (C) 2006, 2007, 2008, 2009, 2014 Werner Baumann
+    Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Werner Baumann
 
     This file is part of davfs2.
 
@@ -101,9 +101,6 @@ static char *url;
 /* The canonicalized mointpoint. */
 static char *mpoint;
 
-/* The type of the kernel file system used. */
-static char *kernel_fs;
-
 /* The file that holds information about mounted filesystems
    (/proc/mounts or /etc/mtab) */
 static char *mounts;
@@ -139,9 +136,6 @@ check_fstab(const dav_args *args);
 
 static void
 check_permissions(dav_args *args);
-
-static int
-do_mount(unsigned long int mopts, void *mdata);
 
 static int
 is_mounted(void);
@@ -254,16 +248,8 @@ main(int argc, char *argv[])
     dav_init_cache(args, mpoint);
 
     int dev = 0;
-    dav_run_msgloop_fn run_msgloop = NULL;
-    void *mdata = NULL;
-    if (args->kernel_fs)
-        kernel_fs = ne_strdup(args->kernel_fs);
     size_t buf_size = args->buf_size * 1024;
-    int mounted = dav_init_kernel_interface(&dev, &run_msgloop, &mdata,
-                                            &kernel_fs, &buf_size, url, mpoint,
-                                            args);
-    if (args->debug & DAV_DBG_CONFIG)
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "kernel_fs: %s", kernel_fs);
+    dav_init_kernel_interface(&dev, &buf_size, url, mpoint, args);
 
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Fork into daemon mode");
@@ -273,16 +259,6 @@ main(int argc, char *argv[])
         if (args->debug & DAV_DBG_CONFIG)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                    "Parent: parent pid: %i, child pid: %i", getpid(), childpid);
-        if (!mounted) {
-            if (args->debug & DAV_DBG_CONFIG)
-                syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-                       "Parent: mounting filesystem");
-            if (do_mount(args->mopts, mdata) != 0) {
-                kill(childpid, SIGTERM);
-                delete_args(args);
-                exit(EXIT_FAILURE);
-            }
-        }
 
         if (args->debug & DAV_DBG_CONFIG)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -362,20 +338,14 @@ main(int argc, char *argv[])
     if (!ret) {
         if (debug & DAV_DBG_CONFIG)
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Starting message loop");
-        run_msgloop(dev, mpoint, buf_size, idle_time, is_mounted,
-                    &keep_on_running, debug & DAV_DBG_KERNEL);
+        dav_fuse_loop(dev, mpoint, buf_size, idle_time, is_mounted,
+                      &keep_on_running, debug & DAV_DBG_KERNEL);
     }
 
     if (debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Closing");
     dav_close_cache(&got_sigterm);
     dav_close_webdav();
-    if (is_mounted() && strcmp(kernel_fs, "coda") == 0) {
-        char *prog = ne_concat("/bin/umount -il ", mpoint, NULL);
-        syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting %s"), mpoint);
-        if (system(prog) != 0 && is_mounted())
-            syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR), _("unmounting failed"));
-    }
     if (debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Removing %s", pidfile);
     remove(pidfile);
@@ -833,33 +803,6 @@ check_permissions(dav_args *args)
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
                "memeber of group %s", args->dav_group);
-}
-
-
-/* Calls the mount()-function to mount the file system.
-   Uses private global variables url and mpoint as device and mount point,
-   kernel_fs as file system type, mopts as mount options and mdata
-   as mount data.
-   return value : 0 on success, -1 if mount() fails. */
-static int
-do_mount(unsigned long int mopts, void *mdata)
-{
-    uid_t orig = geteuid();
-    if (seteuid(0) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
-    int ret = mount(url, mpoint, kernel_fs,  mopts, mdata);
-    if (seteuid(orig) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
-
-    if (ret) {
-        error(0, errno, _("can't mount %s on %s"), url, mpoint);
-        if (errno == ENODEV)
-            error(0, 0, _("kernel does not know file system %s"), kernel_fs);
-        if (errno == EBUSY)
-            error(0, 0, _("mount point is busy"));
-        return -1;
-    }
-    return 0;
 }
 
 
@@ -1510,8 +1453,6 @@ delete_args(dav_args *args)
         free(args->dav_group);
     if (args->conf)
         free(args->conf);
-    if (args->kernel_fs)
-        free(args->kernel_fs);
     if (args->scheme)
         free(args->scheme);
     if (args->host)
@@ -1776,7 +1717,6 @@ new_args(void)
     args->netdev = 1;
     args->grpid = 0;
     args->mopts = DAV_MOPTS;
-    args->kernel_fs = NULL;
     args->buf_size = 0;
 
     args->uid = getuid();
@@ -1881,8 +1821,6 @@ log_dbg_config(dav_args *args)
            "  grpid: %i", args->grpid);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  mopts: %#lx", args->mopts);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  kernel_fs: %s", args->kernel_fs);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  buf_size: %llu KiB", (unsigned long long) args->buf_size);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2209,10 +2147,6 @@ read_config(dav_args *args, const char * filename, int system)
                 if (args->dav_group)
                     free(args->dav_group);
                 args->dav_group = ne_strdup(parmv[1]); 
-            } else if (strcmp(parmv[0], "kernel_fs") == 0) {
-                if (args->kernel_fs)
-                    free(args->kernel_fs);
-                args->kernel_fs = ne_strdup(parmv[1]); 
             } else if (strcmp(parmv[0], "buf_size") == 0) {
                 args->buf_size = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "trust_ca_cert") == 0

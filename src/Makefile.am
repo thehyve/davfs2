@@ -1,5 +1,5 @@
 ## Makefile for program src directory in davfs.
-## Copyright (C) 2006, 2007, 2008, 2009 Werner Baumann
+## Copyright (C) 2006, 2007, 2008, 2009, 2020 Werner Baumann
 ##
 ## This file is part of davfs2.
 ##
@@ -26,9 +26,9 @@ pkgsyscachedir = $(dav_syscachedir)/@PACKAGE@
 ssbindir = @ssbindir@
 
 sbin_PROGRAMS = mount.davfs umount.davfs
-mount_davfs_SOURCES = cache.c dav_coda.c \
+mount_davfs_SOURCES = cache.c \
         dav_fuse.c kernel_interface.c mount_davfs.c webdav.c \
-        cache.h coda.h defaults.h fuse_kernel.h \
+        cache.h defaults.h fuse_kernel.h \
         kernel_interface.h mount_davfs.h webdav.h
 umount_davfs_SOURCES = umount_davfs.c defaults.h
 

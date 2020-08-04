@@ -1,5 +1,5 @@
 /*  dav_fuse.c: interface to the fuse kernel module FUSE_KERNEL_VERSION 7.
-    Copyright (C) 2006, 2007, 2008. 2009, 2014 Werner Baumann
+    Copyright (C) 2006, 2007, 2008. 2009, 2014, 2020 Werner Baumann
 
     This file is part of davfs2.
 
@@ -165,7 +165,7 @@ dav_fuse_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
         return;
     }
 
-    dav_register_kernel_interface(&write_dir_entry, NULL, NULL);
+    dav_register_kernel_interface(&write_dir_entry, NULL);
 
     struct timeval tv;
     tv.tv_sec = idle_time;

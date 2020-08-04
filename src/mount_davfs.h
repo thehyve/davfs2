@@ -1,5 +1,5 @@
 /*  mount_davfs.h: structure to collect arguments and options.
-    Copyright (C) 2006, 2007, 2008, 2009, 2014 Werner Baumann
+    Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Werner Baumann
 
     This file is part of davfs2.
 
@@ -41,7 +41,6 @@ typedef struct {
     int netdev;               /* Command line */
     int grpid;                /* Command line */
     unsigned long int mopts;  /* Command line */
-    char *kernel_fs;          /* User config file, system config file */
     int use_utab;
     size_t buf_size;          /* User config file, system config file */
     /* File mode */
