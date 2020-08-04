@@ -1,5 +1,5 @@
 /*  kernel_interface.h: interface to fuse and coda kernel mocule.
-    Copyright (C) 2006, 2007, 2008, 2009 Werner Baumann
+    Copyright (C) 2006, 2007, 2008, 2009, 2020 Werner Baumann
 
     This file is part of davfs2.
 
@@ -31,22 +31,6 @@
 typedef int (*dav_is_mounted_fn)(void);
 
 
-/* Typedef of the message loop of the specific kernel interfaces. The real
-   function will be returned by dav_init_kernel_interface().
-   device          : File descriptor of the open fuse device.
-   mpoint          : String with the name of the mount point.
-   buf_size        : Size of the buffer for communication with the kernel
-                     module.
-   idle_t          : Time to wait for upcalls before calling dav_tidy_cache().
-   is_mounted_fn   : Call back function to check if still mounted.
-   keep_on_running : Pointer to run flag.
-   dbg             : send debug messages to syslog if dbg != 0 */
-typedef void (*dav_run_msgloop_fn)(int device, char *mpoint, size_t bufsize,
-                                   time_t idle_time,
-                                   dav_is_mounted_fn is_mounted,
-                                   volatile int *keep_on_running, int dbg);
-
-
 /* Function prototypes */
 /*=====================*/
 
@@ -56,8 +40,6 @@ typedef void (*dav_run_msgloop_fn)(int device, char *mpoint, size_t bufsize,
    In case of an error it prints an error message and terminates the program.
    dev       : File descriptor of the open device for communication with the
                kernel file system.
-   msg_loop  : The specific message loop function that will process the kernel
-               upcalls.
    mdata     : That mount data that will be passed to the mount function.
    kernel_fs : Type of the kernel file system to us (fuse or coda). If this
                does not work, the other file system will be tried. The name
@@ -74,21 +56,20 @@ typedef void (*dav_run_msgloop_fn)(int device, char *mpoint, size_t bufsize,
    mode      : Mode of the root node (fuse only).
    return value : 0: the file system has not yet been mounted
                   1: the file system has been mounted successfully. */
-int
-dav_init_kernel_interface(int *dev, dav_run_msgloop_fn *msg_loop, void **mdata,
-                          char **kernel_fs, size_t *buf_size, const char *url,
+void
+dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
                           const char *mpoint, const dav_args *args);
 
 
-/* Message loop for coda kernel module CODA_KERNEL_VERSION 3.
-   Parameters see dav_run_msgloop_fn(). */
-void dav_coda_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
-                   dav_is_mounted_fn is_mounted,
-                   volatile int *keep_on_running, int dbg);
-
-
 /* Message loop for fuse kernel module with major number 7.
-   Parameters see dav_run_msgloop_fn(). */
+   device          : File descriptor of the open fuse device.
+   mpoint          : String with the name of the mount point.
+   buf_size        : Size of the buffer for communication with the kernel
+                     module.
+   idle_t          : Time to wait for upcalls before calling dav_tidy_cache().
+   is_mounted_fn   : Call back function to check if still mounted.
+   keep_on_running : Pointer to run flag.
+   dbg             : send debug messages to syslog if dbg != 0 */
 void
 dav_fuse_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
               dav_is_mounted_fn is_mounted, volatile int *keep_on_running,

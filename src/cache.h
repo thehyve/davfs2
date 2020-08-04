@@ -1,5 +1,5 @@
 /*  cache.h: directory and file cache.
-    Copyright (C) 2006, 2007, 2008, 2009, 2014 Werner Baumann
+    Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Werner Baumann
 
     This file is part of davfs2.
 
@@ -205,7 +205,7 @@ dav_close_cache(volatile int *got_sigterm);
    If blksize is not NULL, the preferred bloksize for IO is asigned.
    It returns the value of alignment. */
 size_t
-dav_register_kernel_interface(dav_write_dir_entry_fn write_fn, int *flush_flag,
+dav_register_kernel_interface(dav_write_dir_entry_fn write_fn,
                               unsigned int *blksize);
 
 

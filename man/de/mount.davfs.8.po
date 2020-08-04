@@ -1,19 +1,26 @@
 # #-#-#-#-#  mount.davfs.8.po (davfs2)  #-#-#-#-#
 # German translation of mount.davfs man page.
-# Copyright (C) 2007, 2014 Werner Baumann
+# Copyright (C) 2007, 2014, 2020 Werner Baumann
 # Werner Baumann <werner.baumann@onlinehome.de>, 2007.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: davfs2 1.5.4\n"
-"POT-Creation-Date: 2016-05-16 11:10+0200\n"
-"PO-Revision-Date: 2016-05-16 11:20+0200\n"
+"POT-Creation-Date: 2020-08-03 11:36+0200\n"
+"PO-Revision-Date: 2020-08-03 17:18+0200\n"
 "Last-Translator: Werner Baumann <werner.baumann@onlinehome.de>\n"
 "Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+# type: TH
+#. type: TH
+#: davfs2.conf.5:1 mount.davfs.8:1
+#, no-wrap
+msgid "2020-08-03"
+msgstr "2020-08-03"
 
 # type: TH
 #. type: TH
@@ -38,27 +45,27 @@ msgstr "BESCHREIBUNG"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:568 mount.davfs.8:551 umount.davfs.8:79
+#: davfs2.conf.5:566 mount.davfs.8:551 umount.davfs.8:79
 #, no-wrap
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:574 mount.davfs.8:568 umount.davfs.8:84
+#: davfs2.conf.5:572 mount.davfs.8:568 umount.davfs.8:84
 #, no-wrap
 msgid "DAVFS2 HOME"
 msgstr "DAVFS2 HOME"
 
 # type: TH
 #. type: Plain text
-#: davfs2.conf.5:577 mount.davfs.8:571 umount.davfs.8:87
+#: davfs2.conf.5:575 mount.davfs.8:571 umount.davfs.8:87
 msgid "@PACKAGE_BUGREPORT@"
 msgstr "@PACKAGE_BUGREPORT@"
 
 # type: SH
 #. type: SH
-#: davfs2.conf.5:579 mount.davfs.8:573 umount.davfs.8:89
+#: davfs2.conf.5:577 mount.davfs.8:573 umount.davfs.8:89
 #, no-wrap
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
@@ -69,13 +76,6 @@ msgstr "SIEHE AUCH"
 #, no-wrap
 msgid "@PROGRAM_NAME@"
 msgstr "@PROGRAM_NAME@"
-
-# type: TH
-#. type: TH
-#: mount.davfs.8:1
-#, no-wrap
-msgid "2016-04-15"
-msgstr "2016-04-15"
 
 # type: Plain text
 #. type: Plain text
@@ -159,13 +159,13 @@ msgstr ""
 msgid ""
 "B<@PACKAGE@> supports B<TLS/SSL> (if the neon library supports it) and "
 "proxies. B<@PROGRAM_NAME@> runs as a daemon in userspace. It integrates into "
-"the virtual file system by either the coda or the fuse kernel files system.  "
-"Currently CODA_KERNEL_VERSION 3 and FUSE_KERNEL_VERSION 7 are supported."
+"the virtual file system by the fuse kernel files system.  Currently "
+"FUSE_KERNEL_VERSION 7 is supported."
 msgstr ""
 "B<@PACKAGE@> unterstützt B<TLS/SSL> (falls die Neon-Bibliothek es "
-"unterstützt) und Verbindungen über einen Proxy. Es wird über das coda oder "
-"das fuse Kernel-Dateisystem in das virtuelle Dateisystem eingebunden.  "
-"Derzeit werden CODA_KERNEL_VERSION 3 und FUSE_KERNEL_VERSION 7 unterstützt."
+"unterstützt) und Verbindungen über einen Proxy. Es wird über das fuse Kernel-"
+"Dateisystem in das virtuelle Dateisystem eingebunden.  Derzeit wird "
+"FUSE_KERNEL_VERSION 7 unterstützt."
 
 # type: Plain text
 #. type: Plain text
