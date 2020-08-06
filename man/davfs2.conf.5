@@ -1,4 +1,4 @@
-.TH @CONFIGFILE@ 5 2020\-08\-03 @PACKAGE_STRING@
+.TH @CONFIGFILE@ 5 2020\-08\-06 @PACKAGE_STRING@
 
 
 .SH NAME
@@ -331,6 +331,15 @@ same credentials are use as for the original server; if the connection
 is over TLS the server certificate will be checked against the trusted
 CAs known by the system; user configured server certificates and client
 certificates are not used for the new server.
+.br
+Default: 0
+
+.TP
+.B sharepoint_href_bug
+SharePoint does not properly encode UTF8-characters within the href-element.
+Because of this some files are invisible because the href-element violates
+the rules. Neon 0.31 and newer has a workaround for this SharePoint bug. This
+option will activate this workaround.
 .br
 Default: 0
 

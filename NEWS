@@ -3,6 +3,19 @@
 # Copying and distribution of this file, with or without modification, are
 # permitted in any medium without royalty.
 
+What is new in davfs2 1.6.0
+===========================
+
+davfs2 no longer support the use of the Coda kernel file system. It would
+have required some chnges. But the fuse kernel file system si better suited
+anyway and is part of the official Linux kernel for many years now. So
+Coda is no longer required.
+
+The Neon library from version 0.31 on has a workaraound for some XML-bugs of
+SharePoint concerning file names. Option "sharepoint_href_bug 1" will activate
+this workaround.
+
+Some bug fixes.
 
 
 What is new in davfs2 1.5.2
