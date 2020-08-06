@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2020-08-06 Werner Baumann (werner.baumann@onlinehome.de)
+    * Update documentation.
+
 2020-08-03 Werner Baumann (werner.baumann@onlinehome.de)
     * cache.h, cache.c, mount_davfs.h, mount_davfs.c,
       kernel_interface.h, kernel_interface.c,
