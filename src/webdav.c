@@ -1,5 +1,5 @@
 /*  webdav.c: send requests to the WebDAV server.
-    Copyright (C) 2006, 2007, 2008, 2009 Werner Baumann
+    Copyright (C) 2006, 2007, 2008, 2009, 2020 Werner Baumann
 
     This file is part of davfs2.
 
@@ -59,10 +59,7 @@
 #include <sys/stat.h>
 #endif
 
-#include "xalloc.h"
-#include "xstrndup.h"
-#include "xvasprintf.h"
-
+#include <ne_alloc.h>
 #include <ne_auth.h>
 #include <ne_basic.h>
 #include <ne_compress.h>
@@ -356,8 +353,8 @@ dav_init_webdav(dav_args *args)
         error(EXIT_FAILURE, errno, _("socket library initialization failed"));
 
     if (args->neon_debug & ~NE_DBG_HTTPPLAIN) {
-        char *buf = xmalloc(log_bufsize);
-        cookie_io_functions_t *log_func = xmalloc(sizeof(cookie_io_functions_t));
+        char *buf = ne_malloc(log_bufsize);
+        cookie_io_functions_t *log_func = ne_malloc(sizeof(cookie_io_functions_t));
         log_func->read = NULL;
         log_func->write = log_writer;
         log_func->seek = NULL;
@@ -375,7 +372,9 @@ dav_init_webdav(dav_args *args)
 
     ne_set_connect_timeout(session, args->connect_timeout);
 
-    char *useragent = xasprintf("%s/%s", PACKAGE_TARNAME, PACKAGE_VERSION);
+    char *useragent = NULL;
+    if (asprintf(&useragent, "%s/%s", PACKAGE_TARNAME, PACKAGE_VERSION) < 0)
+        abort();
     ne_set_useragent(session, useragent);
     free(useragent);
 
@@ -385,17 +384,17 @@ dav_init_webdav(dav_args *args)
 #endif
 
     if (args->username)
-        username = xstrdup(args->username);
+        username = ne_strdup(args->username);
     if (args->password)
-        password = xstrdup(args->password);
+        password = ne_strdup(args->password);
     ne_add_server_auth(session, NE_AUTH_ALL, auth, "server");
 
     if (args->useproxy && args->p_host) {
         ne_session_proxy(session, args->p_host, args->p_port);
         if (args->p_user)
-            p_username = xstrdup(args->p_user);
+            p_username = ne_strdup(args->p_user);
         if (args->p_passwd)
-            p_password = xstrdup(args->p_passwd);
+            p_password = ne_strdup(args->p_passwd);
         ne_add_proxy_auth(session, NE_AUTH_ALL, auth, "proxy");
     }
 
@@ -423,23 +422,23 @@ dav_init_webdav(dav_args *args)
         locks = ne_lockstore_create();
         if (!args->lock_owner) {
             if (!args->username) {
-                owner = xstrdup(PACKAGE_STRING);
+                owner = ne_strdup(PACKAGE_STRING);
             } else {
-                owner = xstrdup(args->username);
+                owner = ne_strdup(args->username);
             }
         } else {
-            owner = xstrdup(args->lock_owner);
+            owner = ne_strdup(args->lock_owner);
         }
         lock_timeout = args->lock_timeout;
     }
 
     if (args->header) {
-        custom_header = xstrdup(args->header);
+        custom_header = ne_strdup(args->header);
     }
 
     if (args->n_cookies) {
         n_cookies = args->n_cookies;
-        cookie_list = (char **) xcalloc(n_cookies, sizeof(char *));
+        cookie_list = (char **) ne_calloc(n_cookies * sizeof(char *));
         ne_hook_post_headers(session, get_cookies, NULL);
     }
 
@@ -526,7 +525,7 @@ dav_close_webdav(void)
 char *
 dav_conv_from_utf_8(const char *s)
 {
-    char *new = xstrdup(s);
+    char *new = ne_strdup(s);
 #if defined DAV_USE_ICONV && defined HAVE_ICONV_H
     if (from_utf_8)
         convert(&new, from_utf_8);
@@ -538,7 +537,7 @@ dav_conv_from_utf_8(const char *s)
 char *
 dav_conv_to_utf_8(const char *s)
 {
-    char *new = xstrdup(s);
+    char *new = ne_strdup(s);
 #if defined DAV_USE_ICONV && defined HAVE_ICONV_H
     if (to_utf_8)
         convert(&new, to_utf_8);
@@ -550,7 +549,7 @@ dav_conv_to_utf_8(const char *s)
 char *
 dav_conv_from_server_enc(const char *s)
 {
-    char *new = xstrdup(s);
+    char *new = ne_strdup(s);
 #if defined DAV_USE_ICONV && defined HAVE_ICONV_H
     if (from_server_enc)
         convert(&new, from_server_enc);
@@ -562,7 +561,7 @@ dav_conv_from_server_enc(const char *s)
 char *
 dav_conv_to_server_enc(const char *s)
 {
-    char *new = xstrdup(s);
+    char *new = ne_strdup(s);
 #if defined DAV_USE_ICONV && defined HAVE_ICONV_H
     if (to_server_enc)
         convert(&new, to_server_enc);
@@ -827,7 +826,7 @@ dav_lock(const char *path, time_t *expire, int *exists)
     lock = ne_lock_create();
     ne_fill_server_uri(session, &lock->uri);
     lock->uri.path = spath;
-    lock->owner = xstrdup(owner);
+    lock->owner = ne_strdup(owner);
     lock->timeout = lock_timeout;
 
     if (!has_if_match_bug && !*exists)
@@ -1160,7 +1159,7 @@ convert(char **s, iconv_t conv)
     size_t insize = strlen(*s);
     char *in = *s;
     size_t outsize = MB_LEN_MAX * (insize + 1);
-    char *buf = xcalloc(outsize, 1);
+    char *buf = ne_calloc(outsize);
     char *out = buf;
 
     iconv(conv, NULL, NULL, &out, &outsize);
@@ -1168,7 +1167,7 @@ convert(char **s, iconv_t conv)
             && insize == 0 && outsize >= MB_LEN_MAX) {
         memset(out, 0, MB_LEN_MAX);
         free(*s);
-        *s = xstrndup(buf, out - buf + MB_LEN_MAX);
+        *s = ne_strndup(buf, out - buf + MB_LEN_MAX);
     }
 
     free(buf);
@@ -1441,11 +1440,11 @@ replace_slashes(char **name)
         char *nn;
         *slash = '\0';
         if (slash == *name) {
-            nn = xasprintf("slash-%s", slash + 1);
+            if (asprintf(&nn, "slash-%s", slash + 1) < 0) abort();
         } else if (slash == end) {
-            nn = xasprintf("%s-slash", *name);
+            if (asprintf(&nn, "%s-slash", *name) < 0) abort();
         } else {
-            nn = xasprintf("%s-slash-%s", *name, slash + 1);
+            if (asprintf(&nn, "%s-slash-%s", *name, slash + 1) < 0) abort();
         }
         free(*name);
         *name = nn;
@@ -1577,9 +1576,9 @@ get_cookies(ne_request *req, void *userdata, const ne_status *status)
         char *s;
         const char *end = strchr(value, ';');
         if (end) {
-            s = xstrndup(value, end - value);
+            s = ne_strndup(value, end - value);
         } else {
-            s = xstrdup(value);
+            s = ne_strdup(value);
         }
         char *es = strchr(s, '=');
         if (!es) {
@@ -1598,12 +1597,12 @@ get_cookies(ne_request *req, void *userdata, const ne_status *status)
         int i = 0;
         for (i = 0; i < n_cookies; i++) {
             if (!cookie_list[i]) {
-                cookie_list[i] = xstrdup(cookie);
+                cookie_list[i] = ne_strdup(cookie);
                 break;
             }
             if (strncmp(cookie_list[i], cookie, nl) == 0) {
                 free(cookie_list[i]);
-                cookie_list[i] = xstrdup(cookie);
+                cookie_list[i] = ne_strdup(cookie);
                 break;
             }
         }
@@ -1664,7 +1663,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     if (!ctx || !uri || !uri->path || !set)
         return;
 
-    char *tmp_path = (char *) xmalloc(strlen(uri->path) + 1);
+    char *tmp_path = (char *) ne_malloc(strlen(uri->path) + 1);
     const char *from = uri->path;
     char *to = tmp_path;
     while (*from) {
@@ -1673,7 +1672,7 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
         *to++ = *from++;
     }
     *to = 0;
-    dav_props *result = xcalloc(1, sizeof(dav_props));
+    dav_props *result = ne_calloc(sizeof(dav_props));
     result->path = ne_path_unescape(tmp_path);
     free (tmp_path);
 
@@ -1695,7 +1694,8 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
             *(result->path + strlen(result->path) - 1) = '\0';
     } else {
         if (result->is_dir) {
-            char *tmp = xasprintf("%s/", result->path);
+            char *tmp = NULL;
+            if (asprintf(&tmp, "%s/", result->path) < 0) abort();
             free(result->path);
             result->path = tmp;
         }
@@ -1707,13 +1707,13 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
     }
 
     if (strcasecmp(result->path, ctx->path) == 0) {
-        result->name = xstrdup("");
+        result->name = ne_strdup("");
     } else {
         if (strlen(result->path) < (strlen(ctx->path) + result->is_dir + 1)) {
             dav_delete_props(result);
             return;
         }
-        result->name = xstrndup(result->path + strlen(ctx->path),
+        result->name = ne_strndup(result->path + strlen(ctx->path),
                                   strlen(result->path) - strlen(ctx->path)
                                   - result->is_dir);
         replace_slashes(&result->name);
@@ -1810,7 +1810,7 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
 
     char *issuer = ne_ssl_readable_dname(ne_ssl_cert_issuer(cert));
     char *subject = ne_ssl_readable_dname(ne_ssl_cert_subject(cert));
-    char *digest = xcalloc(1, NE_SSL_DIGESTLEN);
+    char *digest = ne_calloc(NE_SSL_DIGESTLEN);
     if (!issuer || !subject || ne_ssl_cert_digest(cert, digest) != 0) {
         if (have_terminal) {
             error(0, 0, _("error processing server certificate"));

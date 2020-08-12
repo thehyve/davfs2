@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2020-08-12 Werner Baumann (werner.baumann@onlinehome.de)
+    * Remove gnulib.
+
 2020-06-07 Werner Baumann (werner.baumann@onlinehome.de)
     * webdav.c, get_cookies:
       New parser for cookies (bug #58459).

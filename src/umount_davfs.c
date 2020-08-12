@@ -40,11 +40,9 @@
 #include <unistd.h>
 #endif
 
-#include "xalloc.h"
-#include "xvasprintf.h"
+#include <ne_alloc.h>
 
 #include "defaults.h"
-#include "canonicalize.h"
 
 #ifdef ENABLE_NLS
 #define _(String) gettext(String)
@@ -126,9 +124,9 @@ main(int argc, char *argv[])
 
     char *umount_command = NULL;
     if (mpoint) {
-        umount_command = xasprintf("umount -i '%s'", mpoint);
+        if (asprintf(&umount_command, "umount -i '%s'", mpoint) < 0) abort();
     } else {
-        umount_command = xasprintf("umount -i '%s'", argv[optind]);
+        if (asprintf(&umount_command, "umount -i '%s'", argv[optind]) < 0) abort();
         error(0, 0,
               _("\n"
                 "  can't evaluate PID file name;\n"
@@ -140,13 +138,14 @@ main(int argc, char *argv[])
     char *m = mpoint;
     while (*m == '/')
         m++;
-    char *mp = xstrdup(m);
+    char *mp = ne_strdup(m);
     m = strchr(mp, '/');
     while (m) {
         *m = '-';
         m = strchr(mp, '/');
     }
-    char *pidfile = xasprintf("%s/%s.pid", DAV_SYS_RUN, mp);
+    char *pidfile;
+    if (asprintf(&pidfile, "%s/%s.pid", DAV_SYS_RUN, mp) < 0) abort();
     free(mp);
 
     char *pid = NULL;
@@ -161,7 +160,8 @@ main(int argc, char *argv[])
     }
     fclose(file);
 
-    char *ps_command = xasprintf("ps -p %s", pid);
+    char *ps_command;
+    if (asprintf(&ps_command, "ps -p %s", pid) < 0) abort();
     FILE *ps_in = popen(ps_command, "r");
     if (!ps_in) {
         error(0, 0,

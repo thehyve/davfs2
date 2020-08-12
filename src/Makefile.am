@@ -32,7 +32,6 @@ mount_davfs_SOURCES = cache.c \
         kernel_interface.h mount_davfs.h webdav.h
 umount_davfs_SOURCES = umount_davfs.c defaults.h
 
-AM_CPPFLAGS = -I$(top_builddir)/gl -I$(top_srcdir)/gl
 AM_CFLAGS = -Wall -Werror=format-security \
             -fstack-protector --param=ssp-buffer-size=4
 DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
@@ -50,8 +49,6 @@ DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -DDAV_GROUP=\"$(dav_group)\" \
        -D_FORTIFY_SOURCE=2 @DEFS@
 LIBS = $(NEON_LIBS) @LIBS@
-mount_davfs_LDADD = $(LIBINTL) $(LIBICONV) $(LIBTHREAD) ../gl/libgnu.a
-umount_davfs_LDADD = $(LIBINTL) ../gl/libgnu.a
 
 install-exec-hook:
 	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \

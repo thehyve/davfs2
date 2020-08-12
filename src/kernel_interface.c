@@ -1,5 +1,5 @@
 /*  dav_fuse.c: interface to the fuse kernel module FUSE_KERNEL_VERSION 7.
-    Copyright (C) 2006, 2007, 2008. 2009 Werner Baumann
+    Copyright (C) 2006, 2007, 2008. 2009, 2020 Werner Baumann
 
     This file is part of davfs2.
 
@@ -59,9 +59,6 @@
 #include <sys/types.h>
 #endif
 #include <sys/wait.h>
-
-#include "xalloc.h"
-#include "xvasprintf.h"
 
 #include <ne_ssl.h>
 
@@ -233,7 +230,8 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
     if (idle_time > args->lock_refresh / 2)
         idle_time = args->lock_refresh / 2;
 
-    char *path = xasprintf("%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME);
+    char *path = NULL;
+    if (asprintf(&path, "%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME) < 0) abort();
 
     fuse_device = open(path, O_RDWR | O_NONBLOCK);
 
@@ -268,10 +266,11 @@ dav_init_kernel_interface(const char *url, const char *mpoint,
     if (fuse_device <= 0)
         error(EXIT_FAILURE, 0, _("can't open fuse device"));
 
-    char *mdata = xasprintf("fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
-                            "allow_other,max_read=%lu", fuse_device,
-                            args->dir_mode, args->fsuid, args->fsgid,
-                            (unsigned long int) (buf_size - 1024));
+    char *mdata = NULL;
+    if (asprintf(&mdata, "fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
+                 "allow_other,max_read=%lu", fuse_device, args->dir_mode,
+                 args->fsuid, args->fsgid,
+                 (unsigned long int) (buf_size - 1024)) < 0) abort();
 
     if (mount(url, mpoint, "fuse", args->mopts, mdata) != 0)
         error(EXIT_FAILURE, errno, _("mounting failed"));
