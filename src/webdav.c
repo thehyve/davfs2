@@ -25,9 +25,6 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#ifdef HAVE_ICONV_H
-#include <iconv.h>
-#endif
 #ifdef HAVE_LANGINFO_H
 #include <langinfo.h>
 #endif
@@ -223,23 +220,6 @@ static int initialized;
    Needed by  ssl_verify() which may be called at any time. */
 static int have_terminal;
 
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-/* Handle to convert character encoding from utf-8 to LC_CTYPE.
-   If NULL no conversion is done. */
-static iconv_t from_utf_8;
-
-/* Handle to convert character encoding from LC_CTYPE to utf-8.
-   If NULL no conversion is done. */
-static iconv_t to_utf_8;
-
-/* Handle to convert character encing of path names to LC_CTYPE. If NULL
-   no conversion is done. */
-static iconv_t from_server_enc;
-
-/* Handle to convert from LC_CTYPE to character encoding of path names.
-   If NULL no conversion is done. */
-static iconv_t to_server_enc;
-#endif /* DAV_USE_ICONV && HAVE_ICONV_H */
 
 /* A GNU custom stream, used to redirect neon debug messages to syslog. */
 static FILE *log_stream;
@@ -255,11 +235,6 @@ static char **cookie_list;
 
 /* Private function prototypes and inline functions */
 /*==================================================*/
-
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-static void
-convert(char **s, iconv_t conv);
-#endif
 
 static int
 get_error(int ret, const char *method);
@@ -321,33 +296,6 @@ dav_init_webdav(dav_args *args)
 {
     if (args->neon_debug & ~NE_DBG_HTTPPLAIN)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Initializing webdav");
-
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-    char *lc_charset = nl_langinfo(CODESET);
-    if (lc_charset && strcasecmp(lc_charset, "UTF-8") != 0) {
-        from_utf_8 = iconv_open(lc_charset, "UTF-8");
-        if (from_utf_8 == (iconv_t) -1)
-            from_utf_8 = 0;
-        to_utf_8 = iconv_open("UTF-8", lc_charset);
-        if (to_utf_8 == (iconv_t) -1)
-            to_utf_8 = 0;
-    }
-
-    if (lc_charset && args->s_charset
-            && strcasecmp(args->s_charset, lc_charset) != 0) {
-        if (strcasecmp(args->s_charset, "UTF-8") == 0) {
-            from_server_enc = from_utf_8;
-            to_server_enc = to_utf_8;
-        } else {
-            from_server_enc = iconv_open(lc_charset, args->s_charset);
-            if (from_server_enc == (iconv_t) -1)
-                from_server_enc = 0;
-            to_server_enc = iconv_open(args->s_charset, lc_charset);
-            if (to_server_enc == (iconv_t) -1)
-                to_server_enc = 0;
-        }
-    }
-#endif /* DAV_USE_ICONV && HAVE_ICONV_H */
 
     if (ne_sock_init() != 0)
         error(EXIT_FAILURE, errno, _("socket library initialization failed"));
@@ -519,54 +467,6 @@ dav_close_webdav(void)
     if (session)
         ne_session_destroy(session);
     ne_sock_exit();
-}
-
-
-char *
-dav_conv_from_utf_8(const char *s)
-{
-    char *new = ne_strdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-    if (from_utf_8)
-        convert(&new, from_utf_8);
-#endif
-    return new;
-}
-
-
-char *
-dav_conv_to_utf_8(const char *s)
-{
-    char *new = ne_strdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-    if (to_utf_8)
-        convert(&new, to_utf_8);
-#endif
-    return new;
-}
-
-
-char *
-dav_conv_from_server_enc(const char *s)
-{
-    char *new = ne_strdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-    if (from_server_enc)
-        convert(&new, from_server_enc);
-#endif
-    return new;
-}
-
-
-char *
-dav_conv_to_server_enc(const char *s)
-{
-    char *new = ne_strdup(s);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-    if (to_server_enc)
-        convert(&new, to_server_enc);
-#endif
-    return new;
 }
 
 
@@ -1152,29 +1052,6 @@ dav_unlock(const char *path, time_t *expire)
 /* Private functions */
 /*===================*/
 
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-static void
-convert(char **s, iconv_t conv)
-{
-    size_t insize = strlen(*s);
-    char *in = *s;
-    size_t outsize = MB_LEN_MAX * (insize + 1);
-    char *buf = ne_calloc(outsize);
-    char *out = buf;
-
-    iconv(conv, NULL, NULL, &out, &outsize);
-    if (iconv(conv, &in, &insize, &out, &outsize) >= 0
-            && insize == 0 && outsize >= MB_LEN_MAX) {
-        memset(out, 0, MB_LEN_MAX);
-        free(*s);
-        *s = ne_strndup(buf, out - buf + MB_LEN_MAX);
-    }
-
-    free(buf);
-}
-#endif /* DAV_USE_ICONV && HAVE_ICONV_H */
-
-
 /* Returns a file error code according to ret from the last WebDAV
    method call. If ret has value NE_ERROR the error code from the session is
    fetched and translated.
@@ -1717,10 +1594,6 @@ prop_result(void *userdata, const ne_uri *uri, const ne_prop_result_set *set)
                                   strlen(result->path) - strlen(ctx->path)
                                   - result->is_dir);
         replace_slashes(&result->name);
-#if defined DAV_USE_ICONV && defined HAVE_ICONV_H
-        if (from_server_enc)
-            convert(&result->name, from_server_enc);
-#endif
     }
 
 

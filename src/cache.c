@@ -628,7 +628,7 @@ dav_init_cache(const dav_args *args, const char *mpoint)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Reading stored cache data");
     parse_index();
     root->name = ne_strdup("");
-    root->path = dav_conv_to_server_enc(args->path);
+    root->path = ne_strdup(args->path);
     root->mode = default_dir_mode;
 
     if (!backup)
@@ -909,10 +909,8 @@ dav_create(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     if (!pw)
         return EINVAL;
 
-    char *name_conv = dav_conv_to_server_enc(name);
     char *path = NULL;
-    if (asprintf(&path, "%s%s", parent->path, name_conv) < 0) abort();
-    free(name_conv);
+    if (asprintf(&path, "%s%s", parent->path, name) < 0) abort();
 
     *nodep = new_node(parent, mode | S_IFREG);
     (*nodep)->path = path;
@@ -1037,10 +1035,8 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     if (!pw)
         return EINVAL;
 
-    char *name_conv = dav_conv_to_server_enc(name);
     char *path = NULL;
-    if (asprintf(&path, "%s%s/", parent->path, name_conv) < 0) abort();
-    free(name_conv);
+    if (asprintf(&path, "%s%s/", parent->path, name) < 0) abort();
     int ret = dav_make_collection(path);
 
     if (!ret) {
@@ -1776,10 +1772,8 @@ move_dir(dav_node *src, dav_node *dst, dav_node *dst_parent,
 
     char *dst_path;
     if (!dst) {
-        char *dst_conv = dav_conv_to_server_enc(dst_name);
         dst_path = NULL;
-        if (asprintf(&dst_path, "%s%s/", dst_parent->path, dst_conv) < 0) abort();
-        free(dst_conv);
+        if (asprintf(&dst_path, "%s%s/", dst_parent->path, dst_name) < 0) abort();
     } else {
         dst_path = ne_strdup(dst->path);
     }
@@ -1816,10 +1810,8 @@ move_no_remote(dav_node *src, dav_node *dst, dav_node *dst_parent,
 
     char *dst_path;
     if (!dst) {
-        char *dst_conv = dav_conv_to_server_enc(dst_name);
         dst_path = NULL;
-        if (asprintf(&dst_path, "%s%s", dst_parent->path, dst_conv) < 0) abort();
-        free(dst_conv);
+        if (asprintf(&dst_path, "%s%s", dst_parent->path, dst_name) < 0) abort();
     } else {
         dst_path = ne_strdup(dst->path);
     }
@@ -1885,10 +1877,8 @@ move_reg(dav_node *src, dav_node *dst, dav_node *dst_parent,
 
     char *dst_path;
     if (!dst) {
-        char *dst_conv = dav_conv_to_server_enc(dst_name);
         dst_path = NULL;
-        if (asprintf(&dst_path, "%s%s", dst_parent->path, dst_conv) < 0) abort();
-        free(dst_conv);
+        if (asprintf(&dst_path, "%s%s", dst_parent->path, dst_name) < 0) abort();
     } else {
         dst_path = ne_strdup(dst->path);
     }
@@ -2915,26 +2905,20 @@ write_node(dav_node *node, FILE *file, const char *indent)
     if (asprintf(&ind, "%s  ", indent) < 0) abort();
 
     if (node != root && !is_backup(node)) {
-        if (fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind, type[PATH], node->path,
-                    type[PATH]) < 0)
+        if (fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind, type[PATH],
+                    node->path, type[PATH]) < 0)
             return -1;
     }
 
     if (node != root && node != backup) {
-        char *name = dav_conv_to_utf_8(node->name);
-        int ret = fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind, type[NAME], name,
-                          type[NAME]);
-        free(name);
-        if (ret < 0)
+        if (fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind, type[NAME],
+                    node->name, type[NAME]) < 0)
             return -1;
     }
 
     if (is_reg(node) && node->cache_path != NULL) {
-        char *path = dav_conv_to_utf_8(node->cache_path);
-        int ret = fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind, type[CACHE_PATH],
-                          path, type[CACHE_PATH]);
-        free(path);
-        if (ret < 0)
+        if (fprintf(file, "%s<d:%s><![CDATA[%s]]></d:%s>\n", ind,
+                    type[CACHE_PATH], node->cache_path, type[CACHE_PATH]) < 0)
             return -1;
     }
 
@@ -3335,12 +3319,10 @@ xml_end_string(void *userdata, int state, const char *nspace, const char *name)
         (*((dav_node **) userdata))->path = xml_data;
         break;
     case NAME:
-        (*((dav_node **) userdata))->name = dav_conv_from_utf_8(xml_data);
-        free(xml_data);
+        (*((dav_node **) userdata))->name = xml_data;
         break;
     case CACHE_PATH:
-        (*((dav_node **) userdata))->cache_path = dav_conv_from_utf_8(xml_data);
-        free(xml_data);
+        (*((dav_node **) userdata))->cache_path = xml_data;
         break;
     case ETAG:
         (*((dav_node **) userdata))->etag = xml_data;

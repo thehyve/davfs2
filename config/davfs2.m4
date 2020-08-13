@@ -145,22 +145,6 @@ AC_DEFUN([DAV_LFS],[
 ])
 
 
-# Disable character conversion.
-
-AC_DEFUN([DAV_ICONV],[
-    AC_ARG_ENABLE([iconv],
-      [  --disable-iconv         disable character conversion],
-      [dav_iconv=$enableval],
-      [dav_iconv=yes])
-
-    if test "$dav_iconv" = "yes"; then
-        AC_DEFINE([DAV_USE_ICONV], [1],
-          [Define to enable charcter conversion])
-    fi
-
-])
-
-
 # Output summary
 
 AC_DEFUN([DAV_MESSAGE],[

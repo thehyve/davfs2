@@ -310,23 +310,6 @@ disable caching of files because files in the cache can't be reused.
 Default: 0
 
 .TP
-.B server_charset
-When extracting file names from the path component of the URL,
-\fB@PROGRAM_NAME@\fR will assume they are encoded using this character set
-and translate file names to the local character set. This is \fBnot\fR
-about encoding of file contents and \fBnot\fR about HTTP escaping rules.
-.br
-There is no means in HTTP to know the character encoding of the path
-component. There may be even different encodings within the same path, as
-the encoding of file names is often defined by the clients that created them.
-Nowadays it is best to use only UTF\-8 encoding and to do no conversion. If
-you are not sure that all clients understand UTF\-8, restrict file names to
-pure us\-ascii. Never use characters in file names, that may have a special
-function on some operating systems (like /, : and \(rs).
-.br
-Default: no character set conversion
-
-.TP
 .B connect_timeout
 When creating a TCP connection to the server \fB@PROGRAM_NAME@\fR will
 wait that many seconds for an answer before assuming an error. If a value

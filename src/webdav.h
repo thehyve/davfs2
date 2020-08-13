@@ -71,22 +71,6 @@ void
 dav_close_webdav(void);
 
 
-/* Converts the character encoding of s from and to the local encoding.
-   Converter handles are taken from global variables from_utf_8, to_utf_8,
-   from_server_enc and to_server_enc.
-   If no conversion is necessary, it just returns a copy of s.
-   name : string to be converted.
-   return value : the converted string, newly allocated. */
-char *
-dav_conv_from_utf_8(const char *s);
-char *
-dav_conv_to_utf_8(const char *s);
-char *
-dav_conv_from_server_enc(const char *s);
-char *
-dav_conv_to_server_enc(const char *s);
-
-
 /* Deletes file path on the server.
    On success locks for this file are removed from the lock store.
    path   : Absolute path of the file.

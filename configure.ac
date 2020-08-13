@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-# Copyright (C) 2006, 2007, 2008, 2009, 2012 Werner Baumann
+# Copyright (C) 2006, 2007, 2008, 2009, 2012, 2020 Werner Baumann
 #
 # This file is part of davfs2.
 #
@@ -30,11 +30,9 @@ AC_CONFIG_HEADER([config.h])
 
 # Checks for programs.
 AC_PROG_CC
-gl_EARLY
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
 AC_PROG_LN_S
-gl_INIT
 
 # Checks for libraries.
 AM_GNU_GETTEXT_VERSION(0.19)
@@ -86,7 +84,6 @@ AC_CHECK_FUNCS([ftruncate getmntent memset mkdir nl_langinfo rpmatch select setl
 DAV_DEFAULTS
 DAV_LFS
 DAV_LINGUAS([])
-DAV_ICONV
 AC_DEFINE([_GNU_SOURCE], 1, [Define to enable GNU extensions])
 
 AC_CONFIG_FILES([Makefile

@@ -1479,8 +1479,6 @@ delete_args(dav_args *args)
     }
     if (args->lock_owner)
         free(args->lock_owner);
-    if (args->s_charset)
-        free(args->s_charset);
     if (args->header)
         free(args->header);
 
@@ -1844,8 +1842,6 @@ log_dbg_config(dav_args *args)
            "  retry: %li s", args->retry);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  max_retry: %li s", args->max_retry);
-    syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
-           "  s_charset: %s", args->s_charset);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
            "  header: %s", args->header);
     syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -2260,10 +2256,6 @@ read_config(dav_args *args, const char * filename, int system)
                 args->max_retry = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "max_upload_attempts") == 0) {
                 args->max_upload_attempts = arg_to_int(parmv[1], 10, parmv[0]);
-            } else if (strcmp(parmv[0], "server_charset") == 0) {
-                if (args->s_charset)
-                    free(args->s_charset);
-                args->s_charset = ne_strdup(parmv[1]);
             } else if (system && strcmp(parmv[0], "cache_dir") == 0) {
                 if (args->sys_cache)
                     free(args->sys_cache);
