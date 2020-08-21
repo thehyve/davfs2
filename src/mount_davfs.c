@@ -710,7 +710,7 @@ check_fstab(const dav_args *args)
     struct mntent *ft = getmntent(fstab);
     while (ft) {
         if (ft->mnt_dir) {
-            char *mp = canonicalize_file_name(ft->mnt_dir);
+            char *mp = realpath(ft->mnt_dir, NULL);
             if (mp) {
                 if (strcmp(mp, mpoint) == 0) {
                     free(mp);
@@ -906,7 +906,7 @@ parse_commandline(dav_args *args, int argc, char *argv[])
             url = ne_strdup(argv[i]);
         }
         i++;
-        mpoint = canonicalize_file_name(argv[i]);
+        mpoint = realpath(argv[i], NULL);
         if (!mpoint)
             error(EXIT_FAILURE, 0,
                   _("can't evaluate path of mount point %s"), mpoint);
@@ -1044,7 +1044,7 @@ parse_persona(dav_args *args)
         if (!pw || !pw->pw_name || !pw->pw_dir)
             error(EXIT_FAILURE, errno, _("can't read user data base"));
         args->uid_name = ne_strdup(pw->pw_name);
-        args->home = canonicalize_file_name(pw->pw_dir);
+        args->home = realpath(pw->pw_dir, NULL);
     }
 
     args->ngroups = getgroups(0, NULL);
@@ -2166,7 +2166,7 @@ read_config(dav_args *args, const char * filename, int system)
                 error_at_line(EXIT_FAILURE, 0, filename, lineno,
                               _("malformed line"));
             *(parmv[0] + strlen(parmv[0]) - 1) = '\0';
-            char *mp = canonicalize_file_name(parmv[0] + 1);
+            char *mp = realpath(parmv[0] + 1, NULL);
             if (mp) {
                 applies = (strcmp(mp, mpoint) == 0);
                 free(mp);
@@ -2420,7 +2420,7 @@ read_secrets(dav_args *args, const char *filename, int system)
             if (scheme && !port)
                 port = ne_uri_defaultport(scheme);
 
-            char *mp = canonicalize_file_name(parmv[0]);
+            char *mp = realpath(parmv[0], NULL);
 
             if ((mp && strcmp(mp, mpoint) == 0)
                     || (scheme && args->scheme

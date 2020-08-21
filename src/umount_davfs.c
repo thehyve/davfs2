@@ -26,6 +26,9 @@
 #ifdef HAVE_LIBINTL_H
 #include <libintl.h>
 #endif
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
 #endif
@@ -120,7 +123,7 @@ main(int argc, char *argv[])
     if (optind < (argc - 1))
         error(EXIT_FAILURE, 0, _("too many arguments"));
 
-    char *mpoint = canonicalize_file_name(argv[optind]);
+    char *mpoint = realpath(argv[optind], NULL);
 
     char *umount_command = NULL;
     if (mpoint) {
