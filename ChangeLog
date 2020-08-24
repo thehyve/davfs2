@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2020-08-24 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount_davfs.c, main:
+      Remove gnulib.
+
 2020-08-21 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, umount_davfs.c:
       Replace canonicalize_file_name with realpath.
