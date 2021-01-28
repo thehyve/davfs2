@@ -1219,9 +1219,10 @@ write_mtab_entry(const dav_args *args)
     if (args->use_utab) {
         if (asprintf(&utab_line,
                      "SRC=%s TARGET=%s ROOT=/ "
-                     "OPTS=uid=%i,gid=%i%s%s%s,helper=%s\n",
+                     "OPTS=uid=%i,gid=%i%s%s%s%s,helper=%s\n",
                      url, mpoint, args->fsuid, args->fsgid,
                      (args->grpid) ? ",grpid" : "",
+                     (args->netdev) ? ",_netdev" : "",
                      (!args->privileged) ? ",user=" : "",
                      (!args->privileged) ? args->uid_name : "",
                      DAV_FS_TYPE) < 0) abort();
