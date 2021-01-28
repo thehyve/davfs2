@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: davfs2 1.6.0\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2020-08-06 18:17+0200\n"
+"POT-Creation-Date: 2021-01-28 17:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,7 +77,7 @@ msgstr ""
 
 #: src/cache.c:2748 src/mount_davfs.c:580 src/mount_davfs.c:582
 #: src/mount_davfs.c:756 src/mount_davfs.c:758 src/mount_davfs.c:775
-#: src/mount_davfs.c:777 src/mount_davfs.c:1697 src/mount_davfs.c:1699
+#: src/mount_davfs.c:777 src/mount_davfs.c:1698 src/mount_davfs.c:1700
 msgid "can't read user data base"
 msgstr ""
 
@@ -139,8 +139,8 @@ msgstr ""
 #: src/mount_davfs.c:413 src/mount_davfs.c:453 src/mount_davfs.c:462
 #: src/mount_davfs.c:468 src/mount_davfs.c:494 src/mount_davfs.c:546
 #: src/mount_davfs.c:574 src/mount_davfs.c:1063 src/mount_davfs.c:1068
-#: src/mount_davfs.c:1112 src/mount_davfs.c:1115 src/mount_davfs.c:1288
-#: src/mount_davfs.c:1325 src/webdav.c:446 src/webdav.c:449
+#: src/mount_davfs.c:1112 src/mount_davfs.c:1115 src/mount_davfs.c:1289
+#: src/mount_davfs.c:1326 src/webdav.c:446 src/webdav.c:449
 msgid "can't change effective user id"
 msgstr ""
 
@@ -232,8 +232,8 @@ msgstr ""
 msgid "can't read group data base"
 msgstr ""
 
-#: src/mount_davfs.c:622 src/mount_davfs.c:670 src/mount_davfs.c:1378
-#: src/mount_davfs.c:1382
+#: src/mount_davfs.c:622 src/mount_davfs.c:670 src/mount_davfs.c:1379
+#: src/mount_davfs.c:1383
 #, c-format
 msgid "can't open file %s"
 msgstr ""
@@ -427,81 +427,81 @@ msgid ""
 "in mtab."
 msgstr ""
 
-#: src/mount_davfs.c:1293
+#: src/mount_davfs.c:1294
 #, c-format
 msgid "can't create file %s"
 msgstr ""
 
-#: src/mount_davfs.c:1297
+#: src/mount_davfs.c:1298
 #, c-format
 msgid "can't lock file %s"
 msgstr ""
 
-#: src/mount_davfs.c:1319
+#: src/mount_davfs.c:1320
 #, c-format
 msgid ""
 "Warning: can't write entry into %s, but will mount the file system anyway"
 msgstr ""
 
-#: src/mount_davfs.c:1357
+#: src/mount_davfs.c:1358
 #, c-format
 msgid "option %s has invalid argument;it must be a decimal number"
 msgstr ""
 
-#: src/mount_davfs.c:1360
+#: src/mount_davfs.c:1361
 #, c-format
 msgid "option %s has invalid argument;it must be an octal number"
 msgstr ""
 
-#: src/mount_davfs.c:1363
+#: src/mount_davfs.c:1364
 #, c-format
 msgid "option %s has invalid argument;it must be a number"
 msgstr ""
 
-#: src/mount_davfs.c:1389
+#: src/mount_davfs.c:1390
 #, c-format
 msgid "error writing to file %s"
 msgstr ""
 
-#: src/mount_davfs.c:1591
+#: src/mount_davfs.c:1592
 #, c-format
 msgid "option %s requires argument"
 msgstr ""
 
-#: src/mount_davfs.c:1679
+#: src/mount_davfs.c:1680
 #, c-format
 msgid "Unknown option %s.\n"
 msgstr ""
 
-#: src/mount_davfs.c:2111 src/mount_davfs.c:2348 src/mount_davfs.c:2360
+#: src/mount_davfs.c:2112 src/mount_davfs.c:2349 src/mount_davfs.c:2361
 #, c-format
 msgid "opening %s failed"
 msgstr ""
 
-#: src/mount_davfs.c:2132 src/mount_davfs.c:2173 src/mount_davfs.c:2277
-#: src/mount_davfs.c:2376 src/mount_davfs.c:2443
+#: src/mount_davfs.c:2133 src/mount_davfs.c:2174 src/mount_davfs.c:2278
+#: src/mount_davfs.c:2377 src/mount_davfs.c:2444
 msgid "malformed line"
 msgstr ""
 
-#: src/mount_davfs.c:2210
+#: src/mount_davfs.c:2211
 msgid "Option sharepoint_href_bug requires Neon version 0.31 or newer"
 msgstr ""
 
-#: src/mount_davfs.c:2258 src/mount_davfs.c:2271
+#: src/mount_davfs.c:2259 src/mount_davfs.c:2272
 msgid "unknown option"
 msgstr ""
 
-#: src/mount_davfs.c:2352
+#: src/mount_davfs.c:2353
 #, c-format
 msgid "file %s has wrong owner"
 msgstr ""
 
-#: src/mount_davfs.c:2355
+#: src/mount_davfs.c:2356
 #, c-format
 msgid "file %s has wrong permissions"
 msgstr ""
 
-#: src/mount_davfs.c:2578
+#: src/mount_davfs.c:2579
 #, c-format
 msgid ""
 "Usage:\n"
@@ -510,14 +510,14 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/mount_davfs.c:2582
+#: src/mount_davfs.c:2583
 #, c-format
 msgid ""
 "To mount a WebDAV-resource don't call %s directly, but use\n"
 "`mount' instead.\n"
 msgstr ""
 
-#: src/mount_davfs.c:2584
+#: src/mount_davfs.c:2585
 #, c-format
 msgid ""
 "    mount <mountpoint>  : or\n"
@@ -525,7 +525,7 @@ msgid ""
 "                          /etc/fstab.\n"
 msgstr ""
 
-#: src/mount_davfs.c:2587
+#: src/mount_davfs.c:2588
 #, c-format
 msgid ""
 "    mount -t davfs <server-url> <mountpoint> [-o options]\n"
@@ -536,7 +536,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/mount_davfs.c:2592
+#: src/mount_davfs.c:2593
 #, c-format
 msgid ""
 "Recognised options:\n"
@@ -547,7 +547,7 @@ msgid ""
 "    dir_mode=    : default directory mode (octal)\n"
 msgstr ""
 
-#: src/mount_davfs.c:2598
+#: src/mount_davfs.c:2599
 #, c-format
 msgid ""
 "    ro           : mount read-only\n"

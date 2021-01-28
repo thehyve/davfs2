@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://savannah.nongnu.org/support/?"
 "func=additem&group=davfs2\n"
-"POT-Creation-Date: 2020-08-06 18:17+0200\n"
+"POT-Creation-Date: 2021-01-28 17:35+0100\n"
 "PO-Revision-Date: 2007-05-03 19:50+0200\n"
 "Last-Translator: Vítězslav Kotrla <vitko@post.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -82,7 +82,7 @@ msgstr "chyba při zápisu adresáře %s"
 
 #: src/cache.c:2748 src/mount_davfs.c:580 src/mount_davfs.c:582
 #: src/mount_davfs.c:756 src/mount_davfs.c:758 src/mount_davfs.c:775
-#: src/mount_davfs.c:777 src/mount_davfs.c:1697 src/mount_davfs.c:1699
+#: src/mount_davfs.c:777 src/mount_davfs.c:1698 src/mount_davfs.c:1700
 msgid "can't read user data base"
 msgstr "nemohu přečíst údaje o uživatelích"
 
@@ -145,8 +145,8 @@ msgstr "odpojuji %s"
 #: src/mount_davfs.c:413 src/mount_davfs.c:453 src/mount_davfs.c:462
 #: src/mount_davfs.c:468 src/mount_davfs.c:494 src/mount_davfs.c:546
 #: src/mount_davfs.c:574 src/mount_davfs.c:1063 src/mount_davfs.c:1068
-#: src/mount_davfs.c:1112 src/mount_davfs.c:1115 src/mount_davfs.c:1288
-#: src/mount_davfs.c:1325 src/webdav.c:446 src/webdav.c:449
+#: src/mount_davfs.c:1112 src/mount_davfs.c:1115 src/mount_davfs.c:1289
+#: src/mount_davfs.c:1326 src/webdav.c:446 src/webdav.c:449
 msgid "can't change effective user id"
 msgstr "nemohu změnit identifikátor efektivního uživatele"
 
@@ -241,8 +241,8 @@ msgstr "nemohu změnit skupinu adresáře %s"
 msgid "can't read group data base"
 msgstr "nemohu přečíst údaje o skupinách"
 
-#: src/mount_davfs.c:622 src/mount_davfs.c:670 src/mount_davfs.c:1378
-#: src/mount_davfs.c:1382
+#: src/mount_davfs.c:622 src/mount_davfs.c:670 src/mount_davfs.c:1379
+#: src/mount_davfs.c:1383
 #, c-format
 msgid "can't open file %s"
 msgstr "nemohu otevřít soubor %s"
@@ -455,82 +455,82 @@ msgstr ""
 "Varování: nelze přečíst údaje o uživatelích. Přesto připojuji, v mtab ale "
 "nebude žádný záznam."
 
-#: src/mount_davfs.c:1293
+#: src/mount_davfs.c:1294
 #, fuzzy, c-format
 msgid "can't create file %s"
 msgstr "nemohu vytvořit soubor vyrovnávací paměti %s"
 
-#: src/mount_davfs.c:1297
+#: src/mount_davfs.c:1298
 #, fuzzy, c-format
 msgid "can't lock file %s"
 msgstr "nemohu otevřít soubor %s"
 
-#: src/mount_davfs.c:1319
+#: src/mount_davfs.c:1320
 #, fuzzy, c-format
 msgid ""
 "Warning: can't write entry into %s, but will mount the file system anyway"
 msgstr ""
 "Varování: nelze zapsat položku do mtab, přesto souborový systém připojím"
 
-#: src/mount_davfs.c:1357
+#: src/mount_davfs.c:1358
 #, c-format
 msgid "option %s has invalid argument;it must be a decimal number"
 msgstr "volba %s má neplatný argument; musí to být číslo v desítkové soustavě"
 
-#: src/mount_davfs.c:1360
+#: src/mount_davfs.c:1361
 #, c-format
 msgid "option %s has invalid argument;it must be an octal number"
 msgstr "volba %s má neplatný argument; musí to být číslo v osmičkové soustavě"
 
-#: src/mount_davfs.c:1363
+#: src/mount_davfs.c:1364
 #, c-format
 msgid "option %s has invalid argument;it must be a number"
 msgstr "volba %s má neplatný argument; musí to být číslo"
 
-#: src/mount_davfs.c:1389
+#: src/mount_davfs.c:1390
 #, fuzzy, c-format
 msgid "error writing to file %s"
 msgstr "chyba při zápisu nového indexového souboru %s"
 
-#: src/mount_davfs.c:1591
+#: src/mount_davfs.c:1592
 #, c-format
 msgid "option %s requires argument"
 msgstr "volba %s vyžaduje argument"
 
-#: src/mount_davfs.c:1679
+#: src/mount_davfs.c:1680
 #, c-format
 msgid "Unknown option %s.\n"
 msgstr "Neznámá volba %s.\n"
 
-#: src/mount_davfs.c:2111 src/mount_davfs.c:2348 src/mount_davfs.c:2360
+#: src/mount_davfs.c:2112 src/mount_davfs.c:2349 src/mount_davfs.c:2361
 #, fuzzy, c-format
 msgid "opening %s failed"
 msgstr "odpojení selhalo"
 
-#: src/mount_davfs.c:2132 src/mount_davfs.c:2173 src/mount_davfs.c:2277
-#: src/mount_davfs.c:2376 src/mount_davfs.c:2443
+#: src/mount_davfs.c:2133 src/mount_davfs.c:2174 src/mount_davfs.c:2278
+#: src/mount_davfs.c:2377 src/mount_davfs.c:2444
 msgid "malformed line"
 msgstr "špatně zapsaný řádek"
 
-#: src/mount_davfs.c:2210
+#: src/mount_davfs.c:2211
 msgid "Option sharepoint_href_bug requires Neon version 0.31 or newer"
 msgstr ""
 
-#: src/mount_davfs.c:2258 src/mount_davfs.c:2271
+#: src/mount_davfs.c:2259 src/mount_davfs.c:2272
 msgid "unknown option"
 msgstr "neznámá volba"
 
-#: src/mount_davfs.c:2352
+#: src/mount_davfs.c:2353
 #, c-format
 msgid "file %s has wrong owner"
 msgstr "soubor %s má chybného vlastníka"
 
-#: src/mount_davfs.c:2355
+#: src/mount_davfs.c:2356
 #, c-format
 msgid "file %s has wrong permissions"
 msgstr "soubor %s má chybná oprávnění"
 
-#: src/mount_davfs.c:2578
+#: src/mount_davfs.c:2579
 #, c-format
 msgid ""
 "Usage:\n"
@@ -543,7 +543,7 @@ msgstr ""
 "    %s -h,--help      : vytiskne tuto zprávu\n"
 "\n"
 
-#: src/mount_davfs.c:2582
+#: src/mount_davfs.c:2583
 #, c-format
 msgid ""
 "To mount a WebDAV-resource don't call %s directly, but use\n"
@@ -552,7 +552,7 @@ msgstr ""
 "Pro připojení zdroje WebDAV nevolejte přímo %s, ale\n"
 "použijte místo toho `mount'.\n"
 
-#: src/mount_davfs.c:2584
+#: src/mount_davfs.c:2585
 #, c-format
 msgid ""
 "    mount <mountpoint>  : or\n"
@@ -563,7 +563,7 @@ msgstr ""
 "    mount <url_serveru> : připojí zdroj WebDAV tak, jak je zadáno\n"
 "                          v /etc/fstab.\n"
 
-#: src/mount_davfs.c:2587
+#: src/mount_davfs.c:2588
 #, c-format
 msgid ""
 "    mount -t davfs <server-url> <mountpoint> [-o options]\n"
@@ -580,7 +580,7 @@ msgstr ""
 "                          označuje seznam voleb oddělených čárkou.\n"
 "\n"
 
-#: src/mount_davfs.c:2592
+#: src/mount_davfs.c:2593
 #, c-format
 msgid ""
 "Recognised options:\n"
@@ -599,7 +599,7 @@ msgstr ""
 "    file_mode=   : výchozí mode souboru (v osmičkové soustavě)\n"
 "    dir_mode=    : výchozí mode adresáře (v osmičkové soustavě)\n"
 
-#: src/mount_davfs.c:2598
+#: src/mount_davfs.c:2599
 #, fuzzy, c-format
 msgid ""
 "    ro           : mount read-only\n"
