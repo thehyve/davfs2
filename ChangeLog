@@ -1,6 +1,10 @@
 ChangeLog for davfs2
 --------------------
 
+2021-04-08 Werner Baumann (werner.baumann@onlinehome.de)
+    * mount.davfs.c, get_options:
+      Ignore all unknown options.
+
 2021-01-28 Werner Baumann (werner.baumann@onlinehome.de)
     * mount_davfs.c, write_mtab_entry:
       Add option _netdev to utab-entry.

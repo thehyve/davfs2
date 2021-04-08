@@ -1518,7 +1518,7 @@ expand_home(char **dir, const dav_args *args)
 }
 
 /* Parses the string option and stores the values in the appropriate fields of
-   args. If an unknown option is found exit(EXIT_FAILURE) is called.
+   args.
    All strings returned in args are newly allocated, and the calling function
    is responsible to free them.
    option : a comma separated list of options (like the options in fstab and
@@ -1550,12 +1550,6 @@ get_options(dav_args *args, char *option)
         NOEXEC,
         DEV,
         NODEV,
-        ASYNC,
-        AUTO,
-        NOAUTO,
-        COMMENT,
-        NOFAIL,
-        DEFAULTS,
         END
     };
     char *suboptions[] = {
@@ -1580,12 +1574,6 @@ get_options(dav_args *args, char *option)
         [NOEXEC] = "noexec",
         [DEV] = "dev",
         [NODEV] = "nodev",
-        [ASYNC] = "async",
-        [AUTO] = "auto",
-        [NOAUTO] = "noauto",
-        [COMMENT] = "comment",
-        [NOFAIL] = "nofail",
-        [DEFAULTS] = "defaults",
         [END] = NULL
     };
 
@@ -1681,19 +1669,8 @@ get_options(dav_args *args, char *option)
         case NODEV:
             args->mopts |= MS_NODEV;
             break;
-        case ASYNC:
-        case AUTO:
-        case NOAUTO:
-        case COMMENT:
-        case NOFAIL:
-        case DEFAULTS:
-            break;
         default:
-            if (so == -1) {
-                printf(_("Unknown option %s.\n"), argument);
-                usage();
-                exit(EXIT_FAILURE);
-            }
+            break;
         }
     }
     args->mopts |= DAV_MOPTS;
