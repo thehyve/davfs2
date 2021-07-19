@@ -22,7 +22,7 @@
 EXTRA_DIST = bootstrap BUGS FAQ README.translators \
              config/COPYING.davfs2 config/INSTALL.davfs2 \
              config/gnulib-cache.m4
-SUBDIRS = gl glpo po etc man src
+SUBDIRS = po etc man src
 ACLOCAL_AMFLAGS = -I config
 doc_DATA = AUTHORS BUGS ChangeLog COPYING FAQ INSTALL NEWS README \
            README.translators THANKS TODO
