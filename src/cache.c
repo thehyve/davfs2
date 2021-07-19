@@ -977,8 +977,11 @@ dav_getattr(dav_node *node, uid_t uid)
         return EACCES;
 
     if (is_dir(node)) {
-        if (!node->utime)
-            update_directory(node, retry);
+        if (!node->utime) {
+            int ret = update_directory(node, retry);
+            if (ret)
+            	return ret;
+        }
         if (!node->cache_path) {
             if (create_dir_cache_file(node) != 0)
                 return EIO;
@@ -1006,10 +1009,14 @@ dav_lookup(dav_node **nodep, dav_node *parent, const char *name, uid_t uid)
     if (!has_permission(parent, uid, X_OK | R_OK))
         return EACCES;
 
-    update_directory(parent, retry);
+    int ret = update_directory(parent, retry);
+    if (ret)
+    	return ret;
     *nodep = get_child(parent, name);
     if (!*nodep) {
-        update_directory(parent, file_refresh);
+    	ret = update_directory(parent, file_refresh);
+        if (ret)
+        	return ret;
         *nodep = get_child(parent, name);
     }
     if (!*nodep)
@@ -1039,7 +1046,7 @@ dav_lookup(dav_node **nodep, dav_node *parent, const char *name, uid_t uid)
         }
     }
 
-    return 0;
+    return ret;
 }
 
 
@@ -1059,7 +1066,9 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     if (!has_permission(parent, uid, X_OK | W_OK))
         return EACCES;
 
-    update_directory(parent, retry);
+    int ret = update_directory(parent, retry);
+    if (ret)
+    	return ret;
     if (get_child(parent, name))
         return EEXIST;
 
@@ -1070,7 +1079,7 @@ dav_mkdir(dav_node **nodep, dav_node *parent, const char *name, uid_t uid,
     char *name_conv = dav_conv_to_server_enc(name);
     char *path = ne_concat(parent->path, name_conv, "/", NULL);
     free(name_conv);
-    int ret = dav_make_collection(path);
+    ret = dav_make_collection(path);
 
     if (!ret) {
         *nodep = new_node(parent, mode | S_IFDIR);
@@ -1117,17 +1126,19 @@ dav_open(int *fd, dav_node *node, int flags, pid_t pid, pid_t pgid, uid_t uid,
     if (!open_create && !has_permission(node, uid, how))
         return EACCES;
 
+    int ret = 0;
     if (is_dir(node)) {
         if ((how & W_OK) || (flags & O_TRUNC))
             return EINVAL;
-        update_directory(node, file_refresh);
+        ret = update_directory(node, file_refresh);
+        if (ret)
+        	return ret;
         if (create_dir_cache_file(node) != 0)
             return EIO;
         node->atime = time(NULL);
         return open_file(fd, node, O_RDWR, pid, pgid, uid);
     }
 
-    int ret = 0;
     if ((O_ACCMODE & flags) == O_RDONLY) {
 
         ret = update_cache_file(node);
@@ -1209,7 +1220,9 @@ dav_remove(dav_node *parent, const char *name, uid_t uid)
     if (!has_permission(parent, uid, X_OK | W_OK))
         return EACCES;
 
-    update_directory(parent, retry);
+    int ret = update_directory(parent, retry);
+    if (ret)
+    	return ret;
     dav_node *node = get_child(parent, name);
     if (!node) {
         delete_cache_file(parent);
@@ -1219,7 +1232,6 @@ dav_remove(dav_node *parent, const char *name, uid_t uid)
     if (is_dir(node))
         return EISDIR;
 
-    int ret = 0;
     if (is_created(node)) {
         if (is_locked(node))
             ret = dav_unlock(node->path, &node->lock_expire);
@@ -1268,7 +1280,9 @@ dav_rename(dav_node *src_parent, const char *src_name, dav_node *dst_parent,
             || !has_permission(dst_parent, uid, X_OK | W_OK))
         return EACCES;
 
-    update_directory(src_parent, retry);
+    int ret = update_directory(src_parent, retry);
+    if (ret)
+    	return ret;
     dav_node *src = get_child(src_parent, src_name);
     dav_node *dst = get_child(dst_parent, dst_name);
     if (!src) {
@@ -1279,7 +1293,6 @@ dav_rename(dav_node *src_parent, const char *src_name, dav_node *dst_parent,
     if (src == backup || (dst && is_backup(dst)))
         return EINVAL;
 
-    int ret;
     if (is_dir(src)) {
         ret = move_dir(src, dst, dst_parent, dst_name);
     } else {
@@ -1324,7 +1337,9 @@ dav_rmdir(dav_node *parent, const char *name, uid_t uid)
     if (!has_permission(parent, uid, X_OK | W_OK))
         return EACCES;
 
-    update_directory(parent, retry);
+    int ret = update_directory(parent, retry);
+    if (ret)
+    	return ret;
     dav_node *node = get_child(parent, name);
     if (!node) {
         delete_cache_file(parent);
@@ -1338,7 +1353,7 @@ dav_rmdir(dav_node *parent, const char *name, uid_t uid)
     if (node->childs)
         return ENOTEMPTY;
 
-    int ret = dav_delete_dir(node->path);
+    ret = dav_delete_dir(node->path);
     if (!ret) {
         remove_node(node);
         delete_cache_file(parent);
@@ -2671,7 +2686,9 @@ update_cache_file(dav_node *node)
 
     if (gui_optimize && is_cached(node)
     				&& time(NULL) > (node->utime +file_refresh)) {
-        update_directory(node->parent, file_refresh);
+        ret = update_directory(node->parent, file_refresh);
+        if (ret)
+        	return ret;
         if (!exists(node) || node->parent == NULL)
             return ENOENT;
     }
