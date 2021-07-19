@@ -1016,8 +1016,9 @@ dav_lookup(dav_node **nodep, dav_node *parent, const char *name, uid_t uid)
         return ENOENT;
 
     if (is_dir(*nodep)) {
-        if (!(*nodep)->utime)
-            update_directory(*nodep, retry);
+    	// Disable updating directory listing at lookup as this causes high loads on the server.
+        // if (!(*nodep)->utime)
+        //    update_directory(*nodep, retry);
     } else {
 
         if (is_open(*nodep))
