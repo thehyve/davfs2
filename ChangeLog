@@ -1,6 +1,9 @@
 ChangeLog for davfs2
 --------------------
 
+2021-10-31 Werner Baumann (werner.baumann@onlinehome.de)
+    * Release version 1.6.1
+
 2021-10-24 Werner Baumann (werner.baumann@onlinehome.de)
     * configure.ac:
       Add Neon version 0.32.
