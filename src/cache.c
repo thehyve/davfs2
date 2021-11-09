@@ -1020,8 +1020,10 @@ dav_lookup(dav_node **nodep, dav_node *parent, const char *name, uid_t uid)
     if (is_dir(*nodep)) {
         if (!(*nodep)->utime)
             update_directory(*nodep, retry);
-    } else if (is_open(*nodep)) {
-        attr_from_cache_file(*nodep);
+    } else {
+        update_cache_file(*nodep);
+        if (is_open(*nodep))
+            attr_from_cache_file(*nodep);
     }
 
     return 0;
