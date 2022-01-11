@@ -2288,7 +2288,7 @@ update_node(dav_node *node, dav_props *props)
     }
 
     if (is_cached(node)) {
-        if ((!node->etag && props->mtime > node->smtime)
+        if ((!props->etag && props->mtime > node->smtime)
                 || (node->etag && props->etag
                     && strcmp(node->etag, props->etag) != 0)) {
             if (is_open(node)) {
