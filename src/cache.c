@@ -1021,9 +1021,21 @@ dav_lookup(dav_node **nodep, dav_node *parent, const char *name, uid_t uid)
         if (!(*nodep)->utime)
             update_directory(*nodep, retry);
     } else {
-        update_cache_file(*nodep);
+
         if (is_open(*nodep))
             attr_from_cache_file(*nodep);
+        else if (!is_dirty(*nodep)) {
+            int ret;
+
+            dav_props *props = NULL;
+            ret = dav_get_collection((*nodep)->path, &props);
+
+            if (ret == 0 && ((*nodep)->size != props->size)) {
+                (*nodep)->size = props->size;
+                delete_cache_file(*nodep);
+                dav_delete_props(props);
+           }
+        }
     }
 
     return 0;
