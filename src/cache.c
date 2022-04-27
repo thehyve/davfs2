@@ -1030,11 +1030,13 @@ dav_lookup(dav_node **nodep, dav_node *parent, const char *name, uid_t uid)
             dav_props *props = NULL;
             ret = dav_get_collection((*nodep)->path, &props);
 
-            if (ret == 0 && ((*nodep)->size != props->size)) {
-                (*nodep)->size = props->size;
-                delete_cache_file(*nodep);
+            if (ret == 0) {
+                if ((*nodep)->size != props->size) {
+                    (*nodep)->size = props->size;
+                    delete_cache_file(*nodep);
+                }
                 dav_delete_props(props);
-           }
+            }
         }
     }
 
