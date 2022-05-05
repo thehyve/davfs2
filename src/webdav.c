@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include <errno.h>
-#include <error.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -73,6 +71,7 @@
 #include <ne_utils.h>
 #include <ne_xml.h>
 
+#include "util.h"
 #include "defaults.h"
 #include "mount_davfs.h"
 #include "webdav.h"
@@ -365,7 +364,7 @@ dav_init_webdav(const dav_args *args)
 #endif /* HAVE_ICONV */
 
     if (ne_sock_init() != 0)
-        error(EXIT_FAILURE, errno, _("socket library initialization failed"));
+        ERR(_("socket library initialization failed"));
 
     if (args->neon_debug & ~NE_DBG_HTTPPLAIN) {
         char *buf = malloc(log_bufsize);
@@ -377,8 +376,7 @@ dav_init_webdav(const dav_args *args)
         log_func->close = NULL;
         log_stream = fopencookie(buf, "w", *log_func);
         if (!log_stream)
-            error(EXIT_FAILURE, errno,
-                  _("can't open stream to log neon-messages"));
+            ERR(_("can't open stream to log neon-messages"));
         ne_debug_init(log_stream, args->neon_debug);
     }
 
@@ -419,18 +417,18 @@ dav_init_webdav(const dav_args *args)
 
     if (strcmp(args->scheme, "https") == 0) {
         if (!ne_has_support(NE_FEATURE_SSL))
-            error(EXIT_FAILURE, 0, _("neon library does not support TLS/SSL"));
+            ERR(_("neon library does not support TLS/SSL"));
 
         ne_ssl_set_verify(session, ssl_verify, NULL);
         if (args->trust_server_cert) {
             server_cert = ne_ssl_cert_read(args->trust_server_cert);
             if (!server_cert)
-                error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
+                ERR(_("can't read server certificate %s"),
                       args->trust_server_cert);
         } else if (args->trust_ca_cert) {
             ne_ssl_certificate *ca_cert = ne_ssl_cert_read(args->trust_ca_cert);
             if (!ca_cert)
-                error(EXIT_FAILURE, 0, _("can't read server certificate %s"),
+                ERR(_("can't read server certificate %s"),
                       args->trust_ca_cert);
             ne_ssl_trust_cert(session, ca_cert);
         } else {
@@ -443,13 +441,13 @@ dav_init_webdav(const dav_args *args)
             if (!client_cert) {
                 uid_t orig = geteuid();
                 if (seteuid(0) != 0)
-                    error(EXIT_FAILURE, errno, _("can't change effective user id"));
+                    ERR(_("can't change effective user id"));
                 client_cert = ne_ssl_clicert_read(args->clicert);
                 if (seteuid(orig) != 0)
-                    error(EXIT_FAILURE, errno, _("can't change effective user id"));
+                    ERR(_("can't change effective user id"));
             }
             if (!client_cert)
-                error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
+                ERR(_("can't read client certificate %s"),
                       args->clicert);
             if (client_cert && ne_ssl_clicert_encrypted(client_cert)) {
                 char *pw = NULL;
@@ -467,8 +465,7 @@ dav_init_webdav(const dav_args *args)
                     free(pw);
                 }
                 if (ret)
-                    error(EXIT_FAILURE, 0,
-                          _("can't decrypt client certificate %s"),
+                    ERR(_("can't decrypt client certificate %s"),
                           args->clicert);
             }
             ne_ssl_set_clicert(session, client_cert);
@@ -533,8 +530,7 @@ dav_init_connection(const char *path)
         initialized = 1;
         if (!caps.dav_class1 && !ignore_dav_header) {
             if (have_terminal) {
-                error(EXIT_FAILURE, 0,
-                      _("mounting failed; the server does not support WebDAV"));
+                ERR(_("mounting failed; the server does not support WebDAV"));
             } else {
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                        _("mounting failed; the server does not support WebDAV"));
@@ -545,7 +541,7 @@ dav_init_connection(const char *path)
             ne_lockstore_register(locks, session);
         } else if (locks) {
             if (have_terminal)
-                error(0, 0, _("warning: the server does not support locks"));
+                WARN(_("warning: the server does not support locks"));
             ne_lockstore_destroy(locks);
             locks = NULL;
         }
@@ -694,7 +690,7 @@ dav_delete_props(dav_props *props)
         free(props->path);
     if (props->name)
         free(props->name);
-    if (props->etag) 
+    if (props->etag)
         free(props->etag);
     free(props);
 }
@@ -725,7 +721,7 @@ dav_get_collection(const char *path, dav_props **props)
             dav_props *tofree = ctx.results;
             ctx.results = ctx.results->next;
             dav_delete_props(tofree);
-        }    
+        }
     }
 
     *props = ctx.results;
@@ -820,7 +816,7 @@ dav_get_file(const char *path, const char *cache_path, off_t *size,
     const ne_status *status = ne_get_status(req);
 
     if (!ret && status->code == 200) {
- 
+
         if (modified)
             *modified = 1;
 
@@ -1010,7 +1006,7 @@ dav_move(const char *src, const char *dst)
 
     char *spath = ne_path_escape(src);
     char *dst_path = ne_path_escape(dst);
-    ret = ne_move(session, 1, spath, dst_path); 
+    ret = ne_move(session, 1, spath, dst_path);
     ret = get_error(ret, "MOVE", session);
 
     if (!ret && locks) {
@@ -1328,7 +1324,7 @@ create_rd_session(const ne_uri *uri)
         port = ne_uri_defaultport(uri->scheme);
 
     ne_session *rd_sess = ne_session_create(uri->scheme, uri->host, port);
-    
+
     ne_set_read_timeout(rd_sess, read_timeout);
     ne_set_connect_timeout(rd_sess, connect_timeout);
 
@@ -1343,7 +1339,7 @@ create_rd_session(const ne_uri *uri)
     if (proxy->host) {
         ne_session_proxy(rd_sess, proxy->host, proxy->port);
         ne_add_proxy_auth(rd_sess, NE_AUTH_ALL, auth, "proxy");
-    }    
+    }
 
     if (strcmp(uri->scheme, "https") == 0) {
         ne_ssl_set_verify(rd_sess, ssl_verify, NULL);
@@ -1702,7 +1698,7 @@ auth(void *userdata, const char *realm, int attempt, char *user, char *pwd)
    userdata must be a get_context structure that holds at least the name of
    the local file. If it does not contain a file descriptor, the file is
    opened for writing and the file descriptor is stored in the get_context
-   structure. In case of an error a error flag is set. 
+   structure. In case of an error a error flag is set.
    userdata : A get_context structure, containing the name of the local file,
               the file descriptor (if the file is open), and an error flag.
    block    : Buffer containing the data.
@@ -1995,7 +1991,7 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
         if (ne_ssl_cert_cmp(cert, server_cert) == 0)
             return 0;
         if (have_terminal)
-            error(0, 0, _("the server certificate is not trusted"));
+            WARN(_("the server certificate is not trusted"));
         return -1;
     }
 
@@ -2004,7 +2000,7 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
     char *digest = ne_calloc(NE_SSL_DIGESTLEN);
     if (!issuer || !subject || ne_ssl_cert_digest(cert, digest) != 0) {
         if (have_terminal) {
-            error(0, 0, _("error processing server certificate"));
+            WARN(_("error processing server certificate"));
         } else {
             syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
                    _("error processing server certificate"));
@@ -2018,15 +2014,15 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
     int ret = -1;
     if (have_terminal) {
         if (failures & NE_SSL_NOTYETVALID)
-            error(0, 0, _("the server certificate is not yet valid"));
+            WARN(_("the server certificate is not yet valid"));
         if (failures & NE_SSL_EXPIRED)
-            error(0, 0, _("the server certificate has expired"));
+            WARN(_("the server certificate has expired"));
         if (failures & NE_SSL_IDMISMATCH)
-            error(0, 0, _("the server certificate does not match the server name"));
+            WARN(_("the server certificate does not match the server name"));
         if (failures & NE_SSL_UNTRUSTED)
-            error(0, 0, _("the server certificate is not trusted"));
+            WARN(_("the server certificate is not trusted"));
         if (failures & ~NE_SSL_FAILMASK)
-            error(0, 0, _("unknown certificate error"));
+            WARN(_("unknown certificate error"));
         printf(_("  issuer:      %s"), issuer);
         printf("\n");
         printf(_("  subject:     %s"), subject);
@@ -2048,7 +2044,7 @@ ssl_verify(void *userdata, int failures, const ne_ssl_certificate *cert)
             if (rpmatch(s) > 0)
                 ret = 0;
             free(s);
-    } 
+    }
 
     if (failures & NE_SSL_NOTYETVALID)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),

@@ -21,8 +21,6 @@
 #include "config.h"
 
 #include <ctype.h>
-#include <errno.h>
-#include <error.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -77,6 +75,7 @@
 #include <ne_uri.h>
 #include <ne_utils.h>
 
+#include "util.h"
 #include "defaults.h"
 #include "mount_davfs.h"
 #include "kernel_interface.h"
@@ -224,9 +223,9 @@ main(int argc, char *argv[])
     dav_args *args = parse_commandline(argc, argv);
 
     if (geteuid() != 0)
-        error(EXIT_FAILURE, errno, _("program is not setuid root"));
+        ERR(_("program is not setuid root"));
     if (seteuid(getuid()) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
 
     if (getuid() != 0)
         check_fstab(args);
@@ -272,7 +271,7 @@ main(int argc, char *argv[])
 
     } else if (childpid < 0) {
         delete_args(args);
-        error(EXIT_FAILURE, errno, _("can't start daemon process"));
+        ERR(_("can't start daemon process"));
     }
 
     if (args->debug & DAV_DBG_CONFIG)
@@ -292,7 +291,7 @@ main(int argc, char *argv[])
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "Releasing root privileges");
     uid_t daemon_id = geteuid();
     if (seteuid(0) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
     ret = setuid(daemon_id);
     if (ret) {
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_ERR),
@@ -393,24 +392,23 @@ change_persona(dav_args *args)
 {
     struct group *grp = getgrnam(args->dav_group);
     if (!grp)
-        error(EXIT_FAILURE, errno, _("group %s does not exist"),
+        ERR(_("group %s does not exist"),
               args->dav_group);
     if (seteuid(0) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
     if (setgid(grp->gr_gid) != 0)
-        error(EXIT_FAILURE, errno, _("can't change group id"));
+        ERR(_("can't change group id"));
 
     if (getuid() == 0) {
         struct passwd *pw = getpwnam(args->dav_user);
         if (!pw)
-            error(EXIT_FAILURE, errno, _("user %s does not exist"),
+            ERR(_("user %s does not exist"),
                   args->dav_user);
         if (seteuid(pw->pw_uid) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
-    
+            ERR(_("can't change effective user id"));
     } else {
         if (seteuid(getuid()) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
+            ERR(_("can't change effective user id"));
     }
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG),
@@ -432,7 +430,7 @@ check_dirs(dav_args *args)
     struct stat st;
 
     if (lstat(_PATH_MOUNTED, &st) != 0)
-        error(EXIT_FAILURE, errno, _("can't access file %s"), _PATH_MOUNTED);
+        ERR(_("can't access file %s"), _PATH_MOUNTED);
     int mtab_is_link = S_ISLNK(st.st_mode);
 
     if (stat(DAV_MOUNTS, &st) == 0) {
@@ -450,48 +448,46 @@ check_dirs(dav_args *args)
             abort();
         if (stat(utab_dir, &st) != 0) {
             if (seteuid(0) != 0)
-                error(EXIT_FAILURE, errno, _("can't change effective user id"));
+                ERR(_("can't change effective user id"));
             if (mkdir(utab_dir, S_IRWXU | S_IRGRP | S_IXGRP
                                         | S_IROTH | S_IXOTH) == 0) {
                 syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "  and %s/%s",
                        utab_dir, DAV_UTAB);
             } else {
-                error(0, errno, _("can't create directory %s"), utab_dir);
+                WARN(_("can't create directory %s"), utab_dir);
             }
             if (seteuid(getuid()) != 0)
-                error(EXIT_FAILURE, errno, _("can't change effective user id"));
+                ERR(_("can't change effective user id"));
         }
         free(utab_dir);
     }
 
     if (seteuid(0) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
     if (stat(DAV_SYS_RUN, &st) != 0) {
         if (mkdir(DAV_SYS_RUN, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_ISVTX)
                 != 0 && errno != EEXIST)
-            error(EXIT_FAILURE, errno, _("can't create directory %s"),
+            ERR(_("can't create directory %s"),
                   DAV_SYS_RUN);
     }
     if (stat(DAV_SYS_RUN, &st) != 0)
-        error(EXIT_FAILURE, errno, _("can't access directory %s"),
+        ERR(_("can't access directory %s"),
               DAV_SYS_RUN);
     if ((st.st_mode & (S_IRWXG | S_ISVTX)) != (S_IRWXG | S_ISVTX)) {
         if (chmod(DAV_SYS_RUN, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_ISVTX)
                 != 0)
-            error(EXIT_FAILURE, errno,
-                  _("can't change mode of directory %s"), DAV_SYS_RUN);
+            ERR(_("can't change mode of directory %s"), DAV_SYS_RUN);
     }
     struct group *grp = getgrnam(args->dav_group);
     if (!grp)
-        error(EXIT_FAILURE, errno, _("group %s does not exist"),
+        ERR(_("group %s does not exist"),
               args->dav_group);
     if (st.st_gid != grp->gr_gid) {
         if (chown(DAV_SYS_RUN, 0, grp->gr_gid) != 0)
-            error(EXIT_FAILURE, errno,
-                  _("can't change group of directory %s"), DAV_SYS_RUN);
+            ERR(_("can't change group of directory %s"), DAV_SYS_RUN);
     }
     if (seteuid(getuid()) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
 
     if (getuid() != 0) {
 
@@ -543,65 +539,63 @@ check_dirs(dav_args *args)
     if (strcmp(args->cache_dir, args->sys_cache) == 0) {
 
         if (seteuid(0) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
+            ERR(_("can't change effective user id"));
         if (stat(args->sys_cache, &st) != 0) {
             if (mkdir(args->sys_cache, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
-                error(EXIT_FAILURE, errno, _("can't create directory %s"),
+                ERR(_("can't create directory %s"),
                       args->sys_cache);
         }
         if (stat(args->sys_cache, &st) != 0)
-            error(EXIT_FAILURE, errno, _("can't access directory %s"),
+            ERR(_("can't access directory %s"),
                   args->sys_cache);
         if ((st.st_mode & S_IRWXG) != S_IRWXG) {
             if (chmod(args->sys_cache, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
-                error(EXIT_FAILURE, errno,
-                      _("can't change mode of directory %s"),
+                ERR(_("can't change mode of directory %s"),
                       args->sys_cache);
         }
         struct group *grp = getgrnam(args->dav_group);
         if (!grp)
-            error(EXIT_FAILURE, errno, _("group %s does not exist"),
+            ERR(_("group %s does not exist"),
                   args->dav_group);
         if (st.st_gid != grp->gr_gid) {
             if (chown(args->sys_cache, 0, grp->gr_gid) != 0)
-                error(EXIT_FAILURE, errno,
-                      _("can't change group of directory %s"),
+                ERR(_("can't change group of directory %s"),
                       args->sys_cache);
         }
         if (seteuid(getuid()) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
+            ERR(_("can't change effective user id"));
 
     } else {
 
         struct passwd *pw = getpwuid(getuid());
         if (!pw)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
+            ERR(_("can't read user data base"));
         if (!pw->pw_name)
-            error(EXIT_FAILURE, 0, _("can't read user data base"));
+            ERR(_("can't read user data base"));
         if (stat(args->cache_dir, &st) != 0) {
             if (mkdir(args->cache_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
                     != 0)
-                error(EXIT_FAILURE, errno, _("can't create directory %s"),
+                ERR(_("can't create directory %s"),
                       args->cache_dir);
         }
         if (stat(args->cache_dir, &st) != 0)
-            error(EXIT_FAILURE, errno, _("can't access directory %s"),
+            ERR(_("can't access directory %s"),
                   args->cache_dir);
         if ((st.st_uid != getuid() || (st.st_mode & S_IRWXU) != S_IRWXU)
                 &&  (st.st_mode & S_IRWXO) != S_IRWXO) {
             if ((st.st_mode & S_IRWXG) != S_IRWXG)
-                error(EXIT_FAILURE, errno, _("can't access directory %s"),
+                ERR(_("can't access directory %s"),
                       args->cache_dir);
             struct group *grp = getgrgid(st.st_gid);
             if (!grp)
-                error(EXIT_FAILURE, errno, _("can't read group data base"));
+                ERR(_("can't read group data base"));
             char **members = grp->gr_mem;
             while (*members && strcmp(*members, pw->pw_name) != 0)
                 members++;
             if (!*members)
-                error(EXIT_FAILURE, 0, _("can't access directory %s"),
+                ERR(_("can't access directory %s"),
                 args->cache_dir);
         }
 
@@ -619,12 +613,12 @@ check_double_mounts(dav_args *args)
 {
     FILE *mtab = setmntent(mounts, "r");
     if (!mtab)
-        error(EXIT_FAILURE, errno, _("can't open file %s"), mounts);
+        ERR(_("can't open file %s"), mounts);
     struct mntent *mt = getmntent(mtab);
     while (mt) {
         if (strcmp(mpoint, mt->mnt_dir) == 0
                 && strcmp(url, mt->mnt_fsname) == 0)
-            error(EXIT_FAILURE, 0, _("%s is already mounted on %s"), url,
+            ERR(_("%s is already mounted on %s"), url,
                   mpoint);
         mt = getmntent(mtab);
     }
@@ -647,7 +641,7 @@ check_double_mounts(dav_args *args)
 
     FILE *file = fopen(pidf, "r");
     if (file)
-        error(EXIT_FAILURE, 0, _("found PID file %s.\n"
+        ERR(_("found PID file %s.\n"
               "Either %s is used by another process,\n"
               "or another mount process ended irregular"), pidf, mpoint);
 
@@ -667,7 +661,7 @@ check_fstab(const dav_args *args)
 
     FILE *fstab = setmntent(_PATH_MNTTAB, "r");
     if (!fstab)
-        error(EXIT_FAILURE, errno, _("can't open file %s"), _PATH_MNTTAB);
+        ERR(_("can't open file %s"), _PATH_MNTTAB);
 
     struct mntent *ft = getmntent(fstab);
     while (ft) {
@@ -685,15 +679,15 @@ check_fstab(const dav_args *args)
     }
 
     if (!ft)
-        error(EXIT_FAILURE, 0, _("no entry for %s found in %s"), mpoint,
+        ERR(_("no entry for %s found in %s"), mpoint,
               _PATH_MNTTAB);
 
     if (strcmp(url, ft->mnt_fsname) != 0) {
-        error(EXIT_FAILURE, 0, _("different URL in %s"), _PATH_MNTTAB);
+        ERR(_("different URL in %s"), _PATH_MNTTAB);
     }
 
     if (!ft->mnt_type || strcmp(DAV_FS_TYPE, ft->mnt_type) != 0)
-        error(EXIT_FAILURE, 0, _("different file system type in %s"),
+        ERR(_("different file system type in %s"),
               _PATH_MNTTAB);
 
     if (ft->mnt_opts)
@@ -704,29 +698,28 @@ check_fstab(const dav_args *args)
     if (args->conf || n_args->conf) {
         if (!args->conf || !n_args->conf
                 || strcmp(args->conf, n_args->conf) != 0)
-            error(EXIT_FAILURE, 0, _("different config file in %s"),
+            ERR(_("different config file in %s"),
                   _PATH_MNTTAB);
     }
     if (args->cl_username || n_args->cl_username) {
         if (!args->cl_username || !n_args->cl_username
                 || strcmp(args->cl_username, n_args->cl_username) != 0)
-            error(EXIT_FAILURE, 0, _("different username in %s"), _PATH_MNTTAB);
+            ERR(_("different username in %s"), _PATH_MNTTAB);
     }
     if (!n_args->user && !n_args->users)
-        error(EXIT_FAILURE, 0,
-              _("neither option `user' nor option `users' set in %s"),
-              _PATH_MNTTAB);
+        ERR(_("neither option `user' nor option `users' set in %s"),
+             _PATH_MNTTAB);
     if (args->mopts != n_args->mopts || args->grpid != n_args->grpid)
-        error(EXIT_FAILURE, 0, _("different mount options in %s"),
+        ERR(_("different mount options in %s"),
               _PATH_MNTTAB);
     if (args->uid != n_args->uid)
-        error(EXIT_FAILURE, 0, _("different uid in %s"), _PATH_MNTTAB);
+        ERR(_("different uid in %s"), _PATH_MNTTAB);
     if (args->gid != n_args->gid)
-        error(EXIT_FAILURE, 0, _("different gid in %s"), _PATH_MNTTAB);
+        ERR(_("different gid in %s"), _PATH_MNTTAB);
     if (args->dir_mode != n_args->dir_mode)
-        error(EXIT_FAILURE, 0, _("different dir_mode in %s"), _PATH_MNTTAB);
+        ERR(_("different dir_mode in %s"), _PATH_MNTTAB);
     if (args->file_mode != n_args->file_mode)
-        error(EXIT_FAILURE, 0, _("different file_mode in %s"), _PATH_MNTTAB);
+        ERR(_("different file_mode in %s"), _PATH_MNTTAB);
 
     delete_args(n_args);
 }
@@ -745,26 +738,24 @@ check_permissions(dav_args *args)
         return;
 
     if (args->uid != getuid())
-        error(EXIT_FAILURE, 0,
-              _("you can't set file owner different from your uid"));
+        ERR(_("you can't set file owner different from your uid"));
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "uid ok");
 
     if (getgid() != args->gid) {
         struct passwd *pw = getpwuid(getuid());
         if (!pw)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
+            ERR(_("can't read user data base"));
         if (!pw->pw_name)
-            error(EXIT_FAILURE, 0, _("can't read user data base"));
+            ERR(_("can't read user data base"));
         struct group *grp = getgrgid(args->gid);
         if (!grp)
-            error(EXIT_FAILURE, 0, _("can't read group data base"));
+            ERR(_("can't read group data base"));
         char **members = grp->gr_mem;
         while (*members && strcmp(*members, pw->pw_name) != 0)
             members++;
         if (!*members)
-            error(EXIT_FAILURE, 0,
-                  _("you must be member of the group of the file system"));
+            ERR(_("you must be member of the group of the file system"));
     }
     if (args->debug & DAV_DBG_CONFIG)
         syslog(LOG_MAKEPRI(LOG_DAEMON, LOG_DEBUG), "gid ok");
@@ -772,12 +763,12 @@ check_permissions(dav_args *args)
     struct passwd *pw;
     pw = getpwuid(getuid());
     if (!pw)
-        error(EXIT_FAILURE, errno, _("can't read user data base"));
+        ERR(_("can't read user data base"));
     if (!pw->pw_name)
-        error(EXIT_FAILURE, 0, _("can't read user data base"));
+        ERR(_("can't read user data base"));
     struct group *grp = getgrnam(args->dav_group);
     if (!grp)
-        error(EXIT_FAILURE, errno, _("group %s does not exist"),
+        ERR(_("group %s does not exist"),
               args->dav_group);
     if (pw->pw_gid != grp->gr_gid) {
         int ngroups = getgroups(0, NULL);
@@ -786,9 +777,9 @@ check_permissions(dav_args *args)
             groups = (gid_t *) malloc(ngroups * sizeof(gid_t));
             if (!groups) abort();
             if (getgroups(ngroups, groups) < 0)
-                error(EXIT_FAILURE, 0, _("can't read group data base"));
+                ERR(_("can't read group data base"));
         } else {
-            error(EXIT_FAILURE, 0, _("can't read group data base"));
+            ERR(_("can't read group data base"));
         }
         int i;
         for (i = 0; i < ngroups; i++) {
@@ -797,7 +788,7 @@ check_permissions(dav_args *args)
         }
         free(groups);
         if (i == ngroups)
-            error(EXIT_FAILURE, 0, _("user %s must be member of group %s"),
+            ERR(_("user %s must be member of group %s"),
                   pw->pw_name, grp->gr_name);
     }
     if (args->debug & DAV_DBG_CONFIG)
@@ -892,7 +883,7 @@ parse_commandline(int argc, char *argv[])
         case '?':
             break;
         default:
-            error(EXIT_FAILURE, 0, _("unknown error parsing arguments"));
+            ERR(_("unknown error parsing arguments"));
         }
         o = getopt_long(argc, argv, short_options, options, NULL);
     }
@@ -901,7 +892,7 @@ parse_commandline(int argc, char *argv[])
     switch (argc - i) {
     case 0:
     case 1:
-        error(0, 0, _("missing argument"));
+        WARN(_("missing argument"));
         usage();
         exit(EXIT_FAILURE);
     case 2:
@@ -913,11 +904,10 @@ parse_commandline(int argc, char *argv[])
         i++;
         mpoint = canonicalize_file_name(argv[i]);
         if (!mpoint)
-            error(EXIT_FAILURE, 0,
-                  _("can't evaluate path of mount point %s"), mpoint);
+            ERR(_("can't evaluate path of mount point %s"), mpoint);
         break;
     default:
-        error(0, 0, _("too many arguments"));
+        WARN(_("too many arguments"));
         usage();
         exit(EXIT_FAILURE);
     }
@@ -925,22 +915,21 @@ parse_commandline(int argc, char *argv[])
     if (getuid() != 0 && *argv[i] != '/') {
         struct passwd *pw = getpwuid(getuid());
         if (!pw || !pw->pw_dir)
-            error(EXIT_FAILURE, 0,
-                  _("can't get home directory for uid %i"), getuid());
+            ERR(_("can't get home directory for uid %i"), getuid());
         if (strstr(mpoint, pw->pw_dir) != mpoint)
-            error(EXIT_FAILURE, 0, _("A relative mount point must lie "
+            ERR(_("A relative mount point must lie "
                   "within your home directory"));
     }
 
     if (!url)
-        error(EXIT_FAILURE, 0, _("no WebDAV-server specified"));
+        ERR(_("no WebDAV-server specified"));
     if (split_uri(&args->scheme, &args->host, &args->port, &args->path,
                   url) != 0)
-        error(EXIT_FAILURE, 0, _("invalid URL"));
+        ERR(_("invalid URL"));
     if (!args->port)
         args->port = ne_uri_defaultport(args->scheme);
 
-    return args;       
+    return args;
 }
 
 
@@ -955,7 +944,7 @@ parse_config(dav_args *args)
 
     struct passwd *pw = getpwuid(getuid());
     if (!pw || !pw->pw_dir)
-        error(EXIT_FAILURE, 0, _("can't determine home directory"));
+        ERR(_("can't determine home directory"));
 
     if (args->conf) {
         if (*args->conf == '~') {
@@ -1060,22 +1049,20 @@ parse_config(dav_args *args)
     if (args->clicert) {
         struct stat st;
         if (seteuid(0) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
+            ERR(_("can't change effective user id"));
         if (stat(args->clicert, &st) < 0)
-            error(EXIT_FAILURE, 0, _("can't read client certificate %s"),
+            ERR(_("can't read client certificate %s"),
                   args->clicert);
         if (seteuid(getuid()) != 0)
-            error(EXIT_FAILURE, errno, _("can't change effective user id"));
+            ERR(_("can't change effective user id"));
         if (st.st_uid != getuid() && st.st_uid != 0)
-            error(EXIT_FAILURE, 0,
-                  _("client certificate file %s has wrong owner"),
-                  args->clicert);
+            ERR(_("client certificate file %s has wrong owner"),
+                 args->clicert);
         if ((st.st_mode &
                 (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX))
                 != 0)
-            error(EXIT_FAILURE, 0,
-                  _("client certificate file %s has wrong permissions"),
-                  args->clicert);
+            ERR(_("client certificate file %s has wrong permissions"),
+                 args->clicert);
     }
 
     if (getuid() == 0 && !args->p_host) {
@@ -1109,10 +1096,10 @@ static void
 parse_secrets(dav_args *args)
 {
     if (seteuid(0) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
     read_secrets(args, DAV_SYS_CONF_DIR "/" DAV_SECRETS);
     if (seteuid(getuid()) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
 
     if (args->secrets) {
         read_secrets(args, args->secrets);
@@ -1234,8 +1221,8 @@ write_mtab_entry(const dav_args *args)
     int privileged = (getuid() == 0);
     struct passwd *pw = getpwuid(getuid());
     if (!pw && !privileged) {
-        error(0, errno, _("Warning: can't read user data base. Mounting "
-                          "anyway, but there is no entry in mtab."));
+        WARN(_("Warning: can't read user data base. Mounting "
+               "anyway, but there is no entry in mtab."));
         return;
     }
     char *uid_name = pw->pw_name;
@@ -1286,16 +1273,16 @@ write_mtab_entry(const dav_args *args)
 
     uid_t orig = geteuid();
     if (seteuid(0) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
 
     int ld = open(lock_file, O_RDONLY | O_CREAT,
                   S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
     if (!ld)
-        error(EXIT_FAILURE, errno, _("can't create file %s"), lock_file);
+        ERR(_("can't create file %s"), lock_file);
     while (flock(ld, LOCK_EX) != 0) {
         if (errno == EAGAIN || errno == EINTR)
             continue;
-        error(EXIT_FAILURE, errno, _("can't lock file %s"), lock_file);
+        ERR(_("can't lock file %s"), lock_file);
     }
 
     FILE *tab = NULL;
@@ -1317,13 +1304,13 @@ write_mtab_entry(const dav_args *args)
         }
     }
     if (!tab || err)
-        error(0, 0, _("Warning: can't write entry into %s, but will mount "
-                      "the file system anyway"), tab_file);
+        WARN(_("Warning: can't write entry into %s, but will mount "
+               "the file system anyway"), tab_file);
 
     close(ld);
     remove(lock_file);
     if (seteuid(orig) != 0)
-        error(EXIT_FAILURE, errno, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
 
     sigprocmask(SIG_SETMASK, &oldset, NULL);
     if (lock_file)
@@ -1355,14 +1342,14 @@ arg_to_int(const char *arg, int base, const char *opt)
     int n = strtol(arg, &tail, base);
     if (n < 0 || !tail) {
         if (base == 10) {
-            error(EXIT_FAILURE, 0, _("option %s has invalid argument;"
-                                     "it must be a decimal number"), opt);
+            ERR(_("option %s has invalid argument;"
+                  "it must be a decimal number"), opt);
         } else if (base == 8) {
-            error(EXIT_FAILURE, 0, _("option %s has invalid argument;"
-                                     "it must be an octal number"), opt);
+            ERR(_("option %s has invalid argument;"
+                  "it must be an octal number"), opt);
         } else {
-            error(EXIT_FAILURE, 0, _("option %s has invalid argument;"
-                                     "it must be a number"), opt);
+            ERR(_("option %s has invalid argument;"
+                  "it must be a number"), opt);
         }
     }
 
@@ -1376,18 +1363,18 @@ cp_file(const char *src, const char *dest)
 {
     FILE *in = fopen(src, "r");
     if (!in)
-        error(EXIT_FAILURE, errno, _("can't open file %s"), src);
+        ERR(_("can't open file %s"), src);
 
     FILE *out = fopen(dest, "w");
     if (!out)
-        error(EXIT_FAILURE, errno, _("can't open file %s"), dest);
+        ERR(_("can't open file %s"), dest);
 
     size_t n = 0;
     char *line = NULL;
     int length = getline(&line, &n, in);
     while (length > 0) {
-        if (fputs(line, out) == EOF) 
-            error(EXIT_FAILURE, errno, _("error writing to file %s"), dest);
+        if (fputs(line, out) == EOF)
+            ERR(_("error writing to file %s"), dest);
         length = getline(&line, &n, in);
     }
 
@@ -1576,8 +1563,7 @@ get_options(dav_args *args, char *option)
     while (*option != 0) {
         so = getsubopt(&option, suboptions, &argument);
         if ((!argument) && (so < USER))
-            error(EXIT_FAILURE, 0,
-                 _("option %s requires argument"), suboptions[so]);
+            ERR(_("option %s requires argument"), suboptions[so]);
         switch (so) {
         case CONF:
             if (args->conf)
@@ -1672,9 +1658,9 @@ new_args(void)
     if (getuid() != 0) {
         struct passwd *pw = getpwuid(getuid());
         if (!pw)
-            error(EXIT_FAILURE, errno, _("can't read user data base"));
+            ERR(_("can't read user data base"));
         if (!pw->pw_dir)
-            error(EXIT_FAILURE, 0, _("can't read user data base"));
+            ERR(_("can't read user data base"));
         user_dir = ne_concat(pw->pw_dir, "/.", PACKAGE, NULL);
     }
 
@@ -2106,8 +2092,7 @@ read_config(dav_args *args, const char * filename, int system)
         if (count == 1) {
 
             if (*parmv[0] != '[' || *(parmv[0] + strlen(parmv[0]) - 1) != ']')
-                error_at_line(EXIT_FAILURE, 0, filename, lineno,
-                              _("malformed line"));
+                ERR_AT_LINE(filename, lineno, _("malformed line"));
             *(parmv[0] + strlen(parmv[0]) - 1) = '\0';
             char *mp = canonicalize_file_name(parmv[0] + 1);
             if (mp) {
@@ -2120,11 +2105,11 @@ read_config(dav_args *args, const char * filename, int system)
             if (system && strcmp(parmv[0], "dav_user") == 0) {
                 if (args->dav_user)
                     free(args->dav_user);
-                args->dav_user = ne_strdup(parmv[1]); 
+                args->dav_user = ne_strdup(parmv[1]);
             } else if (system && strcmp(parmv[0], "dav_group") == 0) {
                 if (args->dav_group)
                     free(args->dav_group);
-                args->dav_group = ne_strdup(parmv[1]); 
+                args->dav_group = ne_strdup(parmv[1]);
             } else if (strcmp(parmv[0], "buf_size") == 0) {
                 args->buf_size = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "trust_ca_cert") == 0
@@ -2139,7 +2124,7 @@ read_config(dav_args *args, const char * filename, int system)
             } else if (!system && strcmp(parmv[0], "secrets") == 0) {
                 if (args->secrets)
                     free(args->secrets);
-                args->secrets = ne_strdup(parmv[1]); 
+                args->secrets = ne_strdup(parmv[1]);
             } else if (strcmp(parmv[0], "clientcert") == 0) {
                 if (args->clicert)
                     free(args->clicert);
@@ -2147,8 +2132,7 @@ read_config(dav_args *args, const char * filename, int system)
             } else if (system && strcmp(parmv[0], "proxy") == 0) {
                 if (split_uri(NULL, &args->p_host, &args->p_port, NULL,
                               parmv[1]) != 0)
-                    error_at_line(EXIT_FAILURE, 0, filename, lineno,
-                                  _("malformed line"));
+                    ERR_AT_LINE(filename, lineno, _("malformed line"));
             } else if (system && strcmp(parmv[0], "use_proxy") == 0) {
                 args->useproxy = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "ask_auth") == 0) {
@@ -2185,7 +2169,7 @@ read_config(dav_args *args, const char * filename, int system)
 #if NE_VERSION_MAJOR > 0 || NE_VERSION_MINOR > 30
                 args->sharepoint_href_bug = arg_to_int(parmv[1], 10, parmv[0]);
 #else
-                error(EXIT_FAILURE, 0, _("Option sharepoint_href_bug requires "
+                ERR(_("Option sharepoint_href_bug requires "
                       "Neon version 0.31 or newer"));
 #endif
             } else if (strcmp(parmv[0], "connect_timeout") == 0) {
@@ -2193,7 +2177,7 @@ read_config(dav_args *args, const char * filename, int system)
             } else if (strcmp(parmv[0], "read_timeout") == 0) {
                 args->read_timeout = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "retry") == 0) {
-                args->retry = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->retry = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "max_retry") == 0) {
                 args->max_retry = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "max_upload_attempts") == 0) {
@@ -2205,35 +2189,34 @@ read_config(dav_args *args, const char * filename, int system)
             } else if (system && strcmp(parmv[0], "cache_dir") == 0) {
                 if (args->sys_cache)
                     free(args->sys_cache);
-                args->sys_cache = ne_strdup(parmv[1]); 
+                args->sys_cache = ne_strdup(parmv[1]);
             } else if (!system && strcmp(parmv[0], "cache_dir") == 0) {
                 if (args->cache_dir != NULL)
                     free(args->cache_dir);
-                args->cache_dir = ne_strdup(parmv[1]); 
+                args->cache_dir = ne_strdup(parmv[1]);
             } else if (strcmp(parmv[0], "backup_dir") == 0) {
                 if (args->backup_dir)
                     free(args->backup_dir);
-                args->backup_dir = ne_strdup(parmv[1]); 
+                args->backup_dir = ne_strdup(parmv[1]);
             } else if (strcmp(parmv[0], "cache_size") == 0) {
-                args->cache_size = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->cache_size = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "table_size") == 0) {
-                args->table_size = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->table_size = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "dir_refresh") == 0) {
-                args->dir_refresh = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->dir_refresh = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "file_refresh") == 0) {
-                args->file_refresh = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->file_refresh = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "delay_upload") == 0) {
-                args->delay_upload = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->delay_upload = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "gui_optimize") == 0) {
-                args->gui_optimize = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->gui_optimize = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "minimize_mem") == 0) {
-                args->minimize_mem = arg_to_int(parmv[1], 10, parmv[0]); 
+                args->minimize_mem = arg_to_int(parmv[1], 10, parmv[0]);
             } else if (strcmp(parmv[0], "debug") == 0) {
                 args->debug |= debug_opts(parmv[1]);
                 args->neon_debug |= debug_opts_neon(parmv[1]);
             } else {
-                error_at_line(EXIT_FAILURE, 0, filename, lineno,
-                              _("unknown option"));
+                ERR_AT_LINE(filename, lineno, _("unknown option"));
             }
 
         } else if (applies && count == 3) {
@@ -2245,14 +2228,12 @@ read_config(dav_args *args, const char * filename, int system)
                 if (tmp)
                     free(tmp);
             } else {
-                error_at_line(EXIT_FAILURE, 0, filename, lineno,
-                              _("unknown option"));
+                ERR_AT_LINE(filename, lineno, _("unknown option"));
             }
 
         } else if (count < 0 || count > 3) {
 
-            error_at_line(EXIT_FAILURE, 0, filename, lineno,
-                          _("malformed line"));
+            ERR_AT_LINE(filename, lineno, _("malformed line"));
         }
 
         length = getline(&line, &n, file);
@@ -2265,7 +2246,7 @@ read_config(dav_args *args, const char * filename, int system)
 }
 
 /* Reads environment variable no_proxy. no_proxy must be a comma separated
-   list of domain names. If no_proxy is "*" or args->p_host matches any of 
+   list of domain names. If no_proxy is "*" or args->p_host matches any of
    the entries in the no_proxy-list, args->p_host is removed. */
 static void
 read_no_proxy_list(dav_args *args)
@@ -2305,7 +2286,7 @@ read_no_proxy_list(dav_args *args)
             if (strcasecmp(host, np) == 0) {
                 free(args->p_host);
                 args->p_host = NULL;
-            } 
+            }
         }
 
         free(host);
@@ -2327,10 +2308,10 @@ read_secrets(dav_args *args, const char *filename)
         return;
     }
     if (st.st_uid != geteuid())
-        error(EXIT_FAILURE, 0, _("file %s has wrong owner"), filename);
+        ERR(_("file %s has wrong owner"), filename);
     if ((st.st_mode &
           (S_IXUSR | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)) != 0)
-        error(EXIT_FAILURE, 0, _("file %s has wrong permissions"), filename);
+        ERR(_("file %s has wrong permissions"), filename);
 
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -2350,8 +2331,7 @@ read_secrets(dav_args *args, const char *filename)
         int count;
         count = parse_line(line, parmc, parmv);
         if (count != 0 && count != 3 && count != 2)
-            error_at_line(EXIT_FAILURE, 0, filename, lineno,
-                          _("malformed line"));
+            ERR_AT_LINE(filename, lineno, _("malformed line"));
 
         if (count == 2 || count == 3) {
 
@@ -2417,8 +2397,7 @@ read_secrets(dav_args *args, const char *filename)
                            || strcmp(parmv[0], ccert) == 0)) {
 
                 if (count != 2)
-                    error_at_line(EXIT_FAILURE, 0, filename, lineno,
-                                  _("malformed line"));
+                    ERR_AT_LINE(filename, lineno, _("malformed line"));
                 if (args->clicert_pw) {
                     memset(args->clicert_pw, '\0', strlen(args->clicert_pw));
                     free(args->clicert_pw);

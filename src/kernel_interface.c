@@ -1,5 +1,6 @@
 /*  kernel_interface.c.
     Copyright (C) 2006, 2007, 2008, 2009, 2014, 2020 Werner Baumann
+    Copyright (C) 2022  Ali Abdallah <ali.abdallah@suse.com>
 
     This file is part of davfs2.
 
@@ -20,8 +21,6 @@
 
 #include "config.h"
 
-#include <errno.h>
-#include <error.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -54,6 +53,7 @@
 #endif
 #include <sys/wait.h>
 
+#include "util.h"
 #include "defaults.h"
 #include "mount_davfs.h"
 #include "cache.h"
@@ -83,7 +83,7 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
 {
     uid_t orig = geteuid();
     if (seteuid(0) != 0)
-        error(EXIT_FAILURE, 0, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
 
     char *path;
     if (asprintf(&path, "%s/%s", DAV_DEV_DIR, FUSE_DEV_NAME) < 0)
@@ -92,7 +92,7 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
     *dev = open(path, O_RDWR | O_NONBLOCK);
 
     if (*dev <= 0) {
-        error(0, 0, _("loading kernel module fuse"));
+        ERR(_("loading kernel module fuse"));
         int ret;
         pid_t pid = fork();
         if (pid == 0) {
@@ -106,13 +106,13 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
         }
 
         if (ret) {
-            error(0, 0, _("loading kernel module fuse failed"));
+            WARN(_("loading kernel module fuse failed"));
         } else {
             *dev = open(path, O_RDWR | O_NONBLOCK);
         }
 
         if (*dev <= 0) {
-            error(0, 0, _("waiting for /dev/fuse to be created"));
+            WARN(_("waiting for /dev/fuse to be created"));
             sleep(2); 
             *dev = open(path, O_RDWR | O_NONBLOCK);
         }
@@ -120,7 +120,7 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
 
     free(path);
     if (*dev <= 0) {
-        error(EXIT_FAILURE, 0, _("can't open fuse device"));
+        ERR(_("can't open fuse device"));
     }
 
     if (*buf_size < (FUSE_MIN_READ_BUFFER + 4096)) {
@@ -133,10 +133,10 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
                  args->gid, (unsigned long int) (*buf_size - 4096)) < 0)
         abort();
     if (mount(url, mpoint, "fuse", args->mopts, mdata) != 0) {
-        error(EXIT_FAILURE, errno, _("mounting failed"));
+        ERR(_("mounting failed"));
     }
 
     free(mdata);
     if (seteuid(orig) != 0)
-        error(EXIT_FAILURE, 0, _("can't change effective user id"));
+        ERR(_("can't change effective user id"));
 }

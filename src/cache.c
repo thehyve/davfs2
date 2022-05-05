@@ -24,7 +24,6 @@
 #include <dirent.h>
 #endif
 #include <errno.h>
-#include <error.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -68,6 +67,7 @@
 #include "mount_davfs.h"
 #include "webdav.h"
 #include "cache.h"
+#include "util.h"
 
 #ifdef ENABLE_NLS
 #define _(String) gettext(String)
@@ -649,19 +649,18 @@ dav_init_cache(const dav_args *args, const char *mpoint)
         ret = update_directory(root, 0);
     }
     if (ret == EAGAIN) {
-        error(0, 0, _("connection timed out two times;\n"
-                      "trying one last time"));
+        WARN(_("connection timed out two times;\n"
+             "trying one last time"));
         root->utime = 0;
         ret = update_directory(root, 0);
         if (!ret)
             printf(_("Last try succeeded.\n"));
     }
     if (ret == EAGAIN) {
-        error(0, 0, _("server temporarily unreachable;\n"
-                      "mounting anyway"));
+        WARN(_("server temporarily unreachable;\n"
+             "mounting anyway"));
     } else if (ret) {
-        error(EXIT_FAILURE, 0, _("Mounting failed.\n%s"),
-              dav_get_webdav_error());
+        ERR(_("Mounting failed.\n%s"), dav_get_webdav_error());
     } else {
         dav_statfs();
     }
@@ -2761,7 +2760,7 @@ check_cache_dir(const char *dir, const char *host, const char *path,
 {
     struct passwd *pw = getpwuid(default_uid);
     if (!pw || !pw->pw_name)
-        error(EXIT_FAILURE, 0, _("can't read user data base"));
+        ERR(_("can't read user data base"));
     char *dir_name = ne_concat(host, path, mpoint + 1, "+", pw->pw_name, NULL);
     *(dir_name + strlen(host) + strlen(path) - 1) = '+';
     char *pos = strchr(dir_name, '/');
@@ -2772,7 +2771,7 @@ check_cache_dir(const char *dir, const char *host, const char *path,
 
     DIR *tl_dir = opendir(dir);
     if (!tl_dir)
-        error(EXIT_FAILURE, 0, _("can't open cache directory %s"), dir);
+        ERR(_("can't open cache directory %s"), dir);
 
     struct dirent *de = readdir(tl_dir);
     while (de && !cache_dir) {
@@ -2787,21 +2786,18 @@ check_cache_dir(const char *dir, const char *host, const char *path,
     if (!cache_dir) {
         cache_dir = ne_concat(dir, "/", dir_name, NULL);
         if (mkdir(cache_dir, S_IRWXU) != 0)
-            error(EXIT_FAILURE, 0, _("can't create cache directory %s"),
+            ERR(_("can't create cache directory %s"),
             cache_dir);
     }
     free(dir_name);
 
     struct stat st;
     if (stat(cache_dir, &st) != 0)
-        error(EXIT_FAILURE, 0, _("can't access cache directory %s"),
-              cache_dir);
+        ERR(_("can't access cache directory %s"), cache_dir);
     if (st.st_uid != geteuid())
-        error(EXIT_FAILURE, 0, _("wrong owner of cache directory %s"),
-              cache_dir);
+        ERR(_("wrong owner of cache directory %s"), cache_dir);
     if ((DAV_A_MASK & st.st_mode) != S_IRWXU)
-        error(EXIT_FAILURE, 0,
-              _("wrong permissions set for cache directory %s"), cache_dir);
+        ERR(_("wrong permissions set for cache directory %s"), cache_dir);
 }
 
 

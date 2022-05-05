@@ -28,7 +28,7 @@ ssbindir = @ssbindir@
 sbin_PROGRAMS = mount.davfs umount.davfs
 mount_davfs_SOURCES = cache.c \
         dav_fuse.c kernel_interface.c mount_davfs.c webdav.c \
-        cache.h defaults.h fuse_kernel.h \
+        cache.h defaults.h fuse_kernel.h util.h \
         kernel_interface.h mount_davfs.h webdav.h
 umount_davfs_SOURCES = umount_davfs.c defaults.h
 

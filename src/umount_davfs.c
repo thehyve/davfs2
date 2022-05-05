@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include <error.h>
-#include <errno.h>
 #include <getopt.h>
 #ifdef HAVE_LIBINTL_H
 #include <libintl.h>
@@ -40,6 +38,7 @@
 
 #include <ne_string.h>
 
+#include "util.h"
 #include "defaults.h"
 
 #ifdef ENABLE_NLS
@@ -108,15 +107,15 @@ main(int argc, char *argv[])
         case '?':
             break;
         default:
-            error(EXIT_FAILURE, 0, _("unknown error parsing arguments"));
+            ERR(_("unknown error parsing arguments"));
         }
         o = getopt_long(argc, argv, short_options, options, NULL);
     }
 
     if (optind > (argc - 1))
-        error(EXIT_FAILURE, 0, _("missing argument"));
+        ERR(_("missing argument"));
     if (optind < (argc - 1))
-        error(EXIT_FAILURE, 0, _("too many arguments"));
+        ERR(_("too many arguments"));
 
     char *mpoint = canonicalize_file_name(argv[optind]);
 
@@ -125,11 +124,10 @@ main(int argc, char *argv[])
         umount_command = ne_concat("umount -i '", mpoint, "'", NULL);
     } else {
         umount_command = ne_concat("umount -i '", argv[optind], "'", NULL);
-        error(0, 0,
-              _("\n"
-                "  can't evaluate PID file name;\n"
-                "  trying to unmount anyway;\n"
-                "  please wait for %s to terminate"), PROGRAM_NAME);
+        ERR(_("\n"
+              "  can't evaluate PID file name;\n"
+              "  trying to unmount anyway;\n"
+              "  please wait for %s to terminate"), PROGRAM_NAME);
         return system(umount_command);
     }
 
@@ -148,11 +146,10 @@ main(int argc, char *argv[])
     char *pid = NULL;
     FILE *file = fopen(pidfile, "r");
     if (!file || fscanf(file, "%m[0-9]", &pid) != 1 || !pid) {
-        error(0, 0,
-              _("\n"
-                "  can't read PID from file %s;\n"
-                "  trying to unmount anyway;\n"
-                "  please wait for %s to terminate"), pidfile, PROGRAM_NAME);
+        WARN(_("\n"
+               "  can't read PID from file %s;\n"
+               "  trying to unmount anyway;\n"
+               "  please wait for %s to terminate"), pidfile, PROGRAM_NAME);
         return system(umount_command);
     }
     fclose(file);
@@ -160,11 +157,10 @@ main(int argc, char *argv[])
     char *ps_command = ne_concat("ps -p ", pid, NULL);
     FILE *ps_in = popen(ps_command, "r");
     if (!ps_in) {
-        error(0, 0,
-              _("\n"
-                "  can't read process list;\n"
-                "  trying to unmount anyway;\n"
-                "  please wait for %s to terminate"), PROGRAM_NAME);
+        WARN(_("\n"
+               "  can't read process list;\n"
+               "  trying to unmount anyway;\n"
+               "  please wait for %s to terminate"), PROGRAM_NAME);
         return system(umount_command);
     }
 
@@ -176,11 +172,10 @@ main(int argc, char *argv[])
     pclose(ps_in);
 
     if (!found) {
-        error(0, 0,
-              _("\n"
-                "  can't find %s-process with pid %s;\n"
-                "  trying to unmount anyway.\n"
-                "  you propably have to remove %s manually"),
+        WARN(_("\n"
+               "  can't find %s-process with pid %s;\n"
+               "  trying to unmount anyway.\n"
+               "  you propably have to remove %s manually"),
              PROGRAM_NAME, pid, pidfile);
         return system(umount_command);
     }
@@ -201,7 +196,7 @@ main(int argc, char *argv[])
         ps_in = popen(ps_command, "r");
         if (!ps_in) {
             printf("\n");
-            error(EXIT_FAILURE, 0, _("an error occurred while waiting; "
+            ERR(_("an error occurred while waiting; "
                   "please wait for %s to terminate"), PROGRAM_NAME);
         }
 
