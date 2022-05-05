@@ -143,9 +143,10 @@ main(int argc, char *argv[])
     char *pidfile = ne_concat(DAV_SYS_RUN, "/", mp, ".pid", NULL);
     free(mp);
 
-    char *pid = NULL;
+    char pid[32];
+    memset (pid, '\0', sizeof(pid));
     FILE *file = fopen(pidfile, "r");
-    if (!file || fscanf(file, "%m[0-9]", &pid) != 1 || !pid) {
+    if (!file || fscanf(file, "%s[0-9]", pid) != 1 || pid[0] == '\0') {
         WARN(_("\n"
                "  can't read PID from file %s;\n"
                "  trying to unmount anyway;\n"
