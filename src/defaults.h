@@ -25,6 +25,14 @@
 /* Misc. */
 /*=======*/
 
+#ifdef __FreeBSD__
+#define MS_NOSUID  MNT_NOSUID
+#define MS_NOEXEC  MNT_NOEXEC
+#define MS_RDONLY  MNT_RDONLY
+#define MS_MGC_VAL 0
+#define MS_NODEV   0
+#endif
+
 /* File system type to be used with 'mount -t' and fstab. */
 #define DAV_FS_TYPE "davfs"
 

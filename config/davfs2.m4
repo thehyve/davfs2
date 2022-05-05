@@ -181,6 +181,6 @@ Configuration for building davfs2 AC_PACKAGE_VERSION:
   Neon Library:              ${neon_library_message}
                              ${ne_SSL_message}
   Native Language Support:   ${dav_nls}
-
+  Host                       ${host_os}
 EOF
 ])

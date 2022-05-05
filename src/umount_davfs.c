@@ -49,6 +49,12 @@
 #define bindtextdomain(Domainname, Dirname)
 #endif
 
+#if defined(__linux__)
+#define UMOUNT_CMD "umount -i"
+#elif defined(__FreeBSD__)
+#define UMOUNT_CMD "umount"
+#endif
+
 
 /* This is lazy programming. All the dirty work is left to the real umount
    program, while we just sit and wait for mount.davfs to terminate.
@@ -117,13 +123,13 @@ main(int argc, char *argv[])
     if (optind < (argc - 1))
         ERR(_("too many arguments"));
 
-    char *mpoint = canonicalize_file_name(argv[optind]);
+    char *mpoint = mcanonicalize_file_name(argv[optind]);
 
     char *umount_command = NULL;
     if (mpoint) {
-        umount_command = ne_concat("umount -i '", mpoint, "'", NULL);
+        umount_command = ne_concat(UMOUNT_CMD " '", mpoint, "'", NULL);
     } else {
-        umount_command = ne_concat("umount -i '", argv[optind], "'", NULL);
+        umount_command = ne_concat(UMOUNT_CMD " '", argv[optind], "'", NULL);
         ERR(_("\n"
               "  can't evaluate PID file name;\n"
               "  trying to unmount anyway;\n"

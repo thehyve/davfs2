@@ -57,7 +57,6 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
-#include <sys/xattr.h>
 
 #include <ne_alloc.h>
 #include <ne_string.h>

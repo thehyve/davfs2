@@ -100,9 +100,11 @@ static char *url;
 /* The canonicalized mointpoint. */
 static char *mpoint;
 
+#ifdef __linux__
 /* The file that holds information about mounted filesystems
    (/proc/mounts or /etc/mtab) */
 static char *mounts;
+#endif
 
 /* The PID file */
 static char *pidfile;
@@ -429,6 +431,8 @@ check_dirs(dav_args *args)
 {
     struct stat st;
 
+#ifdef __linux__
+
     if (lstat(_PATH_MOUNTED, &st) != 0)
         ERR(_("can't access file %s"), _PATH_MOUNTED);
     int mtab_is_link = S_ISLNK(st.st_mode);
@@ -461,6 +465,7 @@ check_dirs(dav_args *args)
         }
         free(utab_dir);
     }
+#endif
 
     if (seteuid(0) != 0)
         ERR(_("can't change effective user id"));
@@ -611,6 +616,7 @@ check_dirs(dav_args *args)
 static char *
 check_double_mounts(dav_args *args)
 {
+#ifdef __linux__
     FILE *mtab = setmntent(mounts, "r");
     if (!mtab)
         ERR(_("can't open file %s"), mounts);
@@ -623,6 +629,7 @@ check_double_mounts(dav_args *args)
         mt = getmntent(mtab);
     }
     endmntent(mtab);
+#endif
 
     char *m = mpoint;
     while (*m == '/')
@@ -656,6 +663,7 @@ check_double_mounts(dav_args *args)
 static void
 check_fstab(const dav_args *args)
 {
+#ifdef __linux__
     dav_args *n_args = new_args();
     n_args->mopts = DAV_USER_MOPTS;
 
@@ -666,7 +674,7 @@ check_fstab(const dav_args *args)
     struct mntent *ft = getmntent(fstab);
     while (ft) {
         if (ft->mnt_dir) {
-            char *mp = canonicalize_file_name(ft->mnt_dir);
+            char *mp = mcanonicalize_file_name(ft->mnt_dir);
             if (mp) {
                 if (strcmp(mp, mpoint) == 0) {
                     free(mp);
@@ -722,6 +730,7 @@ check_fstab(const dav_args *args)
         ERR(_("different file_mode in %s"), _PATH_MNTTAB);
 
     delete_args(n_args);
+#endif
 }
 
 
@@ -806,6 +815,7 @@ static int
 is_mounted(void)
 {
     int found = 0;
+#ifdef __linux__
     FILE *mtab = setmntent(mounts, "r");
     if (mtab) {
         struct mntent *mt = getmntent(mtab);
@@ -817,6 +827,7 @@ is_mounted(void)
         }
     }
     endmntent(mtab);
+#endif
     return found;
 }
 
@@ -902,7 +913,7 @@ parse_commandline(int argc, char *argv[])
             url = ne_strdup(argv[i]);
         }
         i++;
-        mpoint = canonicalize_file_name(argv[i]);
+        mpoint = mcanonicalize_file_name(argv[i]);
         if (!mpoint)
             ERR(_("can't evaluate path of mount point %s"), mpoint);
         break;
@@ -1213,6 +1224,7 @@ termination_handler(int signo)
 static void
 write_mtab_entry(const dav_args *args)
 {
+#ifdef __linux__
     struct mntent mntent;
     mntent.mnt_opts = NULL;
     char *utab_line = NULL;
@@ -1321,6 +1333,7 @@ write_mtab_entry(const dav_args *args)
         free(utab_line);
     if (mntent.mnt_opts)
         free(mntent.mnt_opts);
+#endif
 }
 
 
@@ -1506,6 +1519,9 @@ delete_args(dav_args *args)
 static void
 get_options(dav_args *args, char *option)
 {
+#ifdef NODEV
+#undef NODEV
+#endif
     enum {
         CONF = 0,
         USERNAME,
@@ -2094,7 +2110,7 @@ read_config(dav_args *args, const char * filename, int system)
             if (*parmv[0] != '[' || *(parmv[0] + strlen(parmv[0]) - 1) != ']')
                 ERR_AT_LINE(filename, lineno, _("malformed line"));
             *(parmv[0] + strlen(parmv[0]) - 1) = '\0';
-            char *mp = canonicalize_file_name(parmv[0] + 1);
+            char *mp = mcanonicalize_file_name(parmv[0] + 1);
             if (mp) {
                 applies = (strcmp(mp, mpoint) == 0);
                 free(mp);
@@ -2344,7 +2360,7 @@ read_secrets(dav_args *args, const char *filename)
             if (scheme && !port)
                 port = ne_uri_defaultport(scheme);
 
-            char *mp = canonicalize_file_name(parmv[0]);
+            char *mp = mcanonicalize_file_name(parmv[0]);
 
             char *ccert = NULL;
             if (args->clicert) {

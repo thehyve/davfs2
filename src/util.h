@@ -26,7 +26,6 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <err.h>
-#include <error.h>
 
 #ifdef ERR
 #undef ERR
@@ -55,7 +54,31 @@
    }\
 }
 
+#ifdef __FreeBSD__
+#define ERR_AT_LINE(filename, lineno, fmt, ...) {\
+    fprintf(stderr, "%s:%d :", filename, lineno); \
+    if (errno != 0) \
+        err(EXIT_FAILURE, fmt, ## __VA_ARGS__); \
+    else \
+        fprintf(stderr, fmt, ## __VA_ARGS__); \
+    fprintf(stderr, "\n"); \
+    exit(EXIT_FAILURE); \
+}
+#endif
+
+#ifdef __linux__
+#include <error.h>
 #define ERR_AT_LINE(filename, lineno, fmt, ...) \
     error_at_line(EXIT_FAILURE, 0, filename, lineno, fmt, ## __VA_ARGS__);
+#endif
+
+#ifdef __FreeBSD__
+#define mcanonicalize_file_name(path) \
+    realpath(path, NULL)
+#endif
+
+#ifdef __linux__
+#define mcanonicalize_file_name canonicalize_file_name
+#endif
 
 #endif /* __DAVFS_UTIL_H */

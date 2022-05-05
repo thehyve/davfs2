@@ -50,6 +50,10 @@ DEFS = -DPROGRAM_NAME=\"mount.davfs\" \
        -D_FORTIFY_SOURCE=2 @DEFS@
 LIBS = $(NEON_LIBS) @LIBS@
 
+if HOST_TYPE_FREEBSD
+LIBS += @LIBICONV@
+endif
+
 install-exec-hook:
 	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \
 	if test "$(sbindir)" != "$(ssbindir)"; then \

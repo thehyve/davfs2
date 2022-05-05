@@ -47,6 +47,7 @@
 
 #ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>
+#include <sys/uio.h>
 #endif
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
@@ -73,6 +74,59 @@
 /* Name of the device to communicate with the kernel file system. */
 #define FUSE_DEV_NAME "fuse"
 
+#ifdef __FreeBSD__
+enum { DAV_IOV_FSTYPE, DAV_IOV_ALLOW_OTHER, DAV_IOV_FSPATH, DAV_IOV_FSNAME,
+       DAV_IOV_FD, DAV_IOV_MAX_READ, DAV_IOV_ERR, DAV_IOV_MAX};
+
+/* max pairs of iovec mount options */
+#define DAV_MAX_IOVEC_LEN (DAV_IOV_MAX + 1) * 2
+
+/* Code taken from FreeBSD sbin/mount */
+static void
+add_iovec_opt(struct iovec **iov, int *iovlen, const char *name, void *val,
+        size_t len)
+{
+    int i;
+
+    if (*iovlen < 0)
+        return;
+
+    i = *iovlen;
+
+    if (i + 2 > (DAV_MAX_IOVEC_LEN))
+    {
+        ERR("DAV_MAX_IOVEC_LEN reached\n");
+    }
+
+    (*iov)[i].iov_base = strdup(name);
+    (*iov)[i].iov_len = strlen(name) + 1;
+
+    i++;
+
+    (*iov)[i].iov_base = val;
+
+    if (len == (size_t)-1) {
+        if (val != NULL)
+            len = strlen(val) + 1;
+        else
+            len = 0;
+    }
+    (*iov)[i].iov_len = (int)len;
+    *iovlen = ++i;
+}
+
+static void free_iovec (struct iovec *iov, int iovlen)
+{
+    int i = 0;
+    for (i = 0; i <= iovlen;  i+=2)
+    {
+        if (iov[i].iov_base)
+            free(iov[i].iov_base);
+    }
+
+    free(iov);
+}
+#endif
 
 /* Public functions */
 /*==================*/
@@ -81,6 +135,18 @@ void
 dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
                           const char *mpoint, const dav_args *args)
 {
+#ifdef __FreeBSD__
+    struct iovec *iov;
+    int iovlen;
+    char errmsg[255];
+    char fdstr[15];
+    char bufstr[15];
+
+    iovlen = 0;
+    iov = NULL;
+    memset(errmsg, 0, sizeof(errmsg));
+#endif
+
     uid_t orig = geteuid();
     if (seteuid(0) != 0)
         ERR(_("can't change effective user id"));
@@ -96,7 +162,11 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
         int ret;
         pid_t pid = fork();
         if (pid == 0) {
+#if defined(__FreeBSD__)
+            execl("/sbin/kldload", "kldload", "fusefs", NULL);
+#elif defined(__linux__)
             execl("/sbin/modprobe", "modprobe", "fuse", NULL);
+#endif
             _exit(EXIT_FAILURE);
         } else if (pid < 0) {
             exit(EXIT_FAILURE);
@@ -127,6 +197,34 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
         *buf_size = FUSE_MIN_READ_BUFFER + 4096;
     }
 
+#if defined(__FreeBSD__)
+    sprintf(fdstr, "%d", *dev);
+    sprintf(bufstr, "%lu", (unsigned long int) (*buf_size - 4096));
+
+    int allow_other = 1;
+
+    iov = malloc (sizeof (struct iovec) * (DAV_MAX_IOVEC_LEN));
+
+    add_iovec_opt(&iov, &iovlen, "fstype", __DECONST(void *, "fusefs"), (size_t)-1);
+    add_iovec_opt(&iov, &iovlen, "allow_other", __DECONST(void *, &allow_other), (size_t)-1);
+    add_iovec_opt(&iov, &iovlen, "fspath", __DECONST(void *, mpoint), (size_t)-1);
+    add_iovec_opt(&iov, &iovlen, "from", __DECONST(void *, "/dev/fuse"), (size_t)-1);
+
+    add_iovec_opt(&iov, &iovlen, "fsname=", __DECONST(void *, url), strlen(url)+1);
+    add_iovec_opt(&iov, &iovlen, "fd", fdstr, (size_t)-1);
+    add_iovec_opt(&iov, &iovlen, "max_read=", bufstr, (ssize_t)-1);
+    add_iovec_opt(&iov, &iovlen, "errmsg", errmsg, sizeof(errmsg));
+
+    if (nmount(iov, iovlen, args->mopts) == -1) {
+        if (*errmsg != '\0')
+            err(EXIT_FAILURE, _("mounting failed %s : %s"), url, errmsg);
+        else
+            err(EXIT_FAILURE, _("mounting failed %s"), url);
+    }
+
+    free_iovec(iov, iovlen);
+
+#elif defined(__linux__)
     char *mdata;
     if (asprintf(&mdata, "fd=%i,rootmode=%o,user_id=%i,group_id=%i,"
                  "allow_other,max_read=%lu", *dev, args->dir_mode, args->uid,
@@ -137,6 +235,7 @@ dav_init_kernel_interface(int *dev, size_t *buf_size, const char *url,
     }
 
     free(mdata);
+#endif
     if (seteuid(orig) != 0)
         ERR(_("can't change effective user id"));
 }

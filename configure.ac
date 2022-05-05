@@ -86,6 +86,20 @@ DAV_LFS
 DAV_LINGUAS([de])
 AC_DEFINE([_GNU_SOURCE], 1, [Define to enable GNU extensions])
 
+AC_CANONICAL_HOST
+	AS_CASE([$host],
+		[*-linux*],   [host_type=linux],
+		[*-*freebsd*], [host_type=freebsd],
+		[host_type=unsupported])
+
+if test "$host_type" = "unsupported"; then
+AC_MSG_ERROR([Unsupported host operating system => $host])
+fi
+
+# export to Makefile.am
+AM_CONDITIONAL(HOST_TYPE_LINUX, [test x$host_type = xlinux])
+AM_CONDITIONAL(HOST_TYPE_FREEBSD, [test x$host_type = xfreebsd])
+
 AC_CONFIG_FILES([Makefile
                  po/Makefile.in
                  etc/Makefile

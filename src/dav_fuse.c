@@ -1,5 +1,6 @@
 /*  dav_fuse.c: interface to the fuse kernel module FUSE_KERNEL_VERSION 7.
     Copyright (C) 2006, 2007, 2008. 2009, 2014, 2020 Werner Baumann
+    Copyright (C) 2022  Ali Abdallah <ali.abdallah@suse.com>
 
     This file is part of davfs2.
 
@@ -187,7 +188,11 @@ dav_fuse_loop(int device, char *mpoint, size_t bufsize, time_t idle_time,
             unmounting = 1;
             pid_t pid = fork();
             if (pid == 0) {
+#if defined(__linux__)
                 execl("/bin/umount", "umount", "-il", mountpoint, NULL);
+#elif defined(__FreeBSD__)
+                execl("/sbin/umount", "umount", "-v", mountpoint, NULL);
+#endif
                 _exit(EXIT_FAILURE);
             }
         }
@@ -920,7 +925,7 @@ fuse_stat(void)
     out->st.files = st->files;
     out->st.ffree = st->ffree;
     out->st.namelen = st->namelen;
-    out->st.frsize = 0;
+    out->st.frsize = st->bsize;
     out->st.padding = 0;
     int i;
     for (i = 0; i < 6; i++)
