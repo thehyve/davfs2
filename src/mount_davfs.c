@@ -71,6 +71,8 @@
 #include <sys/types.h>
 #endif
 
+#include <fstab.h>
+
 #include <ne_string.h>
 #include <ne_uri.h>
 #include <ne_utils.h>
@@ -616,20 +618,10 @@ check_dirs(dav_args *args)
 static char *
 check_double_mounts(dav_args *args)
 {
-#ifdef __linux__
-    FILE *mtab = setmntent(mounts, "r");
-    if (!mtab)
-        ERR(_("can't open file %s"), mounts);
-    struct mntent *mt = getmntent(mtab);
-    while (mt) {
-        if (strcmp(mpoint, mt->mnt_dir) == 0
-                && strcmp(url, mt->mnt_fsname) == 0)
-            ERR(_("%s is already mounted on %s"), url,
-                  mpoint);
-        mt = getmntent(mtab);
+    if (is_mounted()) {
+        ERR(_("%s is already mounted on %s"), url,
+            mpoint);
     }
-    endmntent(mtab);
-#endif
 
     char *m = mpoint;
     while (*m == '/')
@@ -663,18 +655,17 @@ check_double_mounts(dav_args *args)
 static void
 check_fstab(const dav_args *args)
 {
-#ifdef __linux__
     dav_args *n_args = new_args();
     n_args->mopts = DAV_USER_MOPTS;
 
-    FILE *fstab = setmntent(_PATH_MNTTAB, "r");
-    if (!fstab)
-        ERR(_("can't open file %s"), _PATH_MNTTAB);
+    struct fstab *ft;
 
-    struct mntent *ft = getmntent(fstab);
-    while (ft) {
-        if (ft->mnt_dir) {
-            char *mp = mcanonicalize_file_name(ft->mnt_dir);
+    if (setfsent() == 0)
+        ERR(_("can't open file %s"), _PATH_FSTAB);
+
+    while ((ft = getfsent()) != NULL) {
+        if (ft->fs_file) {
+            char *mp = mcanonicalize_file_name(ft->fs_file);
             if (mp) {
                 if (strcmp(mp, mpoint) == 0) {
                     free(mp);
@@ -683,54 +674,52 @@ check_fstab(const dav_args *args)
                 free(mp);
             }
         }
-        ft = getmntent(fstab);
     }
+    (void) endfsent();
+
 
     if (!ft)
         ERR(_("no entry for %s found in %s"), mpoint,
-              _PATH_MNTTAB);
+              _PATH_FSTAB);
 
-    if (strcmp(url, ft->mnt_fsname) != 0) {
-        ERR(_("different URL in %s"), _PATH_MNTTAB);
+    if (strcmp(url, ft->fs_spec) != 0) {
+        ERR(_("different URL in %s"), _PATH_FSTAB);
     }
 
-    if (!ft->mnt_type || strcmp(DAV_FS_TYPE, ft->mnt_type) != 0)
-        ERR(_("different file system type in %s"),
-              _PATH_MNTTAB);
+    if (!ft->fs_vfstype || strcmp(DAV_FS_TYPE, ft->fs_vfstype) != 0)
+        ERR(_("different file system type in %s %s %s"), ft->fs_vfstype, DAV_FS_TYPE,
+              _PATH_FSTAB);
 
-    if (ft->mnt_opts)
-        get_options(n_args, ft->mnt_opts);
-
-    endmntent(fstab);
+    if (ft->fs_mntops)
+        get_options(n_args, ft->fs_mntops);
 
     if (args->conf || n_args->conf) {
         if (!args->conf || !n_args->conf
                 || strcmp(args->conf, n_args->conf) != 0)
             ERR(_("different config file in %s"),
-                  _PATH_MNTTAB);
+                  _PATH_FSTAB);
     }
     if (args->cl_username || n_args->cl_username) {
         if (!args->cl_username || !n_args->cl_username
                 || strcmp(args->cl_username, n_args->cl_username) != 0)
-            ERR(_("different username in %s"), _PATH_MNTTAB);
+            ERR(_("different username in %s"), _PATH_FSTAB);
     }
     if (!n_args->user && !n_args->users)
         ERR(_("neither option `user' nor option `users' set in %s"),
-             _PATH_MNTTAB);
+             _PATH_FSTAB);
     if (args->mopts != n_args->mopts || args->grpid != n_args->grpid)
         ERR(_("different mount options in %s"),
-              _PATH_MNTTAB);
+              _PATH_FSTAB);
     if (args->uid != n_args->uid)
-        ERR(_("different uid in %s"), _PATH_MNTTAB);
+        ERR(_("different uid in %s"), _PATH_FSTAB);
     if (args->gid != n_args->gid)
-        ERR(_("different gid in %s"), _PATH_MNTTAB);
+        ERR(_("different gid in %s"), _PATH_FSTAB);
     if (args->dir_mode != n_args->dir_mode)
-        ERR(_("different dir_mode in %s"), _PATH_MNTTAB);
+        ERR(_("different dir_mode in %s"), _PATH_FSTAB);
     if (args->file_mode != n_args->file_mode)
-        ERR(_("different file_mode in %s"), _PATH_MNTTAB);
+        ERR(_("different file_mode in %s"), _PATH_FSTAB);
 
     delete_args(n_args);
-#endif
 }
 
 
@@ -814,20 +803,29 @@ check_permissions(dav_args *args)
 static int
 is_mounted(void)
 {
+    static struct statfs *sfsbuf;
+    size_t sfsbufsize;
+    int mntsize;
+    int i;
     int found = 0;
-#ifdef __linux__
-    FILE *mtab = setmntent(mounts, "r");
-    if (mtab) {
-        struct mntent *mt = getmntent(mtab);
-        while (mt && !found) {
-            if (strcmp(mpoint, mt->mnt_dir) == 0
-                        && strcmp(url, mt->mnt_fsname) == 0)
+
+    mntsize = getfsstat(NULL, 0, MNT_NOWAIT);
+    if (mntsize > 0) {
+        sfsbufsize = (mntsize + 1) * sizeof(struct statfs);
+        if ((sfsbuf = malloc(sfsbufsize)) == NULL)
+            ERR("malloc");
+        mntsize = getfsstat(sfsbuf, (long)sfsbufsize, MNT_NOWAIT);
+        for (i = 0; i < mntsize; i++) {
+            struct statfs *sfs;
+            sfs = &sfsbuf[i];
+            if (strcmp(mpoint, sfs->f_mntonname) == 0
+                && strcmp(url, sfs->f_mntfromname) == 0) {
                 found = 1;
-            mt = getmntent(mtab);
+                break;
+            }
         }
     }
-    endmntent(mtab);
-#endif
+    free(sfsbuf);
     return found;
 }
 
