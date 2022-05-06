@@ -71,6 +71,8 @@
 #include <sys/types.h>
 #endif
 
+#include <sys/sysctl.h>
+
 #include <fstab.h>
 
 #include <ne_string.h>
@@ -92,6 +94,10 @@
 #define bindtextdomain(Domainname, Dirname)
 #endif
 
+
+#ifdef __FreeBSD__
+#define VFS_USERMOUNT "vfs.usermount"
+#endif
 
 /* Private global variables */
 /*==========================*/
@@ -655,10 +661,23 @@ check_double_mounts(dav_args *args)
 static void
 check_fstab(const dav_args *args)
 {
-    dav_args *n_args = new_args();
-    n_args->mopts = DAV_USER_MOPTS;
-
+    dav_args *n_args;
     struct fstab *ft;
+
+#ifdef __FreeBSD__
+    int status;
+    int val;
+    size_t val_len = sizeof(int);
+
+    status = sysctlbyname (VFS_USERMOUNT, &val, &val_len, NULL, 0);
+
+    if (status != 0) {
+        WARN(_("sysctl on " VFS_USERMOUNT " failed"));
+    } else if (val == 1) {
+        /* User mount is set, allow user mouting */
+            return;
+    }
+#endif
 
     if (setfsent() == 0)
         ERR(_("can't open file %s"), _PATH_FSTAB);
@@ -689,6 +708,9 @@ check_fstab(const dav_args *args)
     if (!ft->fs_vfstype || strcmp(DAV_FS_TYPE, ft->fs_vfstype) != 0)
         ERR(_("different file system type in %s %s %s"), ft->fs_vfstype, DAV_FS_TYPE,
               _PATH_FSTAB);
+
+    n_args = new_args();
+    n_args->mopts = DAV_USER_MOPTS;
 
     if (ft->fs_mntops)
         get_options(n_args, ft->fs_mntops);
