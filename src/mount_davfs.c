@@ -71,7 +71,9 @@
 #include <sys/types.h>
 #endif
 
+#ifndef __linux__
 #include <sys/sysctl.h>
+#endif
 
 #include <fstab.h>
 
@@ -822,8 +824,8 @@ check_permissions(dav_args *args)
    url (must be device in the mtab entry) and mpoint (mount point).
    return value : 0 - no matching entry in the mtab-file (not mounted)
                   1 - matching entry in the mtab-file (mounted) */
-static int
-is_mounted(void)
+#ifdef __FreeBSD__
+static int is_mounted_freebsd(void)
 {
     static struct statfs *sfsbuf;
     size_t sfsbufsize;
@@ -849,6 +851,38 @@ is_mounted(void)
     }
     free(sfsbuf);
     return found;
+}
+#endif
+
+#ifdef __linux__
+static int is_mounted_linux(void)
+{
+    int found = 0;
+    FILE *mtab = setmntent(mounts, "r");
+    if (mtab) {
+        struct mntent *mt = getmntent(mtab);
+        while (mt && !found) {
+            if (strcmp(mpoint, mt->mnt_dir) == 0
+                        && strcmp(url, mt->mnt_fsname) == 0)
+                found = 1;
+            mt = getmntent(mtab);
+        }
+    }
+    endmntent(mtab);
+    return found;
+}
+#endif
+
+static int
+is_mounted(void)
+{
+#ifdef __linux__
+    return is_mounted_linux();
+#elif __FreeBSD__
+    return is_mounted_freebsd();
+#else
+    return 0;
+#endif
 }
 
 /* Parses commandline arguments and options and stores them in args and the
