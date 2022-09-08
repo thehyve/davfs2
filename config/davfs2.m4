@@ -78,10 +78,6 @@ AC_DEFUN([DAV_DEFAULTS],[
         [the group, the mount.davfs daemon belongs to [davfs2]])
     if test -z "$dav_group"; then dav_group="davfs2"; fi
 
-    AC_ARG_VAR([ssbindir],
-        [where mount will search for mount-helpers [/sbin]])
-    if test -z "$ssbindir"; then ssbindir="/sbin"; fi
-
     AC_ARG_VAR([dav_localstatedir],
         [directory to store pid-files in [/var/run]])
     if test -z "$dav_localstatedir"; then dav_localstatedir="/var/run"; fi

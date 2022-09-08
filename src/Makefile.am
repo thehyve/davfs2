@@ -23,7 +23,6 @@ localedir = $(datadir)/locale
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 pkglocalstatedir = $(dav_localstatedir)/mount.davfs
 pkgsyscachedir = $(dav_syscachedir)/@PACKAGE@
-ssbindir = @ssbindir@
 
 sbin_PROGRAMS = mount.davfs umount.davfs
 mount_davfs_SOURCES = cache.c \
@@ -55,15 +54,4 @@ LIBS += @LIBICONV@
 endif
 
 install-exec-hook:
-	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs; \
-	if test "$(sbindir)" != "$(ssbindir)"; then \
-	  $(mkinstalldirs) $(DESTDIR)$(ssbindir); \
-	  $(LN_S) -f $(sbindir)/mount.davfs $(DESTDIR)$(ssbindir)/mount.davfs; \
-	  $(LN_S) -f $(sbindir)/umount.davfs $(DESTDIR)$(ssbindir)/umount.davfs; \
-	fi
-
-uninstall-hook:
-	if test "$(sbindir)" != "$(ssbindir)"; then \
-	  rm -f $(DESTDIR)$(ssbindir)/mount.davfs; \
-	  rm -f $(DESTDIR)$(ssbindir)/umount.davfs; \
-	fi
+	chmod u+s $(DESTDIR)$(sbindir)/mount.davfs;
