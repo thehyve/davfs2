@@ -130,7 +130,7 @@ main(int argc, char *argv[])
         umount_command = ne_concat(UMOUNT_CMD " '", mpoint, "'", NULL);
     } else {
         umount_command = ne_concat(UMOUNT_CMD " '", argv[optind], "'", NULL);
-        ERR(_("\n"
+        WARN(_("\n"
               "  can't evaluate PID file name;\n"
               "  trying to unmount anyway;\n"
               "  please wait for %s to terminate"), PROGRAM_NAME);
